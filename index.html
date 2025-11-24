@@ -412,6 +412,9 @@
                         <button onclick="showSection('relatorios')" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium">
                             Relatórios
                         </button>
+                        <button onclick="showSection('equipamentos')" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium">
+                            Equipamentos
+                        </button>
                     </div>
                     
                     <!-- Search and Quick Actions -->
@@ -442,7 +445,10 @@
         <div id="notificationCenter" class="hidden fixed top-16 right-4 z-50 w-full max-w-sm bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200 dark:border-gray-700 max-h-96 overflow-hidden">
             <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Notificações</h3>
-                <button onclick="clearAllNotifications()" class="text-sm text-primary hover:text-primary-dark">Limpar todas</button>
+                <div class="flex items-center gap-3">
+                    <button onclick="markAllNotificationsRead()" class="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">Marcar como lidas</button>
+                    <button onclick="clearAllNotifications()" class="text-sm text-primary hover:text-primary-dark">Limpar todas</button>
+                </div>
             </div>
             <div id="notificationList" class="max-h-80 overflow-y-auto custom-scrollbar p-2">
                 <!-- Notifications will be populated here -->
@@ -760,7 +766,14 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frota</label>
-                                    <input type="text" id="frota" placeholder="Digite a identificação da frota" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <div class="flex gap-2">
+                                        <select id="frotaSelect" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <option value="">Selecione uma frota</option>
+                                            <option value="custom">Outro (digitar)</option>
+                                        </select>
+                                        <button type="button" onclick="showSection('equipamentos')" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Gerenciar</button>
+                                    </div>
+                                    <input type="text" id="frotaCustom" placeholder="Digite a identificação da frota" class="mt-2 hidden w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                                 </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Líder</label>
@@ -1236,6 +1249,66 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Equipamentos Section -->
+            <section id="equipamentos" class="section-content hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Cadastro de Equipamentos</h2>
+                    <p class="text-gray-600 dark:text-gray-400">Cadastre frotas por setor para uso nas inspeções</p>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Novo Equipamento</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Setor</label>
+                            <select id="equipTipo" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="caminhao">Caminhão</option>
+                                <option value="trator">Trator</option>
+                                <option value="colhedora">Colhedora</option>
+                                <option value="reboque">Reboque</option>
+                                <option value="manutencao">Manutenção</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frota</label>
+                            <input type="text" id="equipFrota" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descrição</label>
+                            <input type="text" id="equipDesc" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                            <select id="equipStatus" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="ativo" selected>Ativo</option>
+                                <option value="inativo">Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="addEquipment()" class="px-6 py-3 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors duration-200 font-medium">Salvar</button>
+                        <button onclick="populateEquipmentList()" class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">Atualizar Lista</button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Frotas Cadastradas</h3>
+                        <select id="equipFilterTipo" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                            <option value="all" selected>Todos</option>
+                            <option value="caminhao">Caminhão</option>
+                            <option value="trator">Trator</option>
+                            <option value="colhedora">Colhedora</option>
+                            <option value="reboque">Reboque</option>
+                            <option value="manutencao">Manutenção</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                    <div id="equipList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+            </section>
         </main>
 
         <!-- Success Modal -->
@@ -1281,6 +1354,7 @@
         let currentUser = null;
         let currentEquipment = '';
         let inspections = [];
+        let equipments = [];
         let realtimeChannel = null;
         let pollingTimer = null;
         let currentInspectionId = null;
@@ -1294,6 +1368,10 @@
         function getPendingInspections() { try { return JSON.parse(localStorage.getItem('pendingInspections')) || []; } catch(_) { return []; } }
         function setPendingInspections(list) { try { localStorage.setItem('pendingInspections', JSON.stringify(list)); } catch(_) {} }
         function queueInspection(item) { const q = getPendingInspections(); q.push(item); setPendingInspections(q); }
+        function getCachedEquipments() { try { return JSON.parse(localStorage.getItem('cachedEquipments')) || []; } catch(_) { return []; } }
+        function setCachedEquipments(list) { try { localStorage.setItem('cachedEquipments', JSON.stringify(list)); } catch(_) {} }
+        function getCachedNotifications() { try { return JSON.parse(localStorage.getItem('cachedNotifications')) || []; } catch(_) { return []; } }
+        function setCachedNotifications(list) { try { localStorage.setItem('cachedNotifications', JSON.stringify(list)); } catch(_) {} }
         let currentInspection = {
             items: [],
             results: {ok: 0, notOk: 0, percentage: 0}
@@ -1361,6 +1439,61 @@
                             "Funcionamento do limpador de para-brisa",
                             "Motor de partida"
                         ]
+                    },
+                    {
+                        name: "TRANSMISSÃO",
+                        items: [
+                            "Embreagem (folga/funcionamento)",
+                            "Caixa de câmbio (vazamentos/ruídos)",
+                            "Cardans e cruzetas",
+                            "Acoplamentos e flanges",
+                            "Diferencial (fixação/vazamentos)",
+                            "Semieixos e juntas",
+                            "Suportes e coxins da transmissão"
+                        ]
+                    },
+                    {
+                        name: "EIXO DIANTEIRO",
+                        items: [
+                            "Rolamentos e cubos",
+                            "Manga de eixo",
+                            "Amortecedores",
+                            "Molas/feixes e fixações",
+                            "Barra estabilizadora",
+                            "Barra de direção e terminais",
+                            "Geometria/folgas de direção"
+                        ]
+                    },
+                    {
+                        name: "EIXO TRASEIRO",
+                        items: [
+                            "Molas/feixes e fixações",
+                            "Amortecedores",
+                            "Braços/estabilizadores",
+                            "Rolamentos e cubos",
+                            "Eixo/diferencial (ruídos/vazamentos)"
+                        ]
+                    },
+                    {
+                        name: "SISTEMA PNEUMÁTICO",
+                        items: [
+                            "Reservatórios de ar",
+                            "Válvulas e conexões",
+                            "Mangueiras e flexíveis",
+                            "Câmaras de freio",
+                            "Tubulações do sistema",
+                            "Vazamentos/pressão"
+                        ]
+                    },
+                    {
+                        name: "DIREÇÃO",
+                        items: [
+                            "Bomba da direção",
+                            "Caixa de direção",
+                            "Mangueiras e vazamentos",
+                            "Folgas no sistema",
+                            "Alinhamento/funcionamento"
+                        ]
                     }
                 ]
             },
@@ -1408,6 +1541,159 @@
                             "Alavancas e manoplas",
                             "Retrovisor"
                         ]
+                    },
+                    {
+                        name: "TRANSMISSÃO",
+                        items: [
+                            "Caixa de câmbio",
+                            "Cardans e cruzetas",
+                            "Acoplamentos/Flanges",
+                            "Diferencial (fixação/vazamentos)",
+                            "Semieixos/Juntas",
+                            "Coxins/Suportes"
+                        ]
+                    },
+                    {
+                        name: "EMBREAGEM",
+                        items: [
+                            "Acionamento",
+                            "Folga",
+                            "Desgaste",
+                            "Vazamentos",
+                            "Ajustes"
+                        ]
+                    },
+                    {
+                        name: "DIREÇÃO",
+                        items: [
+                            "Bomba da direção",
+                            "Caixa de direção",
+                            "Mangueiras/Vazamentos",
+                            "Barra/Terminais",
+                            "Folgas",
+                            "Alinhamento"
+                        ]
+                    },
+                    {
+                        name: "EIXO DIANTEIRO",
+                        items: [
+                            "Rolamentos/Cubos",
+                            "Manga de eixo",
+                            "Amortecedores",
+                            "Molas/Feixes e fixações",
+                            "Barra estabilizadora"
+                        ]
+                    },
+                    {
+                        name: "EIXO TRASEIRO",
+                        items: [
+                            "Molas/Feixes e fixações",
+                            "Amortecedores",
+                            "Braços/Estabilizadores",
+                            "Rolamentos/Cubos",
+                            "Eixo/Diferencial (ruídos/vazamentos)"
+                        ]
+                    },
+                    {
+                        name: "SISTEMA HIDRÁULICO",
+                        items: [
+                            "Reservatório e filtros",
+                            "Bombas hidráulicas",
+                            "Válvulas/Distribuidores",
+                            "Mangueiras/Flexíveis",
+                            "Abraçadeiras/Conexões",
+                            "Vazamentos/Pressão"
+                        ]
+                    },
+                    {
+                        name: "SISTEMA DE FREIO",
+                        items: [
+                            "Válvulas/Mangueiras",
+                            "Câmaras de freio",
+                            "Lonas/Pastilhas",
+                            "Discos/Tambores",
+                            "Nível de fluido",
+                            "Reservatório de ar"
+                        ]
+                    },
+                    {
+                        name: "SISTEMA DE COMBUSTÍVEL",
+                        items: [
+                            "Tanque - Fixação",
+                            "Tanque - Vazamentos",
+                            "Bomba de combustível",
+                            "Linhas/Conexões",
+                            "Filtros",
+                            "Tampa/vedação"
+                        ]
+                    },
+                    {
+                        name: "SISTEMA DE ARREFECIMENTO",
+                        items: [
+                            "Radiador",
+                            "Ventiladores",
+                            "Mangueiras/Abraçadeiras",
+                            "Reservatório",
+                            "Nível",
+                            "Vazamentos"
+                        ]
+                    },
+                    {
+                        name: "SISTEMA DE LUBRIFICAÇÃO",
+                        items: [
+                            "Nível de óleo",
+                            "Filtros",
+                            "Linhas/Conexões",
+                            "Pontos de graxa",
+                            "Vazamentos"
+                        ]
+                    },
+                    {
+                        name: "PNEUS",
+                        items: [
+                            "Altura dos sulcos dos pneus",
+                            "Emparelhamento de duplos",
+                            "Desgaste irregular",
+                            "Efetuar a calibragem dos pneus",
+                            "Parafuso de roda"
+                        ]
+                    },
+                    {
+                        name: "SUSP. DIANT.",
+                        items: [
+                            "Alinhamento do eixo dianteiro",
+                            "Balança (pino/bucha/mancal/fixação)",
+                            "Feixe de mola",
+                            "Braços tensores"
+                        ]
+                    },
+                    {
+                        name: "SUSP. TRAS.",
+                        items: [
+                            "Alinhamento do eixo traseiro",
+                            "Balança (pino/bucha/mancal/fixação)",
+                            "Feixe de mola",
+                            "Braços tensores"
+                        ]
+                    },
+                    {
+                        name: "ESTRUTURA (SISTEMA DE LONAMENTO)",
+                        items: [
+                            "Braço dianteiro",
+                            "Braço traseiro",
+                            "Pinos",
+                            "Rolamentos",
+                            "Lona",
+                            "Mola"
+                        ]
+                    },
+                    {
+                        name: "ADESIVOS E LACRES",
+                        items: [
+                            "Identificação da frota",
+                            "Adesivos refletivos",
+                            "Lacre da placa traseira"
+                        ]
                     }
                 ]
             },
@@ -1441,7 +1727,8 @@
                             "Alarme de ré",
                             "Sensor de porta",
                             "Ar condicionado",
-                            "Faróis"
+                            "Faróis",
+                            "Chicotes e conexões"
                         ]
                     },
                     {
@@ -1451,12 +1738,212 @@
                             "Esteira - Desgaste",
                             "Roletes - Fixação",
                             "Roletes - Desgaste",
-                            "Motor hidraúlico/Mangueiras - Fixação",
-                            "Motor hidraúlico/Mangueiras - Vazamento",
-                            "Motor hidraúlico/Mangueiras - Funcionamento",
+                            "Motores hidráulicos - Fixação",
+                            "Motores hidráulicos - Vazamentos",
+                            "Motores hidráulicos - Funcionamento",
                             "Sapatas/Roda Motriz - Parafusos",
                             "Sapatas/Roda Motriz - Proteção",
                             "Sapatas/Roda Motriz - Desgaste/Trincas"
+                        ]
+                    },
+                    {
+                        name: "PLATAFORMA / DIVISORES",
+                        items: [
+                            "Divisor de linhas - Fixação",
+                            "Divisor de linhas - Ajustes",
+                            "Guias e placas - Desgaste",
+                            "Rolos alimentadores - Funcionamento",
+                            "Rolos alimentadores - Vazamentos",
+                            "Coberturas/Proteções"
+                        ]
+                    },
+                    {
+                        name: "CORTE DE BASE",
+                        items: [
+                            "Conjunto de facas - Fixação",
+                            "Conjunto de facas - Desgaste",
+                            "Altura de corte",
+                            "Rolamentos/Conjuntos",
+                            "Motores/Transmissão",
+                            "Proteções"
+                        ]
+                    },
+                    {
+                        name: "CORTE DE PONTAS",
+                        items: [
+                            "Conjunto de facas - Fixação",
+                            "Conjunto de facas - Desgaste",
+                            "Altura/ajuste",
+                            "Motores/Transmissão",
+                            "Proteções"
+                        ]
+                    },
+                    {
+                        name: "ALIMENTADOR PRIMÁRIO",
+                        items: [
+                            "Esteira - Tensionamento",
+                            "Esteira - Desgaste",
+                            "Rolos - Fixação",
+                            "Rolos - Desgaste",
+                            "Motores/Válvulas",
+                            "Guia/Proteções"
+                        ]
+                    },
+                    {
+                        name: "ALIMENTADOR SECUNDÁRIO",
+                        items: [
+                            "Esteira - Tensionamento",
+                            "Esteira - Desgaste",
+                            "Rolos - Fixação",
+                            "Rolos - Desgaste",
+                            "Motores/Válvulas",
+                            "Guia/Proteções"
+                        ]
+                    },
+                    {
+                        name: "LIMPADOR / EXTRATOR",
+                        items: [
+                            "Extrator primário - Pá/desgaste",
+                            "Extrator primário - Fixação",
+                            "Extrator secundário - Pá/desgaste",
+                            "Extrator secundário - Fixação",
+                            "Motores/Válvulas",
+                            "Proteções"
+                        ]
+                    },
+                    {
+                        name: "ELEVADOR",
+                        items: [
+                            "Correntes - Tensionamento",
+                            "Correntes - Desgaste",
+                            "Aletas/Pás",
+                            "Trilhos/Guias",
+                            "Motores/Válvulas",
+                            "Proteções"
+                        ]
+                    },
+                    {
+                        name: "SISTEMA HIDRÁULICO",
+                        items: [
+                            "Reservatório e filtros",
+                            "Bombas hidráulicas",
+                            "Válvulas/Distribuidores",
+                            "Mangueiras/Flexíveis",
+                            "Abraçadeiras/Conexões",
+                            "Vazamentos/Pressão"
+                        ]
+                    },
+                    {
+                        name: "TRANSMISSÃO HIDROSTÁTICA",
+                        items: [
+                            "Hidrostatic drive - Bombas",
+                            "Hidrostatic drive - Motores",
+                            "Acoplamentos/Flanges",
+                            "Vazamentos",
+                            "Fixações"
+                        ]
+                    },
+                    {
+                        name: "CABINE / COMANDOS",
+                        items: [
+                            "Assento/ajustes",
+                            "Cintos de segurança",
+                            "Painel/indicadores",
+                            "Comandos/joysticks",
+                            "Ar condicionado",
+                            "Limpeza/visibilidade"
+                        ]
+                    },
+                    {
+                        name: "CHASSI / ESTRUTURA",
+                        items: [
+                            "Trincas/Desgaste",
+                            "Soldas/Fixações",
+                            "Pontos de apoio",
+                            "Proteções",
+                            "Plataformas/escadas"
+                        ]
+                    },
+                    {
+                        name: "PICADOR",
+                        items: [
+                            "Rotores/Facas - Fixação",
+                            "Rotores/Facas - Desgaste",
+                            "Balanceamento/ruídos",
+                            "Rolamentos/Conjuntos",
+                            "Proteções"
+                        ]
+                    },
+                    {
+                        name: "DESCARGA",
+                        items: [
+                            "Tubo de descarga - Fixação",
+                            "Tubo de descarga - Giro/acionamento",
+                            "Defletor/bica - Ajustes",
+                            "Cilindros/mangueiras",
+                            "Proteções"
+                        ]
+                    },
+                    {
+                        name: "GUIAMENTO / AUTOPILOTO",
+                        items: [
+                            "Guias/antenas",
+                            "Sensores de linha",
+                            "Calibração",
+                            "Funcionamento",
+                            "Telemetria/GPS"
+                        ]
+                    },
+                    {
+                        name: "SISTEMA DE COMBUSTÍVEL",
+                        items: [
+                            "Tanque - Fixação",
+                            "Tanque - Vazamentos",
+                            "Bomba de combustível",
+                            "Linhas/Conexões",
+                            "Filtros",
+                            "Tampa/vedação"
+                        ]
+                    },
+                    {
+                        name: "SISTEMA DE ARREFECIMENTO",
+                        items: [
+                            "Radiador",
+                            "Ventiladores",
+                            "Mangueiras/Abraçadeiras",
+                            "Reservatório",
+                            "Nível",
+                            "Vazamentos"
+                        ]
+                    },
+                    {
+                        name: "SISTEMA DE LUBRIFICAÇÃO",
+                        items: [
+                            "Nível de óleo",
+                            "Filtros",
+                            "Linhas/Conexões",
+                            "Pontos de graxa",
+                            "Vazamentos"
+                        ]
+                    },
+                    {
+                        name: "TRANSMISSÃO FINAL",
+                        items: [
+                            "Redutores finais",
+                            "Fixações",
+                            "Vazamentos",
+                            "Níveis",
+                            "Proteções"
+                        ]
+                    },
+                    {
+                        name: "SEGURANÇA",
+                        items: [
+                            "Extintor",
+                            "Alarme de ré",
+                            "Iluminação",
+                            "Sinalização",
+                            "Etiquetas/Avisos"
                         ]
                     }
                 ]
@@ -1716,6 +2203,9 @@
                     showFloatingNotification('warning', 'Sem internet. Exibindo dados em cache.');
                 }
                 inspections = data || [];
+                notifications = getCachedNotifications();
+                updateNotificationBadge();
+                await loadEquipments();
                 updateStats();
                 updateAnalytics();
                 setTimeout(initializeCharts, 500);
@@ -1731,7 +2221,9 @@
         async function saveInspection() {
             // Validação do formulário
             const data = document.getElementById('dataInspecao').value;
-            const frota = document.getElementById('frota').value.trim();
+            const frotaSel = document.getElementById('frotaSelect');
+            const frotaCustom = document.getElementById('frotaCustom');
+            const frota = frotaSel && frotaSel.value === 'custom' ? (frotaCustom.value || '').trim() : (frotaSel ? frotaSel.value.trim() : (document.getElementById('frota')?.value || '').trim());
             const mecanico = document.getElementById('mecanico').value.trim();
             const observacao = (document.getElementById('observacao')?.value || '').trim();
             
@@ -1864,6 +2356,109 @@
             }
         }
 
+        async function loadEquipments() {
+            try {
+                if (isOnline()) {
+                    const resp = await supabase
+                        .from('equipments')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    if (!resp.error) {
+                        equipments = resp.data || [];
+                        setCachedEquipments(equipments);
+                        return;
+                    }
+                }
+                equipments = getCachedEquipments();
+            } catch (_) {
+                equipments = getCachedEquipments();
+            }
+        }
+
+        function populateFrotaOptions(type) {
+            const sel = document.getElementById('frotaSelect');
+            if (!sel) return;
+            const list = (equipments || []).filter(e => (e.tipo || e.setor) === type && (e.status || 'ativo') === 'ativo');
+            const opts = ['<option value="">Selecione uma frota</option>', '<option value="custom">Outro (digitar)</option>']
+                .concat(list.map(e => `<option value="${e.frota}">${e.frota}${e.descricao ? ' - ' + e.descricao : ''}</option>`));
+            sel.innerHTML = opts.join('');
+            const custom = document.getElementById('frotaCustom');
+            if (custom) custom.classList.add('hidden');
+        }
+
+        function bindFrotaSelect() {
+            const sel = document.getElementById('frotaSelect');
+            const custom = document.getElementById('frotaCustom');
+            if (!sel || sel._bound) return;
+            sel.addEventListener('change', () => {
+                if (custom) {
+                    if (sel.value === 'custom') custom.classList.remove('hidden'); else custom.classList.add('hidden');
+                }
+            });
+            sel._bound = true;
+        }
+
+        async function addEquipment() {
+            const tipo = document.getElementById('equipTipo').value;
+            const frota = document.getElementById('equipFrota').value.trim();
+            const descricao = document.getElementById('equipDesc').value.trim();
+            const status = document.getElementById('equipStatus').value;
+            if (!tipo || !frota) {
+                showCustomAlert('Informe setor e frota.');
+                return;
+            }
+            showLoading(true);
+            try {
+                const item = { tipo, frota, descricao, status, created_at: new Date().toISOString() };
+                if (isOnline()) {
+                    const { data, error } = await supabase
+                        .from('equipments')
+                        .insert([item])
+                        .select();
+                    if (error) throw error;
+                    equipments.unshift(data && data[0] ? data[0] : item);
+                } else {
+                    equipments.unshift(item);
+                }
+                setCachedEquipments(equipments);
+                populateEquipmentList();
+                showFloatingNotification('success', 'Equipamento cadastrado');
+                document.getElementById('equipFrota').value = '';
+                document.getElementById('equipDesc').value = '';
+            } catch (e) {
+                showFloatingNotification('error', 'Erro ao cadastrar equipamento');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function populateEquipmentList() {
+            const container = document.getElementById('equipList');
+            const filterSel = document.getElementById('equipFilterTipo');
+            if (!container) return;
+            const tipo = filterSel ? filterSel.value : 'all';
+            const list = (equipments || []).filter(e => tipo === 'all' ? true : (e.tipo || e.setor) === tipo);
+            if (list.length === 0) {
+                container.innerHTML = '<div class="text-gray-500 dark:text-gray-400">Nenhuma frota cadastrada</div>';
+                return;
+            }
+            container.innerHTML = list.map(e => `
+                <div class="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">${e.frota}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${(e.tipo||e.setor)}${e.descricao ? ' • ' + e.descricao : ''}</p>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded-full ${ (e.status||'ativo')==='ativo' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' }">${e.status||'ativo'}</span>
+                    </div>
+                </div>
+            `).join('');
+            if (filterSel && !filterSel._bound) {
+                filterSel.addEventListener('change', populateEquipmentList);
+                filterSel._bound = true;
+            }
+        }
+
         // Funções auxiliares
         function updateDateTime() {
             const now = new Date();
@@ -1920,6 +2515,9 @@
                 updateAnalytics();
                 updateAnalyticsSummary(days);
             }
+            if (sectionId === 'equipamentos') {
+                populateEquipmentList();
+            }
         }
 
         function selectEquipment(type) {
@@ -1936,6 +2534,8 @@
             };
             document.getElementById('checklistTitle').textContent = titles[type] || 'Checklist';
             generateChecklistItems(type);
+            populateFrotaOptions(type);
+            bindFrotaSelect();
             setCurrentDate();
             clearResults();
             toggleMobileBar(true);
@@ -1946,41 +2546,49 @@
             const map = { caminhao: 'truck', trator: 'tractor', colhedora: 'harvester', reboque: 'trailer', manutencao: 'maintenance' };
             const key = map[type];
             const config = key ? equipmentConfigs[key] : null;
-            const items = [];
+            container.innerHTML = '';
+            currentInspection.items = [];
+            let index = 0;
             if (config && Array.isArray(config.sections)) {
                 config.sections.forEach(section => {
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'mb-6';
+                    sectionDiv.innerHTML = `
+                        <div class="px-4 py-2 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md">
+                            <h5 class="text-sm font-semibold text-green-800 dark:text-green-200">${section.name}</h5>
+                        </div>
+                    `;
+                    container.appendChild(sectionDiv);
                     if (Array.isArray(section.items)) {
-                        section.items.forEach(i => items.push(i));
+                        section.items.forEach(item => {
+                            const itemData = { id: index, name: item, section: section.name, status: null, note: '' };
+                            currentInspection.items.push(itemData);
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = 'p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg';
+                            itemDiv.innerHTML = `
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-900 dark:text-white">${item}</span>
+                                    <div class="flex space-x-3">
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" name="item_${index}" value="ok" onchange="updateItemStatus(${index}, 'ok')" class="form-radio h-6 w-6 sm:h-4 sm:w-4 text-primary">
+                                            <span class="ml-2 text-sm text-green-600 dark:text-green-400">OK</span>
+                                        </label>
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" name="item_${index}" value="notok" onchange="updateItemStatus(${index}, 'notok')" class="form-radio h-6 w-6 sm:h-4 sm:w-4 text-primary">
+                                            <span class="ml-2 text-sm text-red-600 dark:text-red-400">NÃO OK</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mt-3 hidden" id="note_${index}">
+                                    <textarea rows="2" placeholder="Observação deste item (opcional)" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" oninput="updateItemNote(${index}, this.value)"></textarea>
+                                </div>
+                            `;
+                            container.appendChild(itemDiv);
+                            index++;
+                        });
                     }
                 });
             }
-            container.innerHTML = '';
-            currentInspection.items = [];
-            items.forEach((item, index) => {
-                const itemData = { id: index, name: item, status: null, note: '' };
-                currentInspection.items.push(itemData);
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg';
-                itemDiv.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <span class="text-gray-900 dark:text-white font-medium">${item}</span>
-                        <div class="flex space-x-3">
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="item_${index}" value="ok" onchange="updateItemStatus(${index}, 'ok')" class="form-radio h-6 w-6 sm:h-4 sm:w-4 text-primary">
-                                <span class="ml-2 text-sm text-green-600 dark:text-green-400">OK</span>
-                            </label>
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="item_${index}" value="notok" onchange="updateItemStatus(${index}, 'notok')" class="form-radio h-6 w-6 sm:h-4 sm:w-4 text-primary">
-                                <span class="ml-2 text-sm text-red-600 dark:text-red-400">NÃO OK</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mt-3 hidden" id="note_${index}">
-                        <textarea rows="2" placeholder="Observação deste item (opcional)" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" oninput="updateItemNote(${index}, this.value)"></textarea>
-                    </div>
-                `;
-                container.appendChild(itemDiv);
-            });
         }
 
         function updateItemStatus(itemId, status) {
@@ -2108,6 +2716,7 @@
             
             // Update history table
             updateHistoryTable();
+            populateAnalyticsFilters();
         }
 
         function updateRing(id, percentage) {
@@ -2391,11 +3000,7 @@
         }
 
         // Notification system
-        let notifications = [
-            { id: 1, type: 'warning', title: 'Manutenção Pendente', message: 'Caminhão FR-001 requer atenção urgente', time: '2 horas atrás' },
-            { id: 2, type: 'info', title: 'Nova Inspeção', message: 'Inspeção do Trator TR-203 foi concluída', time: '4 horas atrás' },
-            { id: 3, type: 'error', title: 'Falha Crítica', message: 'Sistema de freios da Colhedora CL-105', time: '6 horas atrás' }
-        ];
+        let notifications = [];
 
         function showNotificationCenter() {
             const center = document.getElementById('notificationCenter');
@@ -2403,6 +3008,7 @@
             
             if (!center.classList.contains('hidden')) {
                 updateNotificationList();
+                markAllNotificationsRead();
             }
         }
 
@@ -2444,8 +3050,13 @@
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-900 dark:text-white">${notif.title}</p>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">${notif.message}</p>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">${notif.time}</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">${formatNotificationTime(notif.created_at || new Date().toISOString())}</p>
                             </div>
+                            <button onclick="removeNotification('${notif.id}')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -2454,8 +3065,9 @@
 
         function clearAllNotifications() {
             notifications = [];
+            setCachedNotifications([]);
             updateNotificationList();
-            document.getElementById('notificationBadge').classList.add('hidden');
+            updateNotificationBadge();
         }
 
         function showFloatingNotification(type, message, duration = 5000) {
@@ -2495,6 +3107,60 @@
                     notification.remove();
                 }
             }, duration);
+            pushNotification(type, mapTypeTitle(type), message);
+        }
+
+        function pushNotification(type, title, message) {
+            const item = { id: Date.now().toString(), type, title, message, created_at: new Date().toISOString(), read: false };
+            notifications.unshift(item);
+            setCachedNotifications(notifications);
+            updateNotificationBadge();
+            const center = document.getElementById('notificationCenter');
+            if (center && !center.classList.contains('hidden')) updateNotificationList();
+        }
+
+        function markAllNotificationsRead() {
+            notifications = notifications.map(n => ({ ...n, read: true }));
+            setCachedNotifications(notifications);
+            updateNotificationBadge();
+        }
+
+        function removeNotification(id) {
+            notifications = notifications.filter(n => n.id !== id);
+            setCachedNotifications(notifications);
+            updateNotificationList();
+            updateNotificationBadge();
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            if (!badge) return;
+            const unread = notifications.filter(n => !n.read).length;
+            if (unread > 0) {
+                badge.textContent = String(unread);
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function formatNotificationTime(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            const diff = Math.floor((Date.now() - d.getTime()) / 60000);
+            if (diff < 1) return 'agora';
+            if (diff < 60) return `${diff} min atrás`;
+            const h = Math.floor(diff / 60);
+            if (h < 24) return `${h} h atrás`;
+            const days = Math.floor(h / 24);
+            return `${days} d atrás`;
+        }
+
+        function mapTypeTitle(type) {
+            if (type === 'success') return 'Sucesso';
+            if (type === 'error') return 'Erro';
+            if (type === 'warning') return 'Aviso';
+            return 'Informação';
         }
 
         // Charts initialization
@@ -2697,6 +3363,7 @@
                 realtimeChannel = supabase.channel('inspections-all')
                     .on('postgres_changes', { event: '*', schema: 'public', table: 'inspections' }, payload => {
                         loadInitialData();
+                        pushNotification('info', 'Atualização', 'Dados de inspeções atualizados');
                     })
                     .subscribe();
             } catch (e) {
