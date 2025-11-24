@@ -1249,6 +1249,7 @@
         let realtimeChannel = null;
         let pollingTimer = null;
         function isOnline() { return navigator.onLine; }
+        function getOfflineUser() { return { id: 'offline', email: 'Offline' }; }
         function getCachedUser() { try { return JSON.parse(localStorage.getItem('currentUser')); } catch(_) { return null; } }
         function setCachedUser(u) { try { localStorage.setItem('currentUser', JSON.stringify(u)); } catch(_) {} }
         function clearCachedUser() { try { localStorage.removeItem('currentUser'); } catch(_) {} }
@@ -1499,7 +1500,9 @@
                     console.error('Erro ao verificar sessão:', error);
                     if (!isOnline()) {
                         const cached = getCachedUser();
-                        if (cached) { currentUser = cached; showApp(); return; }
+                        currentUser = cached || getOfflineUser();
+                        showApp();
+                        return;
                     }
                     showLogin();
                     return;
@@ -1511,7 +1514,8 @@
                 } else {
                     if (!isOnline()) {
                         const cached = getCachedUser();
-                        if (cached) { currentUser = cached; showApp(); } else { showLogin(); }
+                        currentUser = cached || getOfflineUser();
+                        showApp();
                     } else {
                         showLogin();
                     }
@@ -1519,7 +1523,12 @@
             } catch (error) {
                 console.error('Erro ao verificar autenticação:', error);
                 const cached = getCachedUser();
-                if (cached) { currentUser = cached; showApp(); } else { showLogin(); }
+                if (!isOnline()) {
+                    currentUser = cached || getOfflineUser();
+                    showApp();
+                } else {
+                    if (cached) { currentUser = cached; showApp(); } else { showLogin(); }
+                }
             } finally {
                 showLoading(false);
             }
