@@ -258,7 +258,8 @@
         /* Data visualization */
         .chart-container {
             position: relative;
-            height: 400px;
+            height: min(400px, 50vh);
+            min-height: 240px;
             width: 100%;
         }
         
@@ -288,26 +289,28 @@
         
         .login-container {
             max-width: 400px;
-            margin: 100px auto;
+            margin: 2rem auto;
             padding: 2rem;
         }
         
         .equipment-image {
             width: 100%;
-            height: 120px;
+            height: auto;
+            max-height: 120px;
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 1rem;
         }
         
         .qr-code {
-            width: 120px;
-            height: 120px;
+            width: clamp(80px, 25vw, 120px);
+            height: clamp(80px, 25vw, 120px);
             margin: 0 auto;
             display: block;
         }
         
         .inspection-details-modal {
+            width: 90vw;
             max-width: 800px;
             max-height: 90vh;
             overflow-y: auto;
@@ -414,7 +417,7 @@
                     <!-- Search and Quick Actions -->
                     <div class="flex items-center space-x-4">
                         <div class="relative">
-                            <input type="text" id="globalSearch" placeholder="Buscar inspeções..." class="w-64 px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <input type="text" id="globalSearch" placeholder="Buscar inspeções..." class="w-full sm:w-64 px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                             <svg class="absolute right-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
@@ -436,7 +439,7 @@
         </nav>
 
         <!-- Notification Center -->
-        <div id="notificationCenter" class="hidden fixed top-16 right-4 z-50 w-96 bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200 dark:border-gray-700 max-h-96 overflow-hidden">
+        <div id="notificationCenter" class="hidden fixed top-16 right-4 z-50 w-full max-w-sm bg-white dark:bg-gray-800 shadow-2xl rounded-xl border border-gray-200 dark:border-gray-700 max-h-96 overflow-hidden">
             <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Notificações</h3>
                 <button onclick="clearAllNotifications()" class="text-sm text-primary hover:text-primary-dark">Limpar todas</button>
@@ -919,7 +922,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-yellow-100 text-sm font-medium">Críticos</p>
-                                <p class="text-3xl font-bold" id="criticalCount">3</p>
+                                <p class="text-3xl font-bold" id="criticalCountCard">3</p>
                                 <p class="text-yellow-200 text-xs mt-1">Requerem atenção</p>
                             </div>
                             <div class="w-12 h-12 bg-yellow-400 rounded-lg flex items-center justify-center">
@@ -950,16 +953,33 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     <!-- Performance Chart -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 card-hover">
-                        <div class="flex items-center justify-between mb-6">
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Performance Mensal</h3>
-                            <select id="chartPeriod" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
-                                <option value="7">Últimos 7 dias</option>
-                                <option value="30" selected>Últimos 30 dias</option>
-                                <option value="90">Últimos 90 dias</option>
-                            </select>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <select id="chartPeriod" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                                    <option value="7">Últimos 7 dias</option>
+                                    <option value="30" selected>Últimos 30 dias</option>
+                                    <option value="90">Últimos 90 dias</option>
+                                </select>
+                                <select id="equipmentFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                                    <option value="all" selected>Todos equipamentos</option>
+                                    <option value="caminhao">Caminhão</option>
+                                    <option value="trator">Trator</option>
+                                    <option value="colhedora">Colhedora</option>
+                                    <option value="reboque">Reboque</option>
+                                    <option value="manutencao">Manutenção</option>
+                                </select>
+                                <select id="leaderFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                                    <option value="all" selected>Todos líderes</option>
+                                </select>
+                                <button id="clearAnalyticsFilters" class="text-sm px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Limpar</button>
+                            </div>
                         </div>
                         <div class="relative h-40 sm:h-64">
                             <canvas id="performanceChart"></canvas>
+                        </div>
+                        <div class="mt-3 flex justify-end">
+                            <button onclick="downloadChart('performanceChart', 'performance')" class="text-xs px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Baixar gráfico</button>
                         </div>
                     </div>
 
@@ -968,6 +988,9 @@
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Distribuição por Equipamento</h3>
                         <div class="relative h-40 sm:h-64">
                             <canvas id="equipmentChart"></canvas>
+                        </div>
+                        <div class="mt-3 flex justify-end">
+                            <button onclick="downloadChart('equipmentChart', 'equipamentos')" class="text-xs px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Baixar gráfico</button>
                         </div>
                     </div>
                 </div>
@@ -978,7 +1001,7 @@
                     <div class="xl:col-span-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 card-hover">
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Problemas Críticos</h3>
-                            <span id="criticalCount" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">0 ativos</span>
+                            <span id="criticalCountBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">0 ativos</span>
                         </div>
                         <div class="space-y-4" id="criticalIssues">
                             <div class="flex items-start space-x-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
@@ -1890,6 +1913,13 @@
             if (sectionId === 'nova-inspecao') {
                 backToSelection();
             }
+            if (sectionId === 'analytics') {
+                const sel = document.getElementById('chartPeriod');
+                const days = sel ? parseInt(sel.value, 10) : 30;
+                initializeCharts();
+                updateAnalytics();
+                updateAnalyticsSummary(days);
+            }
         }
 
         function selectEquipment(type) {
@@ -2474,11 +2504,42 @@
 
         function initializeCharts() {
             const sel = document.getElementById('chartPeriod');
+            populateAnalyticsFilters();
             const days = sel ? parseInt(sel.value, 10) : 30;
             buildCharts(days);
+            updateAnalyticsSummary(days);
             if (sel && !sel._bound) {
-                sel.addEventListener('change', () => buildCharts(parseInt(sel.value, 10)));
+                sel.addEventListener('change', () => {
+                    const d = parseInt(sel.value, 10);
+                    buildCharts(d);
+                    updateAnalyticsSummary(d);
+                });
                 sel._bound = true;
+            }
+            const eqSel = document.getElementById('equipmentFilter');
+            const ldSel = document.getElementById('leaderFilter');
+            const clearBtn = document.getElementById('clearAnalyticsFilters');
+            [eqSel, ldSel].forEach(el => {
+                if (el && !el._bound) {
+                    el.addEventListener('change', () => {
+                        const d = sel ? parseInt(sel.value, 10) : 30;
+                        buildCharts(d);
+                        updateAnalyticsSummary(d);
+                        updateAnalytics();
+                    });
+                    el._bound = true;
+                }
+            });
+            if (clearBtn && !clearBtn._bound) {
+                clearBtn.addEventListener('click', () => {
+                    if (eqSel) eqSel.value = 'all';
+                    if (ldSel) ldSel.value = 'all';
+                    const d = sel ? parseInt(sel.value, 10) : 30;
+                    buildCharts(d);
+                    updateAnalyticsSummary(d);
+                    updateAnalytics();
+                });
+                clearBtn._bound = true;
             }
         }
 
@@ -2486,9 +2547,16 @@
             const end = new Date();
             const start = new Date();
             start.setDate(end.getDate() - days + 1);
+            const eqSel = document.getElementById('equipmentFilter');
+            const ldSel = document.getElementById('leaderFilter');
+            const eqFilter = eqSel ? eqSel.value : 'all';
+            const ldFilter = ldSel ? ldSel.value : 'all';
             const filtered = inspections.filter(i => {
                 const d = new Date(i.data);
-                return d >= start && d <= end;
+                const inRange = d >= start && d <= end;
+                const byEq = eqFilter === 'all' ? true : i.tipo === eqFilter;
+                const byLd = ldFilter === 'all' ? true : (i.mecanico || '') === ldFilter;
+                return inRange && byEq && byLd;
             });
             const byDay = {};
             filtered.forEach(i => {
@@ -2529,7 +2597,17 @@
                     equipmentChart = new Chart(equipCtx, {
                         type: 'doughnut',
                         data: { labels: labelsEquip, datasets: [{ data: dataEquip, backgroundColor: colors }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, onClick: (evt, elements) => {
+                            const eqSel = document.getElementById('equipmentFilter');
+                            if (!elements || elements.length === 0 || !eqSel) return;
+                            const idx = elements[0].index;
+                            const order = ['caminhao','trator','colhedora','reboque','manutencao'];
+                            eqSel.value = order[idx] || 'all';
+                            const d = document.getElementById('chartPeriod') ? parseInt(document.getElementById('chartPeriod').value, 10) : 30;
+                            buildCharts(d);
+                            updateAnalyticsSummary(d);
+                            updateAnalytics();
+                        } }
                     });
                 } else {
                     equipmentChart.data.labels = labelsEquip;
@@ -2537,6 +2615,80 @@
                     equipmentChart.update();
                 }
             }
+        }
+
+        function updateAnalyticsSummary(days) {
+            const end = new Date();
+            const start = new Date();
+            start.setDate(end.getDate() - days + 1);
+            const eqSel = document.getElementById('equipmentFilter');
+            const ldSel = document.getElementById('leaderFilter');
+            const eqFilter = eqSel ? eqSel.value : 'all';
+            const ldFilter = ldSel ? ldSel.value : 'all';
+            const filtered = inspections.filter(i => {
+                const d = new Date(i.created_at || i.data);
+                const inRange = d >= start && d <= end;
+                const byEq = eqFilter === 'all' ? true : i.tipo === eqFilter;
+                const byLd = ldFilter === 'all' ? true : (i.mecanico || '') === ldFilter;
+                return inRange && byEq && byLd;
+            });
+            const approvalEl = document.getElementById('approvalRate');
+            const avgTimeEl = document.getElementById('avgTime');
+            const productivityEl = document.getElementById('productivity');
+            if (filtered.length === 0) {
+                if (approvalEl) approvalEl.textContent = '0%';
+                if (avgTimeEl) avgTimeEl.textContent = '—';
+                if (productivityEl) productivityEl.textContent = '0%';
+                return;
+            }
+            const avgApproval = Math.round(filtered.reduce((s, i) => s + (i.results?.percentage || 0), 0) / filtered.length);
+            if (approvalEl) approvalEl.textContent = `${avgApproval}%`;
+            const times = filtered
+                .map(i => new Date(i.created_at || i.data).getTime())
+                .sort((a, b) => a - b);
+            const intervals = [];
+            for (let idx = 1; idx < times.length; idx++) {
+                intervals.push(times[idx] - times[idx - 1]);
+            }
+            const avgMs = intervals.length > 0 ? Math.round(intervals.reduce((s, v) => s + v, 0) / intervals.length) : 0;
+            let avgLabel = '—';
+            if (avgMs > 0) {
+                const mins = Math.round(avgMs / 60000);
+                if (mins < 120) avgLabel = `${mins}min`;
+                else {
+                    const hours = Math.round(mins / 60);
+                    if (hours < 48) avgLabel = `${hours}h`;
+                    else avgLabel = `${Math.round(hours / 24)}d`;
+                }
+            }
+            if (avgTimeEl) avgTimeEl.textContent = avgLabel;
+            const totalDays = days;
+            const daySet = new Set(times.map(t => new Date(t).toISOString().split('T')[0]));
+            const productivity = Math.round((daySet.size / totalDays) * 100);
+            if (productivityEl) productivityEl.textContent = `${productivity}%`;
+        }
+
+        function populateAnalyticsFilters() {
+            const ldSel = document.getElementById('leaderFilter');
+            if (!ldSel) return;
+            const leaders = Array.from(new Set((inspections || []).map(i => i.mecanico).filter(Boolean))).sort();
+            const current = ldSel.value;
+            ldSel.innerHTML = '<option value="all" selected>Todos líderes</option>' + leaders.map(l => `<option value="${l}">${l}</option>`).join('');
+            if (current && current !== 'all') {
+                ldSel.value = current;
+            }
+        }
+
+        function downloadChart(canvasId, name) {
+            const c = document.getElementById(canvasId);
+            if (!c) return;
+            const url = c.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${name}-analytics.png`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
         }
 
         function setupRealtime() {
@@ -2602,10 +2754,21 @@
         function updateAnalytics() {
             const containerIssues = document.getElementById('criticalIssues');
             const containerTop = document.getElementById('topMecanicos');
-            const badge = document.getElementById('criticalCount');
+            const badge = document.getElementById('criticalCountBadge');
+            const cardCrit = document.getElementById('criticalCountCard');
+            const eqSel = document.getElementById('equipmentFilter');
+            const ldSel = document.getElementById('leaderFilter');
+            const eqFilter = eqSel ? eqSel.value : 'all';
+            const ldFilter = ldSel ? ldSel.value : 'all';
+            const filteredAll = inspections.filter(i => {
+                const byEq = eqFilter === 'all' ? true : i.tipo === eqFilter;
+                const byLd = ldFilter === 'all' ? true : (i.mecanico || '') === ldFilter;
+                return byEq && byLd;
+            });
             if (containerIssues) {
-                const crit = inspections.filter(i => (i.results?.percentage||0) < 60 || (i.results?.notOk||0) > (i.results?.ok||0)).slice(0,3);
+                const crit = filteredAll.filter(i => (i.results?.percentage||0) < 60 || (i.results?.notOk||0) > (i.results?.ok||0)).slice(0,3);
                 if (badge) { badge.textContent = `${crit.length} ativos`; }
+                if (cardCrit) { cardCrit.textContent = `${crit.length}`; }
                 if (crit.length === 0) {
                     containerIssues.innerHTML = `<div class="text-center text-gray-500 dark:text-gray-400 py-6">Nenhum problema crítico</div>`;
                 } else {
@@ -2634,7 +2797,7 @@
             }
             if (containerTop) {
                 const byMech = {};
-                inspections.forEach(i => {
+                filteredAll.forEach(i => {
                     const m = i.mecanico||'--';
                     if (!byMech[m]) byMech[m] = { count:0, sum:0 };
                     byMech[m].count++;
