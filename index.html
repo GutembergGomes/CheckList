@@ -859,8 +859,15 @@
                     </div>
 
                     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white" id="checklistTitle">Checklist</h3>
+                            <div class="flex items-center gap-3">
+                                <label class="text-sm text-gray-700 dark:text-gray-300">Equipamento em reforma?</label>
+                                <select id="reformaStatus" class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="nao" selected>Não</option>
+                                    <option value="sim">Sim</option>
+                                </select>
+                            </div>
                         </div>
                 <div class="p-6">
                     <!-- Form Fields -->
@@ -1450,7 +1457,40 @@
                         <button onclick="closeModal('inspectionModal')" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300">Fechar</button>
                     </div>
                 </div>
+                <div id="inspectionAdminBar" class="flex items-center gap-2 mb-3 hidden">
+                    <button onclick="openEditInspection(currentInspectionId)" class="px-3 py-2 bg-yellow-500 text-white rounded-md">Editar</button>
+                    <button onclick="deleteInspection(currentInspectionId)" class="px-3 py-2 bg-red-600 text-white rounded-md">Excluir</button>
+                </div>
                 <div id="inspectionDetails" class="space-y-4"></div>
+            </div>
+        </div>
+
+        <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="glass-morphism p-6 rounded-xl shadow-lg max-w-lg w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Editar Inspeção</h3>
+                <input type="hidden" id="editId" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data</label>
+                        <input type="date" id="editData" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" readonly />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frota</label>
+                        <input type="text" id="editFrota" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Líder</label>
+                        <input type="text" id="editMecanico" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Observação</label>
+                        <textarea id="editObs" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></textarea>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 mt-6">
+                    <button onclick="saveEditInspection()" class="px-4 py-2 bg-primary text-white rounded-md">Salvar</button>
+                    <button onclick="closeModal('editModal')" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300">Cancelar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1853,7 +1893,8 @@
                             "Conjunto de basculamento da cabine",
                             "Reservatório e mangueira do limpador de para-brisa",
                             "Estado da escada",
-                            "Estado dos retrovisores e paralama dianteiro"
+                            "Estado dos retrovisores",
+                            "Paralama dianteiro"
                         ]
                     },
                     {
@@ -2951,18 +2992,55 @@
             const frota = frotaSel && frotaSel.value === 'custom' ? (frotaCustom.value || '').trim() : (frotaSel ? frotaSel.value.trim() : (document.getElementById('frota')?.value || '').trim());
             const mecanico = document.getElementById('mecanico').value.trim();
             const observacao = (document.getElementById('observacao')?.value || '').trim();
+            const reformaStatus = (document.getElementById('reformaStatus')?.value || 'nao') === 'sim';
+            const today = new Date().toISOString().split('T')[0];
             
             if (!data || !frota || !mecanico) {
                 showCustomAlert('Por favor, preencha todos os campos obrigatórios.');
                 return;
             }
+            if (data !== today) {
+                showCustomAlert('Lançamento permitido apenas para a data de hoje.');
+                showFloatingNotification('warning', 'Data inválida: selecione a data de hoje.');
+                return;
+            }
+            try {
+                const now = Date.now();
+                const windowMs = 30 * 60 * 1000;
+                const recentLocal = (inspections || [])
+                    .filter(i => i.tipo === currentEquipment && String(i.frota) === String(frota))
+                    .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))[0];
+                let recentAt = recentLocal ? new Date(recentLocal.created_at).getTime() : 0;
+                if (isOnline()) {
+                    const sinceIso = new Date(now - windowMs).toISOString();
+                    const resp = await supabase
+                        .from('inspections')
+                        .select('created_at')
+                        .eq('tipo', currentEquipment)
+                        .eq('frota', frota)
+                        .gte('created_at', sinceIso)
+                        .order('created_at', { ascending: false })
+                        .limit(1);
+                    if (!resp.error && resp.data && resp.data.length) {
+                        recentAt = Math.max(recentAt, new Date(resp.data[0].created_at).getTime());
+                    }
+                }
+                if (recentAt && (now - recentAt) < windowMs) {
+                    const remainingMs = windowMs - (now - recentAt);
+                    const mins = Math.floor(remainingMs / 60000);
+                    const secs = Math.floor((remainingMs % 60000) / 1000);
+                    showFloatingNotification('warning', `Já existe um checklist para este equipamento nos últimos 30 min. Tente novamente em ${mins}m ${secs}s.`);
+                    showCustomAlert(`Registro bloqueado por 30 minutos. Tempo restante: ${mins} minutos e ${secs} segundos.`);
+                    return;
+                }
+            } catch (_) {}
             
             const completedItems = currentInspection.items.filter(item => item.status !== null);
             if (completedItems.length === 0) {
                 showCustomAlert('Por favor, marque pelo menos um item do checklist.');
                 return;
             }
-            
+
             showLoading(true);
             savingInspection = true;
             const saveBtns = Array.from(document.querySelectorAll('button[onclick="saveInspection()"]'));
@@ -2983,11 +3061,11 @@
                 created_at: new Date().toISOString(),
                 local_id: localId
             };
-            if (observacao) {
-                const idx = inspection.items.length;
-                inspection.items.push({ id: idx, name: 'Observação', status: null, note: observacao });
-            }
-            const dbInspection = { data: inspection.data, tipo: inspection.tipo, frota: inspection.frota, mecanico: inspection.mecanico, items: inspection.items, results: inspection.results, user_id: inspection.user_id, created_at: inspection.created_at, local_id: inspection.local_id };
+            try {
+                const idxReforma = inspection.items.length;
+                inspection.items.push({ id: idxReforma, name: 'Status: Equipamento em reforma', section: 'Geral', status: reformaStatus ? 'ok' : 'notok', note: reformaStatus ? 'Sim' : 'Não' });
+            } catch(_) {}
+            const dbInspection = { data: inspection.data, tipo: inspection.tipo, frota: inspection.frota, mecanico: inspection.mecanico, observacao: inspection.observacao, items: inspection.items, results: inspection.results, user_id: inspection.user_id, created_at: inspection.created_at, local_id: inspection.local_id };
 
             try {
                 if (isOnline() && isAuthenticated) {
@@ -3235,6 +3313,9 @@
             const dateInput = document.getElementById('dataInspecao');
             if (dateInput) {
                 dateInput.value = today;
+                dateInput.min = today;
+                dateInput.max = today;
+                dateInput.readOnly = true;
             }
         }
 
@@ -3562,6 +3643,7 @@
                 return;
             }
             
+            const admin = isAdmin();
             tbody.innerHTML = list.slice().reverse().map(inspection => {
                 const statusColor = inspection.results.percentage >= 80 ? 'green' : 
                                   inspection.results.percentage >= 60 ? 'yellow' : 'red';
@@ -3572,6 +3654,10 @@
                 const stateBadge = isPending
                     ? `<span class=\"inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 ml-2\">Pendente</span>`
                     : `<span class=\"inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 ml-2\">Sincronizado</span>`;
+                const actions = admin ? `
+                    <button onclick=\"openEditInspection('${inspId}')\" class=\"ml-3 text-yellow-600 hover:text-yellow-700 text-sm font-medium\">Editar</button>
+                    <button onclick=\"deleteInspection('${inspId}')\" class=\"ml-3 text-red-600 hover:text-red-700 text-sm font-medium\">Excluir</button>
+                ` : '';
                 
                 return `
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
@@ -3590,6 +3676,7 @@
                             <button onclick="viewInspection('${inspId}')" class="text-primary hover:text-primary-dark text-sm font-medium">
                                 Ver detalhes
                             </button>
+                            ${actions}
                         </td>
                     </tr>
                 `;
@@ -3626,12 +3713,90 @@
             }
         }
 
+        function isAdmin() {
+            const u = currentUser || getCachedUser();
+            return !!(u && u.email === 'gutemberggg10@gmail.com');
+        }
+
+        function openEditInspection(id) {
+            if (!isAdmin()) { showCustomAlert('Acesso restrito.'); return; }
+            const matchId = String(id);
+            const inspection = inspections.find(i => String(i.id) === matchId) || inspections.find(i => String(i.local_id) === matchId);
+            if (!inspection) { showCustomAlert('Inspeção não encontrada'); return; }
+            const modal = document.getElementById('editModal');
+            document.getElementById('editId').value = matchId;
+            document.getElementById('editData').value = inspection.data;
+            document.getElementById('editFrota').value = inspection.frota;
+            document.getElementById('editMecanico').value = inspection.mecanico;
+            try {
+                const obsItem = Array.isArray(inspection.items) ? inspection.items.find(it => String(it.name) === 'Observação') : null;
+                document.getElementById('editObs').value = inspection.observacao || ((obsItem && obsItem.note) ? obsItem.note : '');
+            } catch(_) { document.getElementById('editObs').value = inspection.observacao || ''; }
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        async function saveEditInspection() {
+            if (!isAdmin()) { showCustomAlert('Acesso restrito.'); return; }
+            const id = String(document.getElementById('editId').value || '');
+            const data = document.getElementById('editData').value;
+            const frota = document.getElementById('editFrota').value.trim();
+            const mecanico = document.getElementById('editMecanico').value.trim();
+            const observacao = document.getElementById('editObs').value.trim();
+            if (!id || !data || !frota || !mecanico) { showCustomAlert('Preencha todos os campos.'); return; }
+            showLoading(true);
+            try {
+                const idx = inspections.findIndex(i => String(i.id) === id || String(i.local_id) === id);
+                if (idx < 0) { throw new Error('Inspeção não encontrada'); }
+                inspections[idx].frota = frota;
+                inspections[idx].mecanico = mecanico;
+                inspections[idx].observacao = observacao;
+                setCachedInspections(inspections);
+                if (isOnline() && currentUser && currentUser.id && inspections[idx].id) {
+                    const { error } = await supabase.from('inspections').update({ frota, mecanico, observacao }).eq('id', inspections[idx].id);
+                    if (error) throw error;
+                }
+                updateStats();
+                updateAnalytics();
+                updateHistoryTable();
+                document.getElementById('editModal').classList.add('hidden');
+                showFloatingNotification('success', 'Inspeção atualizada.');
+            } catch (e) {
+                showCustomAlert(e.message || 'Falha ao atualizar.');
+            } finally { showLoading(false); }
+        }
+
+        async function deleteInspection(id) {
+            if (!isAdmin()) { showCustomAlert('Acesso restrito.'); return; }
+            const matchId = String(id);
+            showLoading(true);
+            try {
+                const idx = inspections.findIndex(i => String(i.id) === matchId || String(i.local_id) === matchId);
+                if (idx < 0) { throw new Error('Inspeção não encontrada'); }
+                const record = inspections[idx];
+                if (isOnline() && currentUser && currentUser.id && record.id) {
+                    const { error } = await supabase.from('inspections').delete().eq('id', record.id);
+                    if (error) throw error;
+                }
+                inspections.splice(idx, 1);
+                setCachedInspections(inspections);
+                updateStats();
+                updateAnalytics();
+                updateHistoryTable();
+                closeModal('inspectionModal');
+                showFloatingNotification('success', 'Inspeção excluída.');
+            } catch (e) {
+                showCustomAlert(e.message || 'Falha ao excluir.');
+            } finally { showLoading(false); }
+        }
+
         function viewInspection(id) {
             const matchId = String(id);
             const inspection = inspections.find(i => String(i.id) === matchId) || inspections.find(i => String(i.local_id) === matchId);
             if (!inspection) return;
             currentInspectionId = matchId;
             const details = document.getElementById('inspectionDetails');
+            const reformaItem = Array.isArray(inspection.items) ? inspection.items.find(it => String(it.name) === 'Status: Equipamento em reforma') : null;
+            const reformaText = reformaItem ? (reformaItem.note || (reformaItem.status === 'ok' ? 'Sim' : 'Não')) : 'Não';
             const header = `
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -3649,6 +3814,10 @@
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Líder</p>
                         <p class="font-medium text-gray-900 dark:text-white">${inspection.mecanico}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Em reforma</p>
+                        <p class="font-medium text-gray-900 dark:text-white">${reformaText}</p>
                     </div>
                 </div>
             `;
@@ -3711,6 +3880,10 @@
             details.innerHTML = header + `<div class="space-y-2">${itemsHtml}</div>` + obsBlock + summary;
             const btn = document.getElementById('printInspectionBtn');
             if (btn) { btn.disabled = false; }
+            const adminBar = document.getElementById('inspectionAdminBar');
+            if (adminBar) {
+                if (isAdmin()) { adminBar.classList.remove('hidden'); } else { adminBar.classList.add('hidden'); }
+            }
             showModal('inspectionModal');
         }
 
@@ -4452,16 +4625,25 @@
                 URL.revokeObjectURL(a.href);
                 showFloatingNotification('success', 'Relatório JSON gerado');
             } else if (format === 'csv') {
-                const header = ['data','tipo','frota','lider','ok','nao_ok','percentual'];
-                const rows = filtered.map(i => [
-                    i.data,
-                    i.tipo,
-                    i.frota,
-                    i.mecanico,
-                    i.results?.ok||0,
-                    i.results?.notOk||0,
-                    i.results?.percentage||0
-                ].join(','));
+                const header = ['data','tipo','frota','lider','ok','nao_ok','percentual','observacao'];
+                const rows = filtered.map(i => {
+                    const obs = i.observacao || (Array.isArray(i.items) ? ((i.items.find(it => String(it.name) === 'Observação')?.note) || '') : '');
+                    const esc = (v) => {
+                        const s = String(v ?? '');
+                        if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replaceAll('"', '""') + '"';
+                        return s;
+                    };
+                    return [
+                        esc(i.data),
+                        esc(i.tipo),
+                        esc(i.frota),
+                        esc(i.mecanico),
+                        esc(i.results?.ok||0),
+                        esc(i.results?.notOk||0),
+                        esc(i.results?.percentage||0),
+                        esc(obs)
+                    ].join(',');
+                });
                 const csv = [header.join(','), ...rows].join('\n');
                 const blob = new Blob([csv], { type: 'text/csv' });
                 const a = document.createElement('a');
