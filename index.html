@@ -372,6 +372,7 @@
                             </svg>
                         </div>
                         <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Sistema de Checklist</h1>
+                        <span class="ml-2 px-2 py-1 text-xs font-semibold text-primary border border-primary rounded">GGOMES-LOG</span>
                     </div>
                     
                     <div class="flex items-center space-x-4">
@@ -669,6 +670,28 @@
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12M6 12h12"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-gray-900 dark:text-white font-medium">Plantadoras</span>
+                                    </div>
+                                    <span class="text-2xl font-bold text-gray-900 dark:text-white" id="countPlantadoras">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-cyan-100 dark:bg-cyan-900 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-gray-900 dark:text-white font-medium">Distribuidoras</span>
+                                    </div>
+                                    <span class="text-2xl font-bold text-gray-900 dark:text-white" id="countDistribuidoras">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
                                         <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
                                             <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0a2 2 0 01-2-2v-2a2 2 0 00-2-2H8z"/>
@@ -895,6 +918,8 @@
                                 <option value="caminhao">Caminhão</option>
                                 <option value="trator">Trator</option>
                                 <option value="colhedora">Colhedora</option>
+                                <option value="plantadora">Plantadora</option>
+                                <option value="distribuidora">Distribuidora</option>
                                 <option value="reboque">Reboque</option>
                                 <option value="manutencao">Manutenção</option>
                             </select>
@@ -1033,6 +1058,8 @@
                                     <option value="trator">Trator</option>
                                     <option value="colhedora">Colhedora</option>
                                     <option value="reboque">Reboque</option>
+                                    <option value="plantadora">Plantadora</option>
+                                    <option value="distribuidora">Distribuidora</option>
                                     <option value="manutencao">Manutenção</option>
                                 </select>
                                 <select id="leaderFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
@@ -3003,10 +3030,24 @@
             }
         }
 
+        function typeAliases(t) {
+            const map = {
+                caminhao: ['caminhao','truck'],
+                trator: ['trator','tractor'],
+                colhedora: ['colhedora','harvester'],
+                reboque: ['reboque','trailer'],
+                plantadora: ['plantadora','planter'],
+                distribuidora: ['distribuidora','distributor'],
+                manutencao: ['manutencao','maintenance']
+            };
+            return map[t] || [t];
+        }
+
         function populateFrotaOptions(type) {
             const sel = document.getElementById('frotaSelect');
             if (!sel) return;
-            const list = (equipments || []).filter(e => (e.tipo || e.setor) === type && (e.status || 'ativo') === 'ativo');
+            const aliases = typeAliases(type);
+            const list = (equipments || []).filter(e => aliases.includes(e.tipo || e.setor) && (e.status || 'ativo') === 'ativo');
             const opts = ['<option value="">Selecione uma frota</option>', '<option value="custom">Outro (digitar)</option>']
                 .concat(list.map(e => `<option value="${e.frota}">${e.frota}${e.descricao ? ' - ' + e.descricao : ''}</option>`));
             sel.innerHTML = opts.join('');
@@ -3072,7 +3113,8 @@
             const filterSel = document.getElementById('equipFilterTipo');
             if (!container) return;
             const tipo = filterSel ? filterSel.value : 'all';
-            const list = (equipments || []).filter(e => tipo === 'all' ? true : (e.tipo || e.setor) === tipo);
+            const aliases = tipo === 'all' ? null : typeAliases(tipo);
+            const list = (equipments || []).filter(e => !aliases ? true : aliases.includes(e.tipo || e.setor));
             if (list.length === 0) {
                 container.innerHTML = '<div class="text-gray-500 dark:text-gray-400">Nenhuma frota cadastrada</div>';
                 return;
@@ -3360,6 +3402,10 @@
             document.getElementById('countCaminhoes').textContent = counts.caminhao;
             document.getElementById('countTratores').textContent = counts.trator;
             document.getElementById('countColhedoras').textContent = counts.colhedora;
+            const elPlant = document.getElementById('countPlantadoras');
+            if (elPlant) elPlant.textContent = counts.plantadora;
+            const elDist = document.getElementById('countDistribuidoras');
+            if (elDist) elDist.textContent = counts.distribuidora;
             document.getElementById('countReboques').textContent = counts.reboque;
             
             // Update recent inspections
@@ -3646,7 +3692,7 @@
                 </head><body onload="window.print()">
                     <div class="container">
                         <div class="header">
-                            <div class="brand"><div class="logo">C</div><div><div class="title">Checklist</div><div class="subtitle">${new Date(inspection.data).toLocaleDateString('pt-BR')}</div></div></div>
+                            <div class="brand"><div class="logo">GG</div><div><div class="title">GGOMES-LOG • Checklist</div><div class="subtitle">${new Date(inspection.data).toLocaleDateString('pt-BR')}</div></div></div>
                             <div class="subtitle">Gerado em ${new Date().toLocaleString('pt-BR')}</div>
                         </div>
                         <div class="info">
@@ -4012,13 +4058,13 @@
             }
             const equipCtx = document.getElementById('equipmentChart');
             if (equipCtx && typeof Chart !== 'undefined') {
-                const mapLabels = { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', manutencao: 'Manutenção' };
-                const order = ['caminhao','trator','colhedora','reboque','manutencao'];
-                const counts = { caminhao: 0, trator: 0, colhedora: 0, reboque: 0, manutencao: 0 };
+                const mapLabels = { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', plantadora: 'Plantadoras', distribuidora: 'Distribuidoras', manutencao: 'Manutenção' };
+                const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','manutencao'];
+                const counts = { caminhao: 0, trator: 0, colhedora: 0, reboque: 0, plantadora: 0, distribuidora: 0, manutencao: 0 };
                 filtered.forEach(i => { if (counts[i.tipo] !== undefined) counts[i.tipo]++; });
                 const labelsEquip = order.map(k => mapLabels[k]);
                 const dataEquip = order.map(k => counts[k]);
-                const colors = ['#3B82F6','#10B981','#8B5CF6','#F59E0B','#EF4444'];
+                const colors = ['#3B82F6','#10B981','#8B5CF6','#F59E0B','#EF4444','#06B6D4','#F472B6'];
                 if (!equipmentChart) {
                     equipmentChart = new Chart(equipCtx, {
                         type: 'doughnut',
@@ -4027,7 +4073,7 @@
                             const eqSel = document.getElementById('equipmentFilter');
                             if (!elements || elements.length === 0 || !eqSel) return;
                             const idx = elements[0].index;
-                            const order = ['caminhao','trator','colhedora','reboque','manutencao'];
+                            const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','manutencao'];
                             eqSel.value = order[idx] || 'all';
                             const d = document.getElementById('chartPeriod') ? parseInt(document.getElementById('chartPeriod').value, 10) : 30;
                             buildCharts(d);
@@ -4147,7 +4193,7 @@
             if (pollingTimer) return;
             pollingTimer = setInterval(() => {
                 loadInitialData();
-            }, 15000);
+            }, 300000);
         }
 
         async function syncPendingInspections() {
@@ -4308,7 +4354,7 @@
             });
             const total = filtered.length;
             const avg = total ? Math.round(filtered.reduce((s,i)=>s+(i.results?.percentage||0),0)/total) : 0;
-            const counts = { caminhao: 0, trator: 0, colhedora: 0, reboque: 0, manutencao: 0 };
+            const counts = { caminhao: 0, trator: 0, colhedora: 0, plantadora: 0, distribuidora: 0, reboque: 0, manutencao: 0 };
             filtered.forEach(i => { if (counts[i.tipo] !== undefined) counts[i.tipo]++; });
             if (format === 'json') {
                 const payload = {
@@ -4421,7 +4467,7 @@
                     </head><body onload="window.print()">
                         <div class="container">
                             <div class="header">
-                                <div class="brand"><div class="logo">C</div><div><div class="title">Relatório ${type}</div><div class="subtitle">${dateRange}</div></div></div>
+                                <div class="brand"><div class="logo">GG</div><div><div class="title">GGOMES-LOG • Relatório ${type}</div><div class="subtitle">${dateRange}</div></div></div>
                                 <div class="subtitle">Gerado em ${new Date().toLocaleString('pt-BR')}</div>
                             </div>
                             <div class="kpis">
@@ -4432,6 +4478,8 @@
                                         <span class="chip">Caminhões: ${dist.caminhao}</span>
                                         <span class="chip">Tratores: ${dist.trator}</span>
                                         <span class="chip">Colhedoras: ${dist.colhedora}</span>
+                                        <span class="chip">Plantadoras: ${dist.plantadora}</span>
+                                        <span class="chip">Distribuidoras: ${dist.distribuidora}</span>
                                         <span class="chip">Reboques: ${dist.reboque}</span>
                                         <span class="chip">Manutenção: ${dist.manutencao}</span>
                                     </div>
