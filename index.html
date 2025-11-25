@@ -335,6 +335,14 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Senha</label>
                     <input type="password" id="loginPassword" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
                 </div>
+                <div id="firstNameGroup" class="mb-4 hidden">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome</label>
+                    <input type="text" id="firstName" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div id="lastNameGroup" class="mb-6 hidden">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sobrenome</label>
+                    <input type="text" id="lastName" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
                 <button id="loginSubmit" type="submit" class="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors duration-200 font-medium interactive-scale">
                     Entrar
                 </button>
@@ -345,6 +353,27 @@
                     Não tem uma conta? 
                     <button onclick="toggleAuthMode()" class="text-primary hover:text-primary-dark font-medium">Cadastre-se</button>
                 </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass-morphism p-8 rounded-xl shadow-lg max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Completar perfil</h2>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Informe seu nome e sobrenome</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome</label>
+                <input type="text" id="pmFirstName" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sobrenome</label>
+                <input type="text" id="pmLastName" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="pmSave" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors duration-200 font-medium">Salvar</button>
+                <button id="pmCancel" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300">Agora não</button>
             </div>
         </div>
     </div>
@@ -2699,12 +2728,23 @@
         }
 
         // Mostrar aplicação principal
+        function getDisplayName(u) {
+            const fn = (u?.user_metadata?.first_name || '').trim();
+            const ln = (u?.user_metadata?.last_name || '').trim();
+            if (fn || ln) return `${fn} ${ln}`.trim();
+            return (u?.email || '').split('@')[0];
+        }
+
         function showApp() {
             document.getElementById('loginModal').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('userEmail').textContent = currentUser.email;
             const mech = document.getElementById('mecanico');
-            if (mech) { mech.value = currentUser.email; }
+            if (mech) { mech.value = getDisplayName(currentUser); }
+            if (!((currentUser.user_metadata?.first_name||'').trim() && (currentUser.user_metadata?.last_name||'').trim())) {
+                const pm = document.getElementById('profileModal');
+                if (pm) pm.classList.remove('hidden');
+            }
             loadInitialData();
             setupRealtime();
             startPolling();
@@ -2716,6 +2756,8 @@
             const loginTitle = document.querySelector('#loginModal h2');
             const loginButton = loginForm.querySelector('button[type="submit"]');
             const toggleText = document.querySelector('#loginModal .text-center p');
+            const firstNameGroup = document.getElementById('firstNameGroup');
+            const lastNameGroup = document.getElementById('lastNameGroup');
             
             if (loginForm.getAttribute('data-mode') === 'login') {
                 // Mudar para modo cadastro
@@ -2723,12 +2765,16 @@
                 loginTitle.textContent = 'Criar Conta';
                 loginButton.textContent = 'Cadastrar';
                 toggleText.innerHTML = 'Já tem uma conta? <button onclick="toggleAuthMode()" class="text-primary hover:text-primary-dark font-medium">Faça login</button>';
+                if (firstNameGroup) firstNameGroup.classList.remove('hidden');
+                if (lastNameGroup) lastNameGroup.classList.remove('hidden');
             } else {
                 // Mudar para modo login
                 loginForm.setAttribute('data-mode', 'login');
                 loginTitle.textContent = 'Sistema de Checklist';
                 loginButton.textContent = 'Entrar';
                 toggleText.innerHTML = 'Não tem uma conta? <button onclick="toggleAuthMode()" class="text-primary hover:text-primary-dark font-medium">Cadastre-se</button>';
+                if (firstNameGroup) firstNameGroup.classList.add('hidden');
+                if (lastNameGroup) lastNameGroup.classList.add('hidden');
             }
         }
 
@@ -2739,6 +2785,8 @@
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const isSignUp = this.getAttribute('data-mode') === 'signup';
+            const firstName = document.getElementById('firstName')?.value || '';
+            const lastName = document.getElementById('lastName')?.value || '';
             
             showLoading(true);
             
@@ -2749,9 +2797,15 @@
                 let result;
                 
                 if (isSignUp) {
+                    if (!firstName.trim() || !lastName.trim()) {
+                        showLoading(false);
+                        showCustomAlert('Informe nome e sobrenome para cadastro.');
+                        return;
+                    }
                     result = await supabase.auth.signUp({
                         email,
                         password,
+                        options: { data: { first_name: firstName.trim(), last_name: lastName.trim() } }
                     });
                 } else {
                     result = await supabase.auth.signInWithPassword({
@@ -2773,7 +2827,8 @@
                     currentUser = data.user;
                     setCachedUser(data.user);
                     showApp();
-                    showFloatingNotification('success', `Bem-vindo, ${data.user.email.split('@')[0]}!`);
+                    const dn = (currentUser.user_metadata && ((currentUser.user_metadata.first_name||'').trim() + ' ' + (currentUser.user_metadata.last_name||'').trim()).trim()) || currentUser.email.split('@')[0];
+                    showFloatingNotification('success', `Bem-vindo, ${dn}!`);
                 }
             } catch (error) {
                 console.error('Erro de autenticação:', error);
@@ -2818,6 +2873,32 @@
                 showLoading(false);
             }
         }
+
+        async function saveProfile() {
+            const fn = (document.getElementById('pmFirstName')?.value || '').trim();
+            const ln = (document.getElementById('pmLastName')?.value || '').trim();
+            if (!fn || !ln) { showCustomAlert('Preencha nome e sobrenome.'); return; }
+            showLoading(true);
+            try {
+                const { data, error } = await supabase.auth.updateUser({ data: { first_name: fn, last_name: ln } });
+                if (error) { throw error; }
+                currentUser = data.user || currentUser;
+                setCachedUser(currentUser);
+                const mech = document.getElementById('mecanico');
+                if (mech) mech.value = getDisplayName(currentUser);
+                document.getElementById('profileModal').classList.add('hidden');
+                showFloatingNotification('success', 'Perfil atualizado.');
+            } catch (e) {
+                showCustomAlert(e.message || 'Falha ao atualizar perfil.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        const pmSaveBtn = document.getElementById('pmSave');
+        if (pmSaveBtn) { pmSaveBtn.addEventListener('click', function() { saveProfile(); }); }
+        const pmCancelBtn = document.getElementById('pmCancel');
+        if (pmCancelBtn) { pmCancelBtn.addEventListener('click', function() { document.getElementById('profileModal').classList.add('hidden'); }); }
 
         // Carregar dados iniciais
         async function loadInitialData() {
