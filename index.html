@@ -974,6 +974,11 @@
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Emails restritos</h3>
                         <div id="adminRulesList" class="space-y-2"></div>
                     </div>
+                    <div class="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Atualização do Sistema</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Enviar aviso e atualizar páginas dos usuários.</p>
+                        <button id="adminForceRefreshBtn" class="px-4 py-2 bg-red-600 text-white rounded-md">Forçar atualização dos usuários</button>
+                    </div>
                 </div>
             </section>
 
@@ -1550,6 +1555,7 @@
         let inspections = [];
         let equipments = [];
         let realtimeChannel = null;
+        let systemBroadcastChannel = null;
         let pollingTimer = null;
         let currentInspectionId = null;
         let currentPhotoSessionId = null;
@@ -2950,6 +2956,7 @@
                 inspections = [];
                 clearCachedUser();
                 if (realtimeChannel) { try { supabase.removeChannel(realtimeChannel); } catch (_) {} realtimeChannel = null; }
+                if (systemBroadcastChannel) { try { supabase.removeChannel(systemBroadcastChannel); } catch (_) {} systemBroadcastChannel = null; }
                 if (pollingTimer) { clearInterval(pollingTimer); pollingTimer = null; }
                 showLogin();
                 showFloatingNotification('success', 'Logout realizado com sucesso!');
@@ -4682,7 +4689,7 @@
 
         function setupRealtime() {
             try {
-                if (realtimeChannel) return;
+                if (realtimeChannel && systemBroadcastChannel) return;
                 realtimeChannel = supabase.channel('all-changes')
                     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'inspections' }, (payload) => {
                         if (!savingInspection) {
@@ -4699,6 +4706,23 @@
                         const r = payload && payload.new ? payload.new : {};
                         const f = r.frota || '';
                         pushNotification('info', 'Novo equipamento', f ? `Equipamento ${f} cadastrado` : 'Equipamento cadastrado');
+                    })
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'system_events' }, (payload) => {
+                        const ev = payload && payload.new ? payload.new : {};
+                        if ((ev.type || '') === 'force_refresh') {
+                            showFloatingNotification('warning', 'NOVA ATUALIZAÇÃO DO SISTEMA');
+                            pushNotification('info', 'Atualização', 'NOVA ATUALIZAÇÃO DO SISTEMA');
+                            setTimeout(() => { try { location.reload(); } catch(_) {} }, 2000);
+                        }
+                    })
+                    .subscribe();
+
+                systemBroadcastChannel = supabase.channel('system-broadcast')
+                    .on('broadcast', { event: 'force_refresh' }, (payload) => {
+                        const msg = (payload && payload.payload && payload.payload.message) || 'NOVA ATUALIZAÇÃO DO SISTEMA';
+                        showFloatingNotification('warning', msg);
+                        pushNotification('info', 'Atualização', msg);
+                        setTimeout(() => { try { location.reload(); } catch(_) {} }, 2000);
                     })
                     .subscribe();
             } catch (e) {
@@ -5184,8 +5208,21 @@
         function bindAdminActions() {
             const s = document.getElementById('adminSaveRuleBtn');
             const c = document.getElementById('adminClearBtn');
+            const f = document.getElementById('adminForceRefreshBtn');
             if (s && !s._bound) { s.addEventListener('click', saveAccessRule); s._bound = true; }
             if (c && !c._bound) { c.addEventListener('click', function(){ const e=document.getElementById('adminEmailInput'); if(e) e.value=''; Array.from(document.querySelectorAll('#adminSectionsSelect input[type="checkbox"]')).forEach(b=>{ b.checked=false; }); }); c._bound=true; }
+            if (f && !f._bound) { f.addEventListener('click', adminForceRefresh); f._bound = true; }
+        }
+
+        async function adminForceRefresh() {
+            if (!isAdmin()) { showCustomAlert('Acesso restrito.'); return; }
+            if (!isOnline()) { showFloatingNotification('warning', 'Sem internet. Não foi possível enviar o comando.'); return; }
+            try {
+                await supabase.channel('system-broadcast').send({ type: 'broadcast', event: 'force_refresh', payload: { message: 'NOVA ATUALIZAÇÃO DO SISTEMA' } });
+                showFloatingNotification('success', 'Comando enviado');
+            } catch (_) {
+                showFloatingNotification('warning', 'Falha ao enviar comando online');
+            }
         }
 
         function sanitizeStrayNodes() {
