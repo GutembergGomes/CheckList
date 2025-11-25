@@ -977,7 +977,27 @@
                     <div class="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Atualização do Sistema</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Enviar aviso e atualizar páginas dos usuários.</p>
+                        <div class="space-y-3 mb-4">
+                            <input id="adminUpdateMessage" type="text" placeholder="NOVA ATUALIZAÇÃO DO SISTEMA" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                            <label class="inline-flex items-center text-sm text-gray-700 dark:text-gray-300">
+                                <input id="adminRequireConfirm" type="checkbox" class="form-checkbox">
+                                <span class="ml-2">Usuários devem confirmar atualização</span>
+                            </label>
+                        </div>
                         <button id="adminForceRefreshBtn" class="px-4 py-2 bg-red-600 text-white rounded-md">Forçar atualização dos usuários</button>
+                    </div>
+                    <div class="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Usuários</h3>
+                        <div id="adminUsersList" class="space-y-2"></div>
+                    </div>
+                    <div class="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Guia: Tabela de Usuários (SQL)</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Se os usuários não aparecem, copie e execute este SQL no Supabase.</p>
+                        <div class="flex gap-3">
+                            <button id="adminCopyUsersSqlBtn" class="px-4 py-2 bg-primary text-white rounded-md">Copiar SQL de criação</button>
+                            <button id="adminCopyAuthSyncSqlBtn" class="px-4 py-2 bg-yellow-600 text-white rounded-md">Copiar SQL de migração (auth→users)</button>
+                            <button id="adminRunAuthSyncBtn" class="px-4 py-2 bg-green-600 text-white rounded-md">Executar sincronização</button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1556,6 +1576,9 @@
         let equipments = [];
         let realtimeChannel = null;
         let systemBroadcastChannel = null;
+        let presenceChannel = null;
+        let onlineUsers = {};
+        let usersList = [];
         let pollingTimer = null;
         let currentInspectionId = null;
         let currentPhotoSessionId = null;
@@ -2836,6 +2859,7 @@
                 if (pm) pm.classList.remove('hidden');
             }
             loadAccessControls().then(() => applyAccessControls());
+            ensureUserRecord().then(() => { startPresence(); });
             loadInitialData();
             setupRealtime();
             startPolling();
@@ -3037,6 +3061,7 @@
 
         // Salvar inspeção no Supabase
         async function saveInspection() {
+            if (!isApprovedUser()) { showCustomAlert('Aguardando aprovação do administrador.'); return; }
             if (savingInspection) return;
             // Validação do formulário
             const data = document.getElementById('dataInspecao').value;
@@ -4285,6 +4310,33 @@
             document.body.appendChild(modal);
         }
 
+        function showUpdatePrompt(message) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4 fade-in">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Atualização disponível</h3>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4 whitespace-pre-line">${message}</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="confirmUpdateNow" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors duration-200">Atualizar agora</button>
+                        <button id="dismissUpdate" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300">Depois</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            const confirmBtn = modal.querySelector('#confirmUpdateNow');
+            const dismissBtn = modal.querySelector('#dismissUpdate');
+            if (confirmBtn && !confirmBtn._bound) { confirmBtn.addEventListener('click', function(){ try { location.reload(); } catch(_) {} }); confirmBtn._bound = true; }
+            if (dismissBtn && !dismissBtn._bound) { dismissBtn.addEventListener('click', function(){ const m = this.closest('.fixed'); if (m) m.remove(); }); dismissBtn._bound = true; }
+        }
+
         // Advanced Features
         
         // Search functionality
@@ -4715,14 +4767,19 @@
                             setTimeout(() => { try { location.reload(); } catch(_) {} }, 2000);
                         }
                     })
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'users' }, () => { loadUsers(); })
+                    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users' }, () => { loadUsers(); })
                     .subscribe();
 
                 systemBroadcastChannel = supabase.channel('system-broadcast')
                     .on('broadcast', { event: 'force_refresh' }, (payload) => {
-                        const msg = (payload && payload.payload && payload.payload.message) || 'NOVA ATUALIZAÇÃO DO SISTEMA';
+                        const p = (payload && payload.payload) || {};
+                        const msg = p.message || 'NOVA ATUALIZAÇÃO DO SISTEMA';
+                        const requireConfirm = !!p.requireConfirm;
                         showFloatingNotification('warning', msg);
                         pushNotification('info', 'Atualização', msg);
-                        setTimeout(() => { try { location.reload(); } catch(_) {} }, 2000);
+                        if (requireConfirm) { showUpdatePrompt(msg); }
+                        else { setTimeout(() => { try { location.reload(); } catch(_) {} }, 2000); }
                     })
                     .subscribe();
             } catch (e) {
@@ -5209,20 +5266,223 @@
             const s = document.getElementById('adminSaveRuleBtn');
             const c = document.getElementById('adminClearBtn');
             const f = document.getElementById('adminForceRefreshBtn');
+            const g = document.getElementById('adminCopyUsersSqlBtn');
+            const gs = document.getElementById('adminCopyAuthSyncSqlBtn');
+            const rs = document.getElementById('adminRunAuthSyncBtn');
             if (s && !s._bound) { s.addEventListener('click', saveAccessRule); s._bound = true; }
             if (c && !c._bound) { c.addEventListener('click', function(){ const e=document.getElementById('adminEmailInput'); if(e) e.value=''; Array.from(document.querySelectorAll('#adminSectionsSelect input[type="checkbox"]')).forEach(b=>{ b.checked=false; }); }); c._bound=true; }
             if (f && !f._bound) { f.addEventListener('click', adminForceRefresh); f._bound = true; }
+            if (g && !g._bound) { g.addEventListener('click', adminCopyUsersSQL); g._bound = true; }
+            if (gs && !gs._bound) { gs.addEventListener('click', adminCopyAuthSyncSQL); gs._bound = true; }
+            if (rs && !rs._bound) { rs.addEventListener('click', adminRunAuthSync); rs._bound = true; }
+            loadUsers();
+        }
+
+        function adminCopyUsersSQL() {
+            const sql = [
+                'begin;',
+                'create table if not exists public.users (',
+                '  email text primary key,',
+                '  name text,',
+                '  user_id text,',
+                '  email_confirmed boolean default false,',
+                '  approved boolean default false,',
+                '  last_seen timestamptz default now(),',
+                '  created_at timestamptz default now()',
+                ');',
+                'alter table public.users enable row level security;',
+                'create policy "users_select_admin" on public.users for select using (auth.jwt()->>\'email\' = \'gutemberggg10@gmail.com\');',
+                'create policy "users_select_self" on public.users for select using (email = auth.jwt()->>\'email\');',
+                'create policy "users_insert_self" on public.users for insert with check (email = auth.jwt()->>\'email\');',
+                'create policy "users_update_admin" on public.users for update using (auth.jwt()->>\'email\' = \'gutemberggg10@gmail.com\');',
+                'alter publication supabase_realtime add table public.users;',
+                'commit;'
+            ].join('\n');
+            const tryClipboard = async () => {
+                try { await navigator.clipboard.writeText(sql); showFloatingNotification('success', 'SQL copiado'); }
+                catch(_) {
+                    const ta = document.createElement('textarea'); ta.value = sql; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showFloatingNotification('success', 'SQL copiado'); } catch(e) { showCustomAlert(sql); } ta.remove();
+                }
+            };
+            tryClipboard();
+        }
+
+        function adminCopyAuthSyncSQL() {
+            const sql = [
+                'begin;',
+                'create or replace function public.sync_users_from_auth() returns void language plpgsql security definer set search_path = public as $$',
+                'begin',
+                '  insert into public.users (email, name, user_id, email_confirmed, approved, last_seen, created_at)',
+                '  select u.email,',
+                "         coalesce(trim((u.raw_user_meta_data->>'first_name')||' '||(u.raw_user_meta_data->>'last_name')), split_part(u.email,'@',1)),",
+                '         u.id::text,',
+                '         (u.email_confirmed_at is not null),',
+                '         false,',
+                '         now(),',
+                '         coalesce(u.created_at, now())',
+                '  from auth.users u',
+                '  left join public.users pu on pu.email = u.email',
+                '  where pu.email is null;',
+                'end;',
+                '$$;',
+                'grant execute on function public.sync_users_from_auth() to anon, authenticated;',
+                'commit;'
+            ].join('\n');
+            const tryClipboard = async () => {
+                try { await navigator.clipboard.writeText(sql); showFloatingNotification('success', 'SQL copiado'); }
+                catch(_) {
+                    const ta = document.createElement('textarea'); ta.value = sql; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showFloatingNotification('success', 'SQL copiado'); } catch(e) { showCustomAlert(sql); } ta.remove();
+                }
+            };
+            tryClipboard();
+        }
+
+        async function adminRunAuthSync() {
+            if (!isAdmin()) { showCustomAlert('Acesso restrito.'); return; }
+            if (!isOnline()) { showFloatingNotification('warning', 'Sem internet'); return; }
+            try {
+                const { error } = await supabase.rpc('sync_users_from_auth');
+                if (error) { showFloatingNotification('warning', 'Função não disponível'); return; }
+                showFloatingNotification('success', 'Sincronização concluída');
+                loadUsers();
+            } catch(_) { showFloatingNotification('error', 'Erro ao sincronizar'); }
+        }
+
+        async function loadUsers() {
+            try {
+                if (isOnline()) {
+                    const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+                    if (!error) { usersList = data || []; renderAdminUsers(); return; }
+                    usersList = [];
+                    renderAdminUsers('Tabela users não disponível ou sem acesso.');
+                    return;
+                }
+                renderAdminUsers('Sem internet. Exibindo apenas usuários online.');
+            } catch(_) { renderAdminUsers(); }
+        }
+
+        function renderAdminUsers(message) {
+            const wrap = document.getElementById('adminUsersList');
+            if (!wrap) return;
+            const note = message ? `<div class="text-xs text-yellow-700 dark:text-yellow-300 mb-2">${message}</div>` : '';
+            if (!usersList || usersList.length === 0) {
+                const onlineOnly = Object.values(onlineUsers || {});
+                if (onlineOnly.length === 0) { wrap.innerHTML = note + '<div class="text-sm text-gray-500 dark:text-gray-400">Nenhum usuário encontrado</div>'; return; }
+                wrap.innerHTML = note + onlineOnly.map(u => {
+                    const onlineBadge = '<span class="ml-2 inline-block w-2 h-2 rounded-full bg-green-500" title="online"></span>';
+                    const status = 'Online • origem: presença';
+                    const name = u.name || (u.email || '');
+                    const email = u.email || '';
+                    return `
+                        <div class="p-3 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">${name}${onlineBadge}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">${email} • ${status}</div>
+                            </div>
+                            <div class="flex items-center gap-2"><span class="text-xs text-gray-500">Aguardando cadastro</span></div>
+                        </div>
+                    `;
+                }).join('');
+                return;
+            }
+            wrap.innerHTML = note + usersList.map(u => {
+                const online = !!onlineUsers[u.email];
+                const emailConf = !!u.email_confirmed;
+                const approved = !!u.approved;
+                const onlineBadge = online ? '<span class="ml-2 inline-block w-2 h-2 rounded-full bg-green-500" title="online"></span>' : '<span class="ml-2 inline-block w-2 h-2 rounded-full bg-gray-400" title="offline"></span>';
+                const status = `${emailConf ? 'Email confirmado' : 'Email não confirmado'} • ${approved ? 'Aprovado' : 'Pendente'}`;
+                const actions = approved ? `<button class="px-3 py-1 text-sm bg-yellow-600 text-white rounded-md" onclick="blockUser('${u.email}')">Desativar</button>` : (emailConf ? `<button class="px-3 py-1 text-sm bg-green-600 text-white rounded-md" onclick="approveUser('${u.email}')">Aprovar</button>` : '<span class="text-xs text-gray-500">Aguardando confirmação de email</span>');
+                return `
+                    <div class="p-3 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-between">
+                        <div>
+                            <div class="text-sm font-medium text-gray-900 dark:text-white">${(u.name||u.email)||''}${onlineBadge}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">${u.email} • ${status}</div>
+                        </div>
+                        <div class="flex items-center gap-2">${actions}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function approveUser(email) {
+            if (!isAdmin()) { showCustomAlert('Acesso restrito.'); return; }
+            try {
+                if (isOnline()) {
+                    const { error } = await supabase.from('users').update({ approved: true }).eq('email', email);
+                    if (error) { showFloatingNotification('warning', 'Falha ao aprovar'); return; }
+                    showFloatingNotification('success', 'Usuário aprovado');
+                    loadUsers();
+                } else {
+                    showFloatingNotification('warning', 'Sem internet');
+                }
+            } catch(_) { showFloatingNotification('error', 'Erro ao aprovar'); }
+        }
+
+        async function blockUser(email) {
+            if (!isAdmin()) { showCustomAlert('Acesso restrito.'); return; }
+            try {
+                if (isOnline()) {
+                    const { error } = await supabase.from('users').update({ approved: false }).eq('email', email);
+                    if (error) { showFloatingNotification('warning', 'Falha ao desativar'); return; }
+                    showFloatingNotification('success', 'Usuário desativado');
+                    loadUsers();
+                } else {
+                    showFloatingNotification('warning', 'Sem internet');
+                }
+            } catch(_) { showFloatingNotification('error', 'Erro ao desativar'); }
         }
 
         async function adminForceRefresh() {
             if (!isAdmin()) { showCustomAlert('Acesso restrito.'); return; }
             if (!isOnline()) { showFloatingNotification('warning', 'Sem internet. Não foi possível enviar o comando.'); return; }
             try {
-                await supabase.channel('system-broadcast').send({ type: 'broadcast', event: 'force_refresh', payload: { message: 'NOVA ATUALIZAÇÃO DO SISTEMA' } });
+                const msgEl = document.getElementById('adminUpdateMessage');
+                const requireEl = document.getElementById('adminRequireConfirm');
+                const message = (msgEl && msgEl.value ? msgEl.value : 'NOVA ATUALIZAÇÃO DO SISTEMA').trim();
+                const requireConfirm = !!(requireEl && requireEl.checked);
+                await supabase.channel('system-broadcast').send({ type: 'broadcast', event: 'force_refresh', payload: { message, requireConfirm } });
                 showFloatingNotification('success', 'Comando enviado');
             } catch (_) {
                 showFloatingNotification('warning', 'Falha ao enviar comando online');
             }
+        }
+
+        function getCachedUserRecord() { try { return JSON.parse(localStorage.getItem('userRecord')) || null; } catch(_) { return null; } }
+        function setCachedUserRecord(r) { try { localStorage.setItem('userRecord', JSON.stringify(r)); } catch(_) {} }
+        function isApprovedUser() { const r = getCachedUserRecord(); return !!(r && r.approved); }
+        async function ensureUserRecord() {
+            try {
+                const u = currentUser || getCachedUser();
+                if (!u || !u.email) return null;
+                const rec = { email: u.email, name: getDisplayName(u), user_id: u.id, email_confirmed: !!(u.email_confirmed_at || u.confirmed_at), approved: false, last_seen: new Date().toISOString(), created_at: new Date().toISOString() };
+                if (isOnline()) {
+                    const { data, error } = await supabase.from('users').upsert([rec], { onConflict: 'email' }).select();
+                    if (!error && data && data[0]) { setCachedUserRecord(data[0]); return data[0]; }
+                }
+                setCachedUserRecord(rec);
+                return rec;
+            } catch(_) { return null; }
+        }
+
+        function startPresence() {
+            try {
+                if (presenceChannel) return;
+                const u = currentUser || getCachedUser();
+                presenceChannel = supabase.channel('user-presence', { config: { presence: { key: (u && u.id) ? u.id : (u && u.email) || 'anon' } } })
+                    .on('presence', { event: 'sync' }, () => {
+                        const state = presenceChannel.presenceState();
+                        const merged = {};
+                        Object.values(state).forEach(arr => { arr.forEach(p => { if (p.email) merged[p.email] = { email: p.email, name: p.name }; }); });
+                        onlineUsers = merged;
+                        renderAdminUsers();
+                    })
+                    .subscribe(async (status) => {
+                        if (status === 'SUBSCRIBED') {
+                            const payload = { email: u.email, name: getDisplayName(u) };
+                            try { await presenceChannel.track(payload); } catch(_) {}
+                        }
+                    });
+            } catch(_) {}
         }
 
         function sanitizeStrayNodes() {
