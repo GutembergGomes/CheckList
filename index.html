@@ -3215,6 +3215,7 @@
 
         // Salvar inspeção no Supabase
         async function saveInspection() {
+            await ensureUserRecord();
             if (!isApprovedUser()) { showCustomAlert('Aguardando aprovação do administrador.'); return; }
             if (savingInspection) return;
             // Validação do formulário
@@ -5611,13 +5612,29 @@
             try {
                 const u = currentUser || getCachedUser();
                 if (!u || !u.email) return null;
-                const rec = { email: u.email, name: getDisplayName(u), user_id: u.id, email_confirmed: !!(u.email_confirmed_at || u.confirmed_at), approved: false, last_seen: new Date().toISOString(), created_at: new Date().toISOString() };
+                const base = { email: u.email, name: getDisplayName(u), user_id: u.id, email_confirmed: !!(u.email_confirmed_at || u.confirmed_at), last_seen: new Date().toISOString() };
                 if (isOnline()) {
-                    const { data, error } = await supabase.from('users').upsert([rec], { onConflict: 'email' }).select();
-                    if (!error && data && data[0]) { setCachedUserRecord(data[0]); return data[0]; }
+                    const { data, error } = await supabase.from('users').select('*').eq('email', u.email).limit(1);
+                    if (!error && data && data[0]) {
+                        const existing = data[0];
+                        await supabase.from('users').update(base).eq('email', u.email);
+                        const merged = Object.assign({}, existing, base);
+                        setCachedUserRecord(merged);
+                        return merged;
+                    } else {
+                        const rec = Object.assign({}, base, { approved: false, created_at: new Date().toISOString() });
+                        const { data: ins, error: insErr } = await supabase.from('users').insert([rec]).select();
+                        if (!insErr && ins && ins[0]) { setCachedUserRecord(ins[0]); return ins[0]; }
+                        setCachedUserRecord(rec);
+                        return rec;
+                    }
+                } else {
+                    const cached = getCachedUserRecord();
+                    if (cached) return cached;
+                    const rec = Object.assign({}, base, { approved: false, created_at: new Date().toISOString() });
+                    setCachedUserRecord(rec);
+                    return rec;
                 }
-                setCachedUserRecord(rec);
-                return rec;
             } catch(_) { return null; }
         }
 
