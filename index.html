@@ -808,7 +808,7 @@
                             </div>
                         </div>
 
-                        <div onclick="selectEquipment('distribuidora')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                    <div onclick="selectEquipment('distribuidora')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
                             <div class="flex items-center space-x-4">
                                 <div class="w-12 h-12 bg-cyan-100 dark:bg-cyan-900 rounded-lg flex items-center justify-center">
                                     <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -836,17 +836,19 @@
                             </div>
                         </div>
 
-                        <div onclick="selectEquipment('manutencao')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div onclick="selectEquipment('transbordo')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
                             <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16v6H4zM4 14h16v6H4z"/>
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Manutenção</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklists de reforma e entressafra</p>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Transbordo</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklist de manutenção de transbordos</p>
                                 </div>
                             </div>
                         </div>
@@ -1023,6 +1025,7 @@
                                 <option value="distribuidora">Distribuidora</option>
                                 <option value="reboque">Reboque</option>
                                 <option value="manutencao">Manutenção</option>
+                                <option value="transbordo">Transbordo</option>
                             </select>
                         </div>
                         <div>
@@ -1162,6 +1165,7 @@
                                     <option value="plantadora">Plantadora</option>
                                     <option value="distribuidora">Distribuidora</option>
                                     <option value="manutencao">Manutenção</option>
+                                    <option value="transbordo">Transbordo</option>
                                 </select>
                                 <select id="leaderFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
                                     <option value="all" selected>Todos líderes</option>
@@ -1451,6 +1455,7 @@
                                 <option value="distribuidora">Distribuidora</option>
                                 <option value="reboque">Reboque</option>
                                 <option value="manutencao">Manutenção</option>
+                                <option value="transbordo">Transbordo</option>
                                 <option value="outros">Outros</option>
                             </select>
                         </div>
@@ -1487,6 +1492,7 @@
                                 <option value="plantadora">Plantadora</option>
                                 <option value="distribuidora">Distribuidora</option>
                                 <option value="reboque">Reboque</option>
+                                <option value="transbordo">Transbordo</option>
                                 <option value="manutencao">Manutenção</option>
                                 <option value="outros">Outros</option>
                             </select>
@@ -1941,6 +1947,75 @@
                 await loadEquipments();
                 populateEquipmentList();
                 showFloatingNotification('success', 'Reboques cadastrados');
+            }
+        }
+        async function seedTransbordos() {
+            if (!isOnline()) return;
+            const list = [
+                { tipo: 'transbordo', frota: '176', descricao: 'TRANSBORDO CANA PICADA SMR 12500 SERMAG', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '481', descricao: 'TRANSBORDO CANA PICADA SMR 12500 SERMAG', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '494', descricao: 'TRANSBORDO CANA PICADA SMR 12500 SERMAG', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '531', descricao: 'TRANSBORDO CANA PICADA SMR 12500 SERMAG', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '532', descricao: 'TRANSBORDO CANA PICADA SMR 12500 SERMAG', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '549', descricao: 'TRANSBORDO CANA PICADA SMR 12500 SERMAG', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '562', descricao: 'TRANSBORDO CANA PICADA SMR 12500 SERMAG', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '563', descricao: 'TRANSBORDO CANA PICADA SMR 12500 SERMAG', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '689', descricao: 'TRANSBORDO CANA PICADA SMR10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '693', descricao: 'TRANSBORDO CANA PICADA SMR10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '696', descricao: 'TRANSBORDO CANA PICADA ATA 10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '883', descricao: 'TRANSBORDO CANA PICADA ATA 10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '889', descricao: 'TRANSBORDO CANA PICADA SMR10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '892', descricao: 'TRANSBORDO CANA PICADA ATA 10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '918', descricao: 'TRANSBORDO CANA PICADA SMR10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '924', descricao: 'TRANSBORDO CANA PICADA ATA 10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '3135', descricao: 'TRANSBORDO CANA PICADA SE 8500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '3138', descricao: 'TRANSBORDO CANA PICADA SE 8500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '3293', descricao: 'TRANSBORDO CANA PICADA ATA 10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '3294', descricao: 'TRANSBORDO CANA PICADA ATA 10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '5390', descricao: 'TRANSBORDO CANA PICADA SMR 12500 SERMAG', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '5398', descricao: 'TRANSBORDO CANA PICADA SMR 12500 SERMAG', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '5414', descricao: 'TRANSBORDO CANA PICADA SMR 8500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '5427', descricao: 'TRANSBORDO CANA PICADA SMR 8500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6511', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6512', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6513', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6514', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6515', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6516', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6517', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6518', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6675', descricao: 'TRANSBORDO CANA PICADA TASI 22/2200', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6676', descricao: 'TRANSBORDO CANA PICADA TASI 22/2200', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6678', descricao: 'TRANSBORDO CANA PICADA TASI 22/2200', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6726', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6951', descricao: 'TRANSBORDO CANA PICADA TASI 22/2200', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6992', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6993', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '6994', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '70032', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '8057', descricao: 'TRANSBORDO CANA PICADA ATA 10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '8058', descricao: 'TRANSBORDO CANA PICADA ATA 10500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '8150', descricao: 'TRANSBORDO CANA PICADA TASI 22/2200', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '8164', descricao: 'TRANSBORDO CANA PICADA ATA 21500', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'transbordo', frota: '9399', descricao: 'TRANSBORDO CANA PICADA SMR 8500', status: 'ativo', created_at: new Date().toISOString() }
+            ];
+            const frotas = list.map(t => t.frota);
+            const { data: existing, error } = await supabase
+                .from('equipments')
+                .select('frota,tipo')
+                .eq('tipo', 'transbordo')
+                .in('frota', frotas);
+            if (error) return;
+            const existingSet = new Set((existing || []).map(e => String(e.frota)));
+            const toInsert = list.filter(t => !existingSet.has(String(t.frota)));
+            if (toInsert.length === 0) return;
+            const { error: insErr } = await supabase
+                .from('equipments')
+                .insert(toInsert);
+            if (!insErr) {
+                await loadEquipments();
+                populateEquipmentList();
+                showFloatingNotification('success', 'Transbordos cadastrados');
             }
         }
         let currentInspection = {
@@ -2762,6 +2837,85 @@
                         ]
                     }
                 ]
+            },
+            transbordo: {
+                title: "Checklist de Reforma/Entressafra - Transbordo de Cana",
+                sections: [
+                    {
+                        name: "PRIMÁRIA",
+                        items: [
+                            "Lavagem geral",
+                            "Lubrificação geral"
+                        ]
+                    },
+                    {
+                        name: "MECÂNICO",
+                        items: [
+                            "Desmontar cubos de roda",
+                            "Desmontar tandem",
+                            "Verificar tandem - rolamentos",
+                            "Suspensão - pinos/buchas",
+                            "Eixos/mancais",
+                            "Conferir parafusos e porcas"
+                        ]
+                    },
+                    {
+                        name: "HIDRÁULICO",
+                        items: [
+                            "Reservatório e filtros",
+                            "Bombas hidráulicas",
+                            "Válvulas/Distribuidores",
+                            "Mangueiras/Flexíveis",
+                            "Abraçadeiras/Conexões",
+                            "Vazamentos/Pressão"
+                        ]
+                    },
+                    {
+                        name: "ELÉTRICA",
+                        items: [
+                            "Chicotes elétricos",
+                            "Iluminação traseira",
+                            "Iluminação lateral",
+                            "Tomadas/Pinos",
+                            "Painel/Monitoramento"
+                        ]
+                    },
+                    {
+                        name: "CALDEIRARIA",
+                        items: [
+                            "Chassi/Estrutura",
+                            "Soldas/Chapas",
+                            "Proteções",
+                            "Mancais de basculamento",
+                            "Engate"
+                        ]
+                    },
+                    {
+                        name: "FREIO",
+                        items: [
+                            "Válvulas/Mangueiras",
+                            "Flexíveis/Câmaras",
+                            "Lonas/Pastilhas",
+                            "Reservatório de ar"
+                        ]
+                    },
+                    {
+                        name: "PNEUS",
+                        items: [
+                            "Calibragem",
+                            "Medição de sulco",
+                            "Emparelhamento",
+                            "Balanceamento"
+                        ]
+                    },
+                    {
+                        name: "FUNILARIA",
+                        items: [
+                            "Pintura",
+                            "Número/frota e adesivos"
+                        ]
+                    }
+                ]
             }
         };
             manutencao: [
@@ -3046,6 +3200,7 @@
                 await seedPlanters();
                 await seedDistributors();
                 await seedTrailers();
+                await seedTransbordos();
                 await syncPendingInspections();
                 await syncPendingEquipments();
                 updateStats();
@@ -3279,7 +3434,8 @@
                 reboque: ['reboque','trailer'],
                 plantadora: ['plantadora','planter'],
                 distribuidora: ['distribuidora','distributor'],
-                manutencao: ['manutencao','maintenance']
+                manutencao: ['manutencao','maintenance'],
+                transbordo: ['transbordo']
             };
             return map[t] || [t];
         }
@@ -3468,6 +3624,7 @@
                     trator: 'Checklist - Trator',
                     colhedora: 'Checklist - Colhedora',
                     reboque: 'Checklist - Reboque',
+                    transbordo: 'Checklist - Transbordo',
                     manutencao: 'Checklist - Manutenção',
                     plantadora: 'Checklist - Plantadora de Cana',
                     distribuidora: 'Checklist - Distribuidora de Cana'
@@ -3489,6 +3646,7 @@
         function generateChecklistItems(type) {
             const container = document.getElementById('checklistItems');
             const map = { caminhao: 'truck', trator: 'tractor', colhedora: 'harvester', reboque: 'trailer', manutencao: 'maintenance', plantadora: 'planter', distribuidora: 'distributor' };
+            map.transbordo = 'transbordo';
             const key = map[type];
             const config = key ? equipmentConfigs[key] : null;
             container.innerHTML = '';
@@ -3737,6 +3895,7 @@
                 plantadora: inspections.filter(i => i.tipo === 'plantadora').length,
                 distribuidora: inspections.filter(i => i.tipo === 'distribuidora').length,
                 reboque: inspections.filter(i => i.tipo === 'reboque').length,
+                transbordo: inspections.filter(i => i.tipo === 'transbordo').length,
                 manutencao: inspections.filter(i => i.tipo === 'manutencao').length
             };
             
@@ -4634,13 +4793,13 @@
             }
             const equipCtx = document.getElementById('equipmentChart');
             if (equipCtx && typeof Chart !== 'undefined') {
-                const mapLabels = { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', plantadora: 'Plantadoras', distribuidora: 'Distribuidoras', manutencao: 'Manutenção' };
-                const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','manutencao'];
-                const counts = { caminhao: 0, trator: 0, colhedora: 0, reboque: 0, plantadora: 0, distribuidora: 0, manutencao: 0 };
+                const mapLabels = { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', plantadora: 'Plantadoras', distribuidora: 'Distribuidoras', transbordo: 'Transbordos', manutencao: 'Manutenção' };
+                const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo','manutencao'];
+                const counts = { caminhao: 0, trator: 0, colhedora: 0, reboque: 0, plantadora: 0, distribuidora: 0, transbordo: 0, manutencao: 0 };
                 filtered.forEach(i => { if (counts[i.tipo] !== undefined) counts[i.tipo]++; });
                 const labelsEquip = order.map(k => mapLabels[k]);
                 const dataEquip = order.map(k => counts[k]);
-                const colors = ['#3B82F6','#10B981','#8B5CF6','#F59E0B','#EF4444','#06B6D4','#F472B6'];
+                const colors = ['#3B82F6','#10B981','#8B5CF6','#F59E0B','#06B6D4','#FB923C','#F472B6','#0EA5E9'];
                 if (!equipmentChart) {
                     equipmentChart = new Chart(equipCtx, {
                         type: 'doughnut',
@@ -4649,7 +4808,7 @@
                             const eqSel = document.getElementById('equipmentFilter');
                             if (!elements || elements.length === 0 || !eqSel) return;
                             const idx = elements[0].index;
-                            const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','manutencao'];
+                            const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo','manutencao'];
                             eqSel.value = order[idx] || 'all';
                             const d = document.getElementById('chartPeriod') ? parseInt(document.getElementById('chartPeriod').value, 10) : 30;
                             buildCharts(d);
