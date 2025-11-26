@@ -1164,7 +1164,6 @@
                                     <option value="reboque">Reboque</option>
                                     <option value="plantadora">Plantadora</option>
                                     <option value="distribuidora">Distribuidora</option>
-                                    <option value="manutencao">Manutenção</option>
                                     <option value="transbordo">Transbordo</option>
                                 </select>
                                 <select id="leaderFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
@@ -3895,8 +3894,7 @@
                 plantadora: inspections.filter(i => i.tipo === 'plantadora').length,
                 distribuidora: inspections.filter(i => i.tipo === 'distribuidora').length,
                 reboque: inspections.filter(i => i.tipo === 'reboque').length,
-                transbordo: inspections.filter(i => i.tipo === 'transbordo').length,
-                manutencao: inspections.filter(i => i.tipo === 'manutencao').length
+                transbordo: inspections.filter(i => i.tipo === 'transbordo').length
             };
             
             const totalEquipments = Object.values(counts).reduce((a, b) => a + b, 0);
@@ -4793,9 +4791,9 @@
             }
             const equipCtx = document.getElementById('equipmentChart');
             if (equipCtx && typeof Chart !== 'undefined') {
-                const mapLabels = { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', plantadora: 'Plantadoras', distribuidora: 'Distribuidoras', transbordo: 'Transbordos', manutencao: 'Manutenção' };
-                const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo','manutencao'];
-                const counts = { caminhao: 0, trator: 0, colhedora: 0, reboque: 0, plantadora: 0, distribuidora: 0, transbordo: 0, manutencao: 0 };
+                const mapLabels = { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', plantadora: 'Plantadoras', distribuidora: 'Distribuidoras', transbordo: 'Transbordos' };
+                const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo'];
+                const counts = { caminhao: 0, trator: 0, colhedora: 0, reboque: 0, plantadora: 0, distribuidora: 0, transbordo: 0 };
                 filtered.forEach(i => { if (counts[i.tipo] !== undefined) counts[i.tipo]++; });
                 const labelsEquip = order.map(k => mapLabels[k]);
                 const dataEquip = order.map(k => counts[k]);
@@ -4808,7 +4806,7 @@
                             const eqSel = document.getElementById('equipmentFilter');
                             if (!elements || elements.length === 0 || !eqSel) return;
                             const idx = elements[0].index;
-                            const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo','manutencao'];
+                            const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo'];
                             eqSel.value = order[idx] || 'all';
                             const d = document.getElementById('chartPeriod') ? parseInt(document.getElementById('chartPeriod').value, 10) : 30;
                             buildCharts(d);
