@@ -310,6 +310,27 @@
             max-height: 90vh;
             overflow-y: auto;
         }
+        .tire-grid { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:14px; }
+        .tire-row { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:8px; align-items:center; }
+        .tire-circle { width:44px; height:44px; border-radius:9999px; display:flex; align-items:center; justify-content:center; font-weight:600; border:2px solid #9CA3AF; background:#F9FAFB; color:#111827; }
+        .tire-circle.dark { background:#374151; color:#F3F4F6; border-color:#4B5563; }
+        .tire-label { font-size:12px; color:#6B7280; text-align:center; }
+        .calib-highlight { box-shadow: 0 0 0 2px #5D5CDE inset; border-color: #5D5CDE !important; }
+        .map-tabs { display:flex; gap:8px; }
+        .map-tab { font-size:12px; padding:6px 10px; border:1px solid #e5e7eb; border-radius:8px; background:#fff; color:#374151; }
+        .dark .map-tab { background:#374151; border-color:#4B5563; color:#e5e7eb; }
+        .map-tab.active { background:#5D5CDE; color:#fff; border-color:#5D5CDE; }
+        .vehicle-body { height:48px; border:2px dashed #9CA3AF; border-radius:10px; background:#F9FAFB; }
+        .dark .vehicle-body { border-color:#4B5563; background:#374151; }
+        .axle-row { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:8px; align-items:center; }
+        .axle-label { font-size:12px; color:#6B7280; text-align:center; }
+        .record-modal { color:#111827; }
+        .dark .record-modal { color:#F3F4F6; }
+        .record-table { width:100%; border-collapse:collapse; font-size:12px; }
+        .record-table th, .record-table td { border:1px solid #e5e7eb; padding:6px; text-align:left; }
+        .dark .record-table th, .dark .record-table td { border-color:#4B5563; }
+        .muted { color:#6B7280; font-size:12px; }
+        .dark .muted { color:#D1D5DB; }
     </style>
 </head>
 <body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -452,6 +473,9 @@
                         </button>
                         <button onclick="showSection('equipamentos')" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium">
                             Equipamentos
+                        </button>
+                        <button onclick="showSection('inventario')" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium">
+                            Inventário de Pneus
                         </button>
                         <button onclick="showSection('admin')" id="adminNavBtn" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium hidden">
                             Admin
@@ -1435,7 +1459,7 @@
             </section>
 
             <!-- Equipamentos Section -->
-            <section id="equipamentos" class="section-content hidden">
+    <section id="equipamentos" class="section-content hidden">
                 <div class="mb-8">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Cadastro de Equipamentos</h2>
                     <p class="text-gray-600 dark:text-gray-400">Cadastre frotas por setor para uso nas inspeções</p>
@@ -1497,6 +1521,870 @@
                             </select>
                     </div>
                     <div id="equipList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+    </section>
+
+            <section id="inventario" class="section-content hidden">
+                <div class="max-w-7xl mx-auto">
+                    <div class="glass-morphism rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-8">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m-4-4h8"/></svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Ficha de Inventário de Pneus</h2>
+                                    <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Selecione a ficha desejada para iniciar o lançamento</p>
+                                </div>
+                            </div>
+                            <div class="hidden sm:flex items-center gap-2">
+                                <span class="px-3 py-1 text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full">Inventário</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div onclick="showSection('calibragem')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m-4-4h8"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Calibragem</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Lançar pressão e posições</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div onclick="showSection('controle3p')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Ficha de Controle 3P</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Sulco, DOT e pressão</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div onclick="showSection('historico_pneus')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-amber-100 dark:bg-amber-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m4-7v7m4-4v4"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Histórico de Pneus</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Calibragens e Fichas 3P</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="controle3p" class="section-content hidden">
+                <div class="max-w-7xl mx-auto">
+                    <div class="mb-8">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16"/></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Ficha de Controle 3P</h2>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Preencha conforme a ficha de controle</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex gap-2">
+                                <button id="c3pBtnSalvar" class="px-4 py-2 bg-primary text-white rounded-lg" onclick="saveControle3p()">Salvar</button>
+                                <button class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg" onclick="clearControle3pForm()">Limpar</button>
+                                <button class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg" onclick="window.print()">Imprimir</button>
+                            </div>
+                            <div id="controle3pStatus" class="text-sm text-gray-500 dark:text-gray-400"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Frota</label>
+                                <select id="c3pFrotaSelect" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></select>
+                                <input id="c3pFrotaCustom" placeholder="Digite a frota" type="text" class="mt-2 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white hidden">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Equipamento</label>
+                                <select id="c3pEquipamento" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="caminhao">Caminhão</option>
+                                    <option value="transbordo">Transbordo</option>
+                                    <option value="trator">Trator</option>
+                                    <option value="colhedora">Colhedora</option>
+                                    <option value="plantadora">Plantadora</option>
+                                    <option value="distribuidora">Distribuidora</option>
+                                    <option value="reboque">Reboque</option>
+                                    <option value="manutencao">Manutenção</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Hodômetro/Horímetro</label>
+                                <input id="c3pHodo" type="text" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Ordem de Serviço/Item</label>
+                                <input id="c3pOS" type="text" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Matrícula</label>
+                                <input id="c3pMatricula" type="text" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div class="md:col-span-1">
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Nome</label>
+                                <input id="c3pNome" type="text" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Data Inicial</label>
+                                <input id="c3pDataIni" type="date" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Hora Inicial</label>
+                                <input id="c3pHoraIni" type="time" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Data Final</label>
+                                <input id="c3pDataFim" type="date" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Hora Final</label>
+                                <input id="c3pHoraFim" type="time" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm table-fixed">
+                                <thead class="sticky top-0 z-10">
+                                    <tr class="bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                                        <th class="px-2 py-2 text-left">SEQ</th>
+                                        <th class="px-2 py-2 text-left">POSIÇÃO</th>
+                                        <th class="px-2 py-2 text-left">Nº FOGO PNEU</th>
+                                        <th class="px-2 py-2 text-left">MEDIDA</th>
+                                        <th class="px-2 py-2 text-left">FABRICANTE</th>
+                                        <th class="px-2 py-2 text-left">MODELO</th>
+                                        <th class="px-2 py-2 text-left">ÍNDICE DE CARGA</th>
+                                        <th class="px-2 py-2 text-left">DOT</th>
+                                        <th class="px-2 py-2 text-left">1º SULCO</th>
+                                        <th class="px-2 py-2 text-left">2º SULCO</th>
+                                        <th class="px-2 py-2 text-left">3º SULCO</th>
+                                        <th class="px-2 py-2 text-left">PRESSÃO ENCONTRADO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ctrl3pTableBody" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="historico_pneus" class="section-content hidden">
+                <div class="max-w-7xl mx-auto">
+                    <div class="mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m4-7v7m4-4v4"/></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Histórico de Pneus</h2>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Calibragens e Fichas de Controle 3P</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-4 shadow-sm">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Tipo</label>
+                                <select id="histEquipTipo" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="all">Todos</option>
+                                    <option value="caminhao">Caminhão</option>
+                                    <option value="transbordo">Transbordo</option>
+                                    <option value="trator">Trator</option>
+                                    <option value="colhedora">Colhedora</option>
+                                    <option value="plantadora">Plantadora</option>
+                                    <option value="distribuidora">Distribuidora</option>
+                                    <option value="reboque">Reboque</option>
+                                    <option value="manutencao">Manutenção</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Frota</label>
+                                <select id="histFrotaSelect" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></select>
+                                <input id="histFrotaCustom" placeholder="Digite a frota" type="text" class="mt-2 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white hidden">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Data Inicial</label>
+                                <input id="histDataIni" type="date" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Data Final</label>
+                                <input id="histDataFim" type="date" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div class="flex items-end">
+                                <button class="w-full px-4 py-2 bg-primary text-white rounded-md" onclick="loadHistoricoPneus()">Atualizar</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="map-tabs">
+                                <button id="histTabCal" class="map-tab active" onclick="showHistoricoTab('cal')">Calibragens</button>
+                                <button id="histTabC3p" class="map-tab" onclick="showHistoricoTab('c3p')">Controle 3P</button>
+                            </div>
+                            <div id="histStatus" class="text-sm text-gray-500 dark:text-gray-400"></div>
+                        </div>
+                    </div>
+                    <div id="histCalList" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                        <div id="histCalRows" class="divide-y divide-gray-200 dark:divide-gray-700"></div>
+                    </div>
+                    <div id="histC3pList" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hidden">
+                        <div id="histC3pRows" class="divide-y divide-gray-200 dark:divide-gray-700"></div>
+                    </div>
+                </div>
+            </section>
+            <section id="historico_pneus" class="section-content hidden">
+                <div class="max-w-7xl mx-auto">
+                    <div class="mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v10m4-7v7m4-4v4"/></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Histórico de Pneus</h2>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Calibragens e Fichas de Controle 3P</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-4 shadow-sm">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Tipo</label>
+                                <select id="histEquipTipo" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="all">Todos</option>
+                                    <option value="caminhao">Caminhão</option>
+                                    <option value="transbordo">Transbordo</option>
+                                    <option value="trator">Trator</option>
+                                    <option value="colhedora">Colhedora</option>
+                                    <option value="plantadora">Plantadora</option>
+                                    <option value="distribuidora">Distribuidora</option>
+                                    <option value="reboque">Reboque</option>
+                                    <option value="manutencao">Manutenção</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Frota</label>
+                                <select id="histFrotaSelect" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></select>
+                                <input id="histFrotaCustom" placeholder="Digite a frota" type="text" class="mt-2 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white hidden">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Data Inicial</label>
+                                <input id="histDataIni" type="date" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Data Final</label>
+                                <input id="histDataFim" type="date" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div class="flex items-end">
+                                <button class="w-full px-4 py-2 bg-primary text-white rounded-md" onclick="loadHistoricoPneus()">Atualizar</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="map-tabs">
+                                <button id="histTabCal" class="map-tab active" onclick="showHistoricoTab('cal')">Calibragens</button>
+                                <button id="histTabC3p" class="map-tab" onclick="showHistoricoTab('c3p')">Controle 3P</button>
+                            </div>
+                            <div id="histStatus" class="text-sm text-gray-500 dark:text-gray-400"></div>
+                        </div>
+                    </div>
+                    <div id="histCalList" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                        <div id="histCalRows" class="divide-y divide-gray-200 dark:divide-gray-700"></div>
+                    </div>
+                    <div id="histC3pList" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hidden">
+                        <div id="histC3pRows" class="divide-y divide-gray-200 dark:divide-gray-700"></div>
+                    </div>
+                </div>
+            </section>
+            <section id="calibragem" class="section-content hidden">
+                <div class="max-w-7xl mx-auto">
+                    <div class="glass-morphism rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-8">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m-4-4h8"/></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Calibragem de Pneu</h2>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Preencha conforme a ficha de inventário. Consulte as abreviações abaixo.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="px-2 py-1 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded">DE = Dianteiro Esquerdo</span>
+                            <span class="px-2 py-1 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded">DI = Dianteiro Direito</span>
+                            <span class="px-2 py-1 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded">EE = Externo Esquerdo</span>
+                            <span class="px-2 py-1 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded">EI = Interno Esquerdo</span>
+                            <span class="px-2 py-1 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded">EST = Estepe</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex gap-2">
+                                <button id="calBtnSalvar" class="px-4 py-2 bg-primary text-white rounded-lg" onclick="saveCalibragem()">Salvar</button>
+                                <button class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg" onclick="clearCalibragemForm()">Limpar</button>
+                                <button class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg" onclick="window.print()">Imprimir</button>
+                            </div>
+                            <div id="calibragemStatus" class="text-sm text-gray-500 dark:text-gray-400"></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Frota</label>
+                                <select id="calFrotaSelect" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></select>
+                                <input id="calFrotaCustom" placeholder="Digite a frota" type="text" class="mt-2 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white hidden">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Equipamento</label>
+                                <select id="calEquipamento" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="caminhao">Caminhão</option>
+                                    <option value="transbordo">Transbordo</option>
+                                    <option value="trator">Trator</option>
+                                    <option value="colhedora">Colhedora</option>
+                                    <option value="plantadora">Plantadora</option>
+                                    <option value="distribuidora">Distribuidora</option>
+                                    <option value="reboque">Reboque</option>
+                                    <option value="manutencao">Manutenção</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Hodômetro/Horímetro</label>
+                                <input id="calHodo" type="text" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Ordem de Serviço/Item</label>
+                                <input id="calOS" type="text" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Matrícula</label>
+                                <input id="calMatricula" type="text" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div class="md:col-span-1">
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Nome</label>
+                                <input id="calNome" type="text" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Data Inicial</label>
+                                <input id="calDataIni" type="date" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Hora Inicial</label>
+                                <input id="calHoraIni" type="time" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Data Final</label>
+                                <input id="calDataFim" type="date" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Hora Final</label>
+                                <div class="flex gap-2">
+                                    <input id="calHoraFim" type="time" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <button class="mt-1 px-3 py-2 text-xs bg-gray-200 dark:bg-gray-700 rounded-lg" onclick="setCalibragemEndNow()">Agora</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-8 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Posição Nº Fogo dos Pneus</h3>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">1º DE</label>
+                                        <input id="pos_1de" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">1º DI</label>
+                                        <input id="pos_1di" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">2º DE</label>
+                                        <input id="pos_2de" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">2º DI</label>
+                                        <input id="pos_2di" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">3º DE</label>
+                                        <input id="pos_3de" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">3º DI</label>
+                                        <input id="pos_3di" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">4º DE</label>
+                                        <input id="pos_4de" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">4º DI</label>
+                                        <input id="pos_4di" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">1º EE</label>
+                                        <input id="pos_1ee" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">1º EI</label>
+                                        <input id="pos_1ei" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">2º EE</label>
+                                        <input id="pos_2ee" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">2º EI</label>
+                                        <input id="pos_2ei" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">3º EE</label>
+                                        <input id="pos_3ee" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">3º EI</label>
+                                        <input id="pos_3ei" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">4º EE</label>
+                                        <input id="pos_4ee" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">4º EI</label>
+                                        <input id="pos_4ei" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-1 gap-2">
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">EST1</label>
+                                        <input id="pos_est1" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-500 dark:text-gray-400">EST2</label>
+                                        <input id="pos_est2" type="text" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-8 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Medição de Sulco</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">1DE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_1de_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_1de_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">1DI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_1di_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_1di_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">2DE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_2de_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_2de_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">2DI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_2di_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_2di_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">3DE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_3de_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_3de_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">3DI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_3di_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_3di_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">4DE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_4de_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_4de_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">4DI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_4di_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_4di_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">1EI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_1ei_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_1ei_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">1EE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_1ee_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_1ee_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">2EI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_2ei_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_2ei_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">2EE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_2ee_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_2ee_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">3EI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_3ei_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_3ei_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">3EE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_3ee_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_3ee_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">4EI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_4ei_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_4ei_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">4EE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <input id="sulco_4ee_a" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="sulco_4ee_b" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 dark:text-gray-400">EST</label>
+                                <input id="sulco_est" type="text" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-8 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Mapa Visual de Posições</h3>
+                            <div class="map-tabs">
+                                <button id="tabTruck" class="map-tab active" onclick="setCalibMap('truck')">Caminhão</button>
+                                <button id="tabTrans" class="map-tab" onclick="setCalibMap('transbordo')">Transbordo</button>
+                            </div>
+                        </div>
+                        <div id="mapTruck">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <div class="tire-label">Dianteiros</div>
+                                <div class="space-y-3 mt-2">
+                                    <div class="tire-row">
+                                        <button class="tire-circle" onclick="focusCalibragemField('1de')">1º DE</button>
+                                        <div class="tire-label">Eixo 1</div>
+                                        <button class="tire-circle" onclick="focusCalibragemField('1di')">1º DI</button>
+                                    </div>
+                                    <div class="tire-row">
+                                        <button class="tire-circle" onclick="focusCalibragemField('2de')">2º DE</button>
+                                        <div class="tire-label">Eixo 2</div>
+                                        <button class="tire-circle" onclick="focusCalibragemField('2di')">2º DI</button>
+                                    </div>
+                                    <div class="tire-row">
+                                        <button class="tire-circle" onclick="focusCalibragemField('3de')">3º DE</button>
+                                        <div class="tire-label">Eixo 3</div>
+                                        <button class="tire-circle" onclick="focusCalibragemField('3di')">3º DI</button>
+                                    </div>
+                                    <div class="tire-row">
+                                        <button class="tire-circle" onclick="focusCalibragemField('4de')">4º DE</button>
+                                        <div class="tire-label">Eixo 4</div>
+                                        <button class="tire-circle" onclick="focusCalibragemField('4di')">4º DI</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="tire-label">Duplos</div>
+                                <div class="space-y-3 mt-2">
+                                    <div class="tire-row">
+                                        <button class="tire-circle" onclick="focusCalibragemField('1ee')">1º EE</button>
+                                        <div class="tire-label">Eixo 1</div>
+                                        <button class="tire-circle" onclick="focusCalibragemField('1ei')">1º EI</button>
+                                    </div>
+                                    <div class="tire-row">
+                                        <button class="tire-circle" onclick="focusCalibragemField('2ee')">2º EE</button>
+                                        <div class="tire-label">Eixo 2</div>
+                                        <button class="tire-circle" onclick="focusCalibragemField('2ei')">2º EI</button>
+                                    </div>
+                                    <div class="tire-row">
+                                        <button class="tire-circle" onclick="focusCalibragemField('3ee')">3º EE</button>
+                                        <div class="tire-label">Eixo 3</div>
+                                        <button class="tire-circle" onclick="focusCalibragemField('3ei')">3º EI</button>
+                                    </div>
+                                    <div class="tire-row">
+                                        <button class="tire-circle" onclick="focusCalibragemField('4ee')">4º EE</button>
+                                        <div class="tire-label">Eixo 4</div>
+                                        <button class="tire-circle" onclick="focusCalibragemField('4ei')">4º EI</button>
+                                    </div>
+                                </div>
+                                <div class="tire-row mt-4">
+                                    <button class="tire-circle" onclick="focusCalibragemField('est1')">EST1</button>
+                                    <div class="tire-label">Estepe</div>
+                                    <button class="tire-circle" onclick="focusCalibragemField('est2')">EST2</button>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        <div id="mapTransbordo" class="hidden">
+                            <div class="vehicle-body"></div>
+                            <div class="space-y-3 mt-3">
+                                <div class="axle-row">
+                                    <button class="tire-circle" onclick="focusCalibragemField('1ee')">1º EE</button>
+                                    <div class="axle-label">Eixo 1</div>
+                                    <button class="tire-circle" onclick="focusCalibragemField('1ei')">1º EI</button>
+                                </div>
+                                <div class="axle-row">
+                                    <button class="tire-circle" onclick="focusCalibragemField('2ee')">2º EE</button>
+                                    <div class="axle-label">Eixo 2</div>
+                                    <button class="tire-circle" onclick="focusCalibragemField('2ei')">2º EI</button>
+                                </div>
+                                <div class="axle-row">
+                                    <button class="tire-circle" onclick="focusCalibragemField('3ee')">3º EE</button>
+                                    <div class="axle-label">Eixo 3</div>
+                                    <button class="tire-circle" onclick="focusCalibragemField('3ei')">3º EI</button>
+                                </div>
+                                <div class="axle-row">
+                                    <button class="tire-circle" onclick="focusCalibragemField('4ee')">4º EE</button>
+                                    <div class="axle-label">Eixo 4</div>
+                                    <button class="tire-circle" onclick="focusCalibragemField('4ei')">4º EI</button>
+                                </div>
+                                <div class="axle-row mt-2">
+                                    <button class="tire-circle" onclick="focusCalibragemField('est1')">EST1</button>
+                                    <div class="axle-label">Estepe</div>
+                                    <button class="tire-circle" onclick="focusCalibragemField('est2')">EST2</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Calibragem</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div id="calib_box_1de" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">1º DE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_1de_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_1de_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_1di" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">1º DI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_1di_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_1di_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_2de" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">2º DE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_2de_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_2de_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_2di" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">2º DI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_2di_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_2di_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_3de" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">3º DE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_3de_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_3de_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_3di" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">3º DI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_3di_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_3di_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_4de" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">4º DE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_4de_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_4de_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_4di" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">4º DI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_4di_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_4di_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_1ei" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">1º EI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_1ei_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_1ei_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_1ee" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">1º EE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_1ee_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_1ee_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_2ei" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">2º EI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_2ei_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_2ei_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_2ee" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">2º EE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_2ee_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_2ee_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_3ei" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">3º EI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_3ei_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_3ei_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_3ee" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">3º EE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_3ee_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_3ee_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_4ei" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">4º EI</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_4ei_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_4ei_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_4ee" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">4º EE</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_4ee_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_4ee_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_est1" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">EST1</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_est1_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_est1_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                            <div id="calib_box_est2" class="border border-transparent rounded-lg p-1">
+                                <label class="text-xs text-gray-500 dark:text-gray-400">EST2</label>
+                                <div class="grid grid-cols-2 gap-2 mt-1">
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Encontrada</div>
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Aplicada</div>
+                                    <input id="calib_est2_encon" placeholder="Encontrada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <input id="calib_est2_colo" placeholder="Aplicada" type="text" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                        <label class="text-xs font-medium text-gray-500 dark:text-gray-400">Observações</label>
+                        <textarea id="calObservacoes" rows="4" class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></textarea>
+                    </div>
                 </div>
             </section>
         </main>
@@ -1607,6 +2495,12 @@
         function queueEquipment(item) { const q = getPendingEquipments(); q.push(item); setPendingEquipments(q); }
         function getCachedNotifications() { try { return JSON.parse(localStorage.getItem('cachedNotifications')) || []; } catch(_) { return []; } }
         function setCachedNotifications(list) { try { localStorage.setItem('cachedNotifications', JSON.stringify(list)); } catch(_) {} }
+        function getPendingCalibragem() { try { return JSON.parse(localStorage.getItem('pendingCalibragem')) || []; } catch(_) { return []; } }
+        function setPendingCalibragem(list) { try { localStorage.setItem('pendingCalibragem', JSON.stringify(list)); } catch(_) {} }
+        function queueCalibragem(item) { const q = getPendingCalibragem(); q.push(item); setPendingCalibragem(q); }
+        function getPendingControle3p() { try { return JSON.parse(localStorage.getItem('pendingControle3p')) || []; } catch(_) { return []; } }
+        function setPendingControle3p(list) { try { localStorage.setItem('pendingControle3p', JSON.stringify(list)); } catch(_) {} }
+        function queueControle3p(item) { const q = getPendingControle3p(); q.push(item); setPendingControle3p(q); }
         function addOrReplaceInspection(item) {
             const k = String(item.local_id || item.id || '');
             if (!k) {
@@ -3202,6 +4096,8 @@
                 await seedTransbordos();
                 await syncPendingInspections();
                 await syncPendingEquipments();
+                await syncPendingCalibragem();
+                await syncPendingControle3p();
                 updateStats();
                 updateAnalytics();
                 setTimeout(initializeCharts, 500);
@@ -3464,6 +4360,375 @@
             sel._bound = true;
         }
 
+        function populateFrotaOptionsFor(type, selectId, customId) {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            const aliases = typeAliases(type);
+            const list = (equipments || []).filter(e => aliases.includes(e.tipo || e.setor) && (e.status || 'ativo') === 'ativo');
+            const opts = ['<option value="">Selecione uma frota</option>', '<option value="custom">Outro (digitar)</option>']
+                .concat(list.map(e => `<option value="${e.frota}">${e.frota}${e.descricao ? ' - ' + e.descricao : ''}</option>`));
+            sel.innerHTML = opts.join('');
+            const custom = document.getElementById(customId);
+            if (custom) custom.classList.add('hidden');
+        }
+
+        function bindFrotaSelectFor(selectId, customId) {
+            const sel = document.getElementById(selectId);
+            const custom = document.getElementById(customId);
+            if (!sel || sel._bound) return;
+            sel.addEventListener('change', () => {
+                if (custom) {
+                    if (sel.value === 'custom') custom.classList.remove('hidden'); else custom.classList.add('hidden');
+                }
+            });
+            sel._bound = true;
+        }
+
+        function showHistoricoTab(which) {
+            const cal = document.getElementById('histCalList');
+            const c3p = document.getElementById('histC3pList');
+            const tCal = document.getElementById('histTabCal');
+            const tC3p = document.getElementById('histTabC3p');
+            if (!cal || !c3p || !tCal || !tC3p) return;
+            if (which === 'c3p') {
+                cal.classList.add('hidden');
+                c3p.classList.remove('hidden');
+                tCal.classList.remove('active');
+                tC3p.classList.add('active');
+            } else {
+                c3p.classList.add('hidden');
+                cal.classList.remove('hidden');
+                tC3p.classList.remove('active');
+                tCal.classList.add('active');
+            }
+        }
+
+        async function loadHistoricoPneus() {
+            try {
+                const status = document.getElementById('histStatus');
+                if (status) status.textContent = 'Carregando...';
+                await loadEquipments();
+                const tipo = document.getElementById('histEquipTipo')?.value || 'all';
+                const frotaSel = document.getElementById('histFrotaSelect');
+                const frotaCus = document.getElementById('histFrotaCustom');
+                const frota = (frotaSel && frotaSel.value === 'custom') ? (frotaCus?.value || '') : (frotaSel?.value || '');
+                const di = document.getElementById('histDataIni')?.value || '';
+                const df = document.getElementById('histDataFim')?.value || '';
+                const calRows = document.getElementById('histCalRows');
+                const c3pRows = document.getElementById('histC3pRows');
+                const toDate = s => { try { return new Date(s); } catch(_) { return null; } };
+                const inRange = (dt) => {
+                    const dti = di ? new Date(di+'T00:00:00') : null;
+                    const dtf = df ? new Date(df+'T23:59:59') : null;
+                    if (dti && dt < dti) return false;
+                    if (dtf && dt > dtf) return false;
+                    return true;
+                };
+                let calList = [];
+                let c3pList = [];
+                const online = isOnline();
+                if (online) {
+                    const calResp = await supabase.from('calibragem').select('*').order('created_at', { ascending: false }).limit(100);
+                    const c3pResp = await supabase.from('controle_3p').select('*').order('created_at', { ascending: false }).limit(100);
+                    calList = (calResp.data || []);
+                    c3pList = (c3pResp.data || []);
+                }
+                const pendCal = getPendingCalibragem();
+                const pendC3p = getPendingControle3p();
+                calList = [...pendCal, ...calList];
+                c3pList = [...pendC3p, ...c3pList];
+                const matchTipo = (rec) => tipo === 'all' || String(rec.header?.equipamento || '').toLowerCase().includes(tipo);
+                const matchFrota = (rec) => !frota || String(rec.header?.frota || '') === frota;
+                const fmtDate = (s) => { try { const d = new Date(s || rec.header?.data_ini); return d.toLocaleDateString('pt-BR'); } catch(_) { return s || ''; } };
+                const renderCal = calList
+                    .filter(rec => matchTipo(rec) && matchFrota(rec) && inRange(toDate(rec.created_at || rec.header?.data_ini || new Date())))
+                    .map(rec => {
+                        const d = fmtDate(rec.created_at || rec.header?.data_ini);
+                        const f = rec.header?.frota || '';
+                        const e = rec.header?.equipamento || '';
+                        const u = rec.user_id || '';
+                        const lid = String(rec.local_id || rec.id || '');
+                        return `
+                            <div class="py-3 flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">${f} — ${e}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">${d}${rec.offline ? ' • Offline' : ''}</div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300" onclick="viewCalibragem('${lid}')">Ver</button>
+                                    <button class="px-2 py-1 bg-yellow-500 text-white rounded-md" onclick="openEditCalibragem('${lid}')">Editar</button>
+                                    <button class="px-2 py-1 bg-red-600 text-white rounded-md" onclick="deleteCalibragem('${lid}')">Excluir</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                const renderC3p = c3pList
+                    .filter(rec => matchTipo(rec) && matchFrota(rec) && inRange(toDate(rec.created_at || rec.header?.data_ini || new Date())))
+                    .map(rec => {
+                        const d = fmtDate(rec.created_at || rec.header?.data_ini);
+                        const f = rec.header?.frota || '';
+                        const e = rec.header?.equipamento || '';
+                        const u = rec.user_id || '';
+                        const lid = String(rec.local_id || rec.id || '');
+                        return `
+                            <div class="py-3 flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">${f} — ${e}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">${d}${rec.offline ? ' • Offline' : ''}</div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300" onclick="viewControle3p('${lid}')">Ver</button>
+                                    <button class="px-2 py-1 bg-yellow-500 text-white rounded-md" onclick="openEditControle3p('${lid}')">Editar</button>
+                                    <button class="px-2 py-1 bg-red-600 text-white rounded-md" onclick="deleteControle3p('${lid}')">Excluir</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                if (calRows) calRows.innerHTML = renderCal || '<div class="py-3 text-sm text-gray-500 dark:text-gray-400">Sem registros</div>';
+                if (c3pRows) c3pRows.innerHTML = renderC3p || '<div class="py-3 text-sm text-gray-500 dark:text-gray-400">Sem registros</div>';
+                if (status) status.textContent = `${(calList||[]).length} calibragens • ${(c3pList||[]).length} fichas 3P`;
+            } catch(_) {}
+        }
+
+        async function findCalibragemByLocalId(localId) {
+            try {
+                if (!localId) return null;
+                const pend = getPendingCalibragem().find(i => String(i.local_id) === String(localId));
+                if (pend) return pend;
+                if (isOnline()) {
+                    const resp = await supabase.from('calibragem').select('*').eq('local_id', localId).limit(1);
+                    if (!resp.error && resp.data && resp.data.length) return resp.data[0];
+                }
+                return null;
+            } catch(_) { return null; }
+        }
+
+        async function findControle3pByLocalId(localId) {
+            try {
+                if (!localId) return null;
+                const pend = getPendingControle3p().find(i => String(i.local_id) === String(localId));
+                if (pend) return pend;
+                if (isOnline()) {
+                    const resp = await supabase.from('controle_3p').select('*').eq('local_id', localId).limit(1);
+                    if (!resp.error && resp.data && resp.data.length) return resp.data[0];
+                }
+                return null;
+            } catch(_) { return null; }
+        }
+
+        function openRecordModal(title, html) {
+            const m = document.getElementById('recordModal');
+            const t = document.getElementById('recordModalTitle');
+            const c = document.getElementById('recordDetails');
+            const p = document.getElementById('printRecordBtn');
+            if (!m || !t || !c) return;
+            t.textContent = title || '';
+            c.innerHTML = html || '';
+            m.classList.remove('hidden');
+            if (p) {
+                p.onclick = () => printRecord();
+                p.disabled = false;
+            }
+        }
+
+        function closeRecordModal() {
+            const m = document.getElementById('recordModal');
+            if (m) m.classList.add('hidden');
+        }
+
+        async function viewCalibragem(localId) {
+            const rec = await findCalibragemByLocalId(localId);
+            if (!rec) { showCustomAlert('Registro não encontrado'); return; }
+            const h = rec.header || {};
+            const sulco = rec.sulco || {};
+            const calib = rec.calibragem || {};
+            const pos = rec.pos || {};
+            const header = `
+                <div class="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm font-semibold text-gray-900 dark:text-white">${h.frota || ''} — ${h.equipamento || ''}</div>
+                            <div class="muted">${h.data_ini || ''} ${h.hora_ini || ''} — ${h.data_fim || ''} ${h.hora_fim || ''}</div>
+                        </div>
+                        <div class="muted">Hodo/Hor: ${h.hodo || ''}</div>
+                    </div>
+                </div>`;
+            const posRows = ['1de','1di','2de','2di','3de','3di','4de','4di','1ee','1ei','2ee','2ei','3ee','3ei','4ee','4ei','est1','est2']
+                .map(k => `<tr><td>${k.toUpperCase()}</td><td>${(pos[k])||''}</td></tr>`).join('');
+            const sulcoRows = ['1de','1di','2de','2di','3de','3di','4de','4di','1ee','1ei','2ee','2ei','3ee','3ei','4ee','4ei']
+                .map(k => `<tr><td>${k.toUpperCase()}</td><td>${(sulco[k]?.a)||''}</td><td>${(sulco[k]?.b)||''}</td></tr>`).join('') + `<tr><td>EST</td><td colspan="2">${sulco.est || ''}</td></tr>`;
+            const calibRows = ['1de','1di','2de','2di','3de','3di','4de','4di','1ee','1ei','2ee','2ei','3ee','3ei','4ee','4ei','est1','est2']
+                .map(k => `<tr><td>${k.toUpperCase()}</td><td>${(calib[k]?.encon)||''}</td><td>${(calib[k]?.colo)||''}</td></tr>`).join('');
+            const body = `
+                <div class="section">
+                    <div class="text-sm font-semibold mb-2">Posição Nº Fogo</div>
+                    <table class="record-table"><thead><tr><th>Posição</th><th>Nº Fogo</th></tr></thead><tbody>${posRows}</tbody></table>
+                </div>
+                <div class="section">
+                    <div class="text-sm font-semibold mb-2">Sulco (mm)</div>
+                    <table class="record-table"><thead><tr><th>Posição</th><th>A</th><th>B</th></tr></thead><tbody>${sulcoRows}</tbody></table>
+                </div>
+                <div class="section">
+                    <div class="text-sm font-semibold mb-2">Calibragem (psi)</div>
+                    <table class="record-table"><thead><tr><th>Posição</th><th>Encontrada</th><th>Aplicada</th></tr></thead><tbody>${calibRows}</tbody></table>
+                </div>
+                <div class="section">
+                    <div class="text-sm font-semibold mb-1">Observações</div>
+                    <div class="muted">${rec.observacoes || ''}</div>
+                </div>
+            `;
+            openRecordModal('Calibragem', header + body);
+        }
+
+        async function viewControle3p(localId) {
+            const rec = await findControle3pByLocalId(localId);
+            if (!rec) { showCustomAlert('Registro não encontrado'); return; }
+            const h = rec.header || {};
+            const header = `
+                <div class="p-4 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 rounded-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm font-semibold text-gray-900 dark:text-white">${h.frota || ''} — ${h.equipamento || ''}</div>
+                            <div class="muted">${h.data_ini || ''} ${h.hora_ini || ''} — ${h.data_fim || ''} ${h.hora_fim || ''}</div>
+                        </div>
+                        <div class="muted">OS/Item: ${h.os_item || ''}</div>
+                    </div>
+                </div>`;
+            const rows = Array.isArray(rec.rows) ? rec.rows : [];
+            const bodyRows = rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.posicao||''}</td><td>${r.fogo||''}</td><td>${r.medida||''}</td><td>${r.fabricante||''}</td><td>${r.modelo||''}</td><td>${r.indice||''}</td><td>${r.dot||''}</td><td>${r.sulco1||''}</td><td>${r.sulco2||''}</td><td>${r.sulco3||''}</td><td>${r.pressao||''}</td></tr>`).join('');
+            const body = `
+                <div class="section">
+                    <div class="text-sm font-semibold mb-2">Itens</div>
+                    <table class="record-table"><thead><tr><th>#</th><th>Posição</th><th>Nº Fogo</th><th>Medida</th><th>Fabricante</th><th>Modelo</th><th>Índice</th><th>DOT</th><th>Sulco 1</th><th>Sulco 2</th><th>Sulco 3</th><th>Pressão</th></tr></thead><tbody>${bodyRows}</tbody></table>
+                </div>
+            `;
+            openRecordModal('Ficha Controle 3P', header + body);
+        }
+
+        async function openEditCalibragem(localId) {
+            const rec = await findCalibragemByLocalId(localId);
+            if (!rec) { showCustomAlert('Registro não encontrado'); return; }
+            showSection('calibragem');
+            const h = rec.header || {};
+            const eq = document.getElementById('calEquipamento');
+            if (eq) eq.value = h.equipamento || 'caminhao';
+            const vv = String(eq?.value || '').toLowerCase();
+            setCalibMap(vv.includes('transbord') ? 'transbordo' : 'truck');
+            await loadEquipments();
+            populateFrotaOptionsFor(eq?.value || 'caminhao','calFrotaSelect','calFrotaCustom');
+            const sel = document.getElementById('calFrotaSelect');
+            const cus = document.getElementById('calFrotaCustom');
+            const hasFrota = Array.from(sel?.options || []).some(o => o.value === h.frota);
+            if (sel) sel.value = hasFrota ? h.frota : 'custom';
+            if (cus) { if (!hasFrota) { cus.classList.remove('hidden'); cus.value = h.frota || ''; } else { cus.value = ''; cus.classList.add('hidden'); } }
+            const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+            setVal('calHodo', h.hodo);
+            setVal('calOS', h.os_item);
+            setVal('calMatricula', h.matricula);
+            setVal('calNome', h.nome);
+            setVal('calDataIni', h.data_ini);
+            setVal('calHoraIni', h.hora_ini);
+            setVal('calDataFim', h.data_fim);
+            setVal('calHoraFim', h.hora_fim);
+            const pos = rec.pos || {};
+            Object.keys(pos || {}).forEach(k => { setVal('pos_'+k, pos[k]); });
+            const sulco = rec.sulco || {};
+            Object.keys(sulco || {}).forEach(k => {
+                const v = sulco[k];
+                if (k === 'est') { setVal('sulco_est', v || ''); } else { setVal('sulco_'+k+'_a', v?.a || ''); setVal('sulco_'+k+'_b', v?.b || ''); }
+            });
+            const calib = rec.calibragem || {};
+            Object.keys(calib || {}).forEach(k => { setVal('calib_'+k+'_encon', calib[k]?.encon || ''); setVal('calib_'+k+'_colo', calib[k]?.colo || ''); });
+            setVal('calObservacoes', rec.observacoes);
+        }
+
+        async function openEditControle3p(localId) {
+            const rec = await findControle3pByLocalId(localId);
+            if (!rec) { showCustomAlert('Registro não encontrado'); return; }
+            showSection('controle3p');
+            const h = rec.header || {};
+            const eq = document.getElementById('c3pEquipamento');
+            if (eq) eq.value = h.equipamento || 'caminhao';
+            await loadEquipments();
+            populateFrotaOptionsFor(eq?.value || 'caminhao','c3pFrotaSelect','c3pFrotaCustom');
+            const sel = document.getElementById('c3pFrotaSelect');
+            const cus = document.getElementById('c3pFrotaCustom');
+            const hasFrota = Array.from(sel?.options || []).some(o => o.value === h.frota);
+            if (sel) sel.value = hasFrota ? h.frota : 'custom';
+            if (cus) { if (!hasFrota) { cus.classList.remove('hidden'); cus.value = h.frota || ''; } else { cus.value = ''; cus.classList.add('hidden'); } }
+            const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+            setVal('c3pHodo', h.hodo);
+            setVal('c3pOS', h.os_item);
+            setVal('c3pMatricula', h.matricula);
+            setVal('c3pNome', h.nome);
+            setVal('c3pDataIni', h.data_ini);
+            setVal('c3pHoraIni', h.hora_ini);
+            setVal('c3pDataFim', h.data_fim);
+            setVal('c3pHoraFim', h.hora_fim);
+            const rows = rec.rows || [];
+            rows.forEach(r => {
+                const id = r.seq;
+                const setBy = (field, v) => { const el = document.querySelector(`#ctrl3pTableBody input[data-id="${id}"][data-field="${field}"]`); if (el) el.value = v || ''; };
+                setBy('posicao', r.posicao);
+                setBy('fogo', r.fogo);
+                setBy('medida', r.medida);
+                setBy('fabricante', r.fabricante);
+                setBy('modelo', r.modelo);
+                setBy('indice', r.indice);
+                setBy('dot', r.dot);
+                setBy('sulco1', r.sulco1);
+                setBy('sulco2', r.sulco2);
+                setBy('sulco3', r.sulco3);
+                setBy('pressao', r.pressao);
+            });
+        }
+
+        async function deleteCalibragem(localId) {
+            try {
+                let q = getPendingCalibragem();
+                const idx = q.findIndex(i => String(i.local_id) === String(localId));
+                if (idx >= 0) { q.splice(idx,1); setPendingCalibragem(q); }
+                if (isOnline()) { await supabase.from('calibragem').delete().eq('local_id', localId); }
+                loadHistoricoPneus();
+                showFloatingNotification('success', 'Calibragem excluída');
+            } catch(_) { showFloatingNotification('error', 'Falha ao excluir'); }
+        }
+
+        async function deleteControle3p(localId) {
+            try {
+                let q = getPendingControle3p();
+                const idx = q.findIndex(i => String(i.local_id) === String(localId));
+                if (idx >= 0) { q.splice(idx,1); setPendingControle3p(q); }
+                if (isOnline()) { await supabase.from('controle_3p').delete().eq('local_id', localId); }
+                loadHistoricoPneus();
+                showFloatingNotification('success', 'Ficha 3P excluída');
+            } catch(_) { showFloatingNotification('error', 'Falha ao excluir'); }
+        }
+        function initHistoricoPneus() {
+            try {
+                const tipoSel = document.getElementById('histEquipTipo');
+                const apply = (v) => {
+                    const vv = String(v || '').toLowerCase();
+                    if (vv === 'all') {
+                        populateFrotaOptionsFor('caminhao','histFrotaSelect','histFrotaCustom');
+                    } else {
+                        populateFrotaOptionsFor(vv,'histFrotaSelect','histFrotaCustom');
+                    }
+                };
+                const bindF = () => bindFrotaSelectFor('histFrotaSelect','histFrotaCustom');
+                loadEquipments().then(() => { apply(tipoSel?.value || 'all'); bindF(); });
+                if (tipoSel) tipoSel.addEventListener('change', () => apply(tipoSel.value));
+                const now = new Date();
+                const df = document.getElementById('histDataFim');
+                const di = document.getElementById('histDataIni');
+                const dEnd = now.toISOString().split('T')[0];
+                const dStart = new Date(now.getTime() - 30*24*60*60*1000).toISOString().split('T')[0];
+                if (df) df.value = dEnd;
+                if (di) di.value = dStart;
+                loadHistoricoPneus();
+            } catch(_) {}
+        }
+
         async function addEquipment() {
             const tipo = document.getElementById('equipTipo').value;
             const frota = document.getElementById('equipFrota').value.trim();
@@ -3572,7 +4837,7 @@
         }
 
         function showSection(sectionId) {
-            if (isRestrictedUser() && !['nova-inspecao','equipamentos'].includes(sectionId)) { showCustomAlert('Acesso restrito.'); sectionId = 'nova-inspecao'; }
+            if (isRestrictedUser() && !['nova-inspecao','equipamentos','inventario','calibragem','controle3p','historico_pneus'].includes(sectionId)) { showCustomAlert('Acesso restrito.'); sectionId = 'nova-inspecao'; }
             if (sectionId === 'admin' && !isAdmin()) { showCustomAlert('Acesso restrito.'); sectionId = 'dashboard'; }
             // Update navigation
             document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -3597,6 +4862,7 @@
                 targetSection.classList.add('fade-in');
             }
             if (sectionId === 'admin') { renderAccessControls(); bindAdminActions(); }
+            if (sectionId === 'historico_pneus') { initHistoricoPneus(); }
 
             // Reset nova inspeção section
             if (sectionId === 'nova-inspecao') {
@@ -3611,6 +4877,12 @@
             }
             if (sectionId === 'equipamentos') {
                 populateEquipmentList();
+            }
+            if (sectionId === 'calibragem') {
+                initCalibragemForm();
+            }
+            if (sectionId === 'controle3p') {
+                initControle3pForm();
             }
         }
 
@@ -4105,7 +5377,7 @@
         }
         function getAllowedSectionsFor(email) {
             const rule = getAccessRuleFor(email);
-            return (rule && Array.isArray(rule.allowed_sections) && rule.allowed_sections.length) ? rule.allowed_sections : ['nova-inspecao','equipamentos'];
+            return (rule && Array.isArray(rule.allowed_sections) && rule.allowed_sections.length) ? rule.allowed_sections : ['nova-inspecao','equipamentos','inventario','calibragem','controle3p'];
         }
 
         function applyAccessControls() {
@@ -4113,7 +5385,7 @@
             if (adminBtn) { if (isAdmin()) adminBtn.classList.remove('hidden'); else adminBtn.classList.add('hidden'); }
             const restricted = isRestrictedUser();
             const allow = getAllowedSectionsFor((currentUser||getCachedUser()||{}).email || '');
-            const sections = ['dashboard','historico','analytics','relatorios','nova-inspecao','equipamentos','admin'];
+            const sections = ['dashboard','historico','analytics','relatorios','nova-inspecao','equipamentos','inventario','calibragem','controle3p','admin'];
             sections.forEach(id => {
                 const btn = id === 'admin' ? document.getElementById('adminNavBtn') : document.querySelector(`button[onclick="showSection('${id}')"]`);
                 if (!btn) return;
@@ -5092,6 +6364,345 @@
             }
         }
 
+        function initCalibragemForm() {
+            try {
+                const u = (typeof currentUser !== 'undefined' && currentUser) || getCachedUser() || getOfflineUser();
+                const nm = document.getElementById('calNome');
+                if (nm) nm.value = getDisplayName(u);
+                const now = new Date();
+                const d = now.toISOString().split('T')[0];
+                const t = now.toTimeString().slice(0,5);
+                const di = document.getElementById('calDataIni');
+                const hi = document.getElementById('calHoraIni');
+                const df = document.getElementById('calDataFim');
+                const hf = document.getElementById('calHoraFim');
+                if (di) di.value = d;
+                if (hi) hi.value = t;
+                if (df) df.value = d;
+                if (hf) hf.value = t;
+                attachCalibragemMasks();
+                const st = document.getElementById('calibragemStatus');
+                if (st) st.textContent = '';
+                const eq = document.getElementById('calEquipamento');
+                const pick = (v) => {
+                    const vv = String(v || '').toLowerCase();
+                    setCalibMap(vv.includes('transbord') ? 'transbordo' : 'truck');
+                    populateFrotaOptionsFor(vv || 'caminhao', 'calFrotaSelect', 'calFrotaCustom');
+                };
+                const bindFrota = () => bindFrotaSelectFor('calFrotaSelect','calFrotaCustom');
+                if (eq) {
+                    loadEquipments().then(() => {
+                        pick(eq.value);
+                        bindFrota();
+                    });
+                    eq.addEventListener('change', () => pick(eq.value));
+                } else {
+                    setCalibMap('truck');
+                    loadEquipments().then(() => {
+                        populateFrotaOptionsFor('caminhao','calFrotaSelect','calFrotaCustom');
+                        bindFrota();
+                    });
+                }
+            } catch(_) {}
+        }
+
+        function attachCalibragemMasks() {
+            try {
+                const ids = Array.from(document.querySelectorAll('input[id^="sulco_"], input[id^="calib_"]'));
+                ids.forEach(el => {
+                    el.addEventListener('input', () => {
+                        const v = String(el.value || '').replace(',', '.');
+                        const n = v.replace(/[^0-9.]/g, '');
+                        const parts = n.split('.');
+                        const clean = parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : n;
+                        el.value = clean;
+                    });
+                });
+            } catch(_) {}
+        }
+
+        function focusCalibragemField(key) {
+            try {
+                showSection('calibragem');
+                const box = document.getElementById('calib_box_' + key);
+                const input = document.getElementById('calib_' + key + '_encon');
+                if (box) {
+                    box.classList.add('calib-highlight');
+                    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => { box.classList.remove('calib-highlight'); }, 2000);
+                }
+                if (input) { input.focus(); }
+            } catch(_) {}
+        }
+
+        function setCalibMap(type) {
+            try {
+                const mt = document.getElementById('mapTruck');
+                const mx = document.getElementById('mapTransbordo');
+                const tbT = document.getElementById('tabTruck');
+                const tbX = document.getElementById('tabTrans');
+                if (!mt || !mx || !tbT || !tbX) return;
+                if (type === 'transbordo') {
+                    mt.classList.add('hidden');
+                    mx.classList.remove('hidden');
+                    tbT.classList.remove('active');
+                    tbX.classList.add('active');
+                } else {
+                    mx.classList.add('hidden');
+                    mt.classList.remove('hidden');
+                    tbX.classList.remove('active');
+                    tbT.classList.add('active');
+                }
+            } catch(_) {}
+        }
+
+        function setCalibragemEndNow() {
+            try {
+                const now = new Date();
+                const d = now.toISOString().split('T')[0];
+                const t = now.toTimeString().slice(0,5);
+                const df = document.getElementById('calDataFim');
+                const hf = document.getElementById('calHoraFim');
+                if (df) df.value = d;
+                if (hf) hf.value = t;
+            } catch(_) {}
+        }
+
+        function collectCalibragemData() {
+            const header = {
+                frota: (() => { const sel = document.getElementById('calFrotaSelect'); const cus = document.getElementById('calFrotaCustom'); return ((sel?.value === 'custom' ? (cus?.value||'') : (sel?.value||'')) || '').trim(); })(),
+                equipamento: (document.getElementById('calEquipamento')?.value || '').trim(),
+                hodo: (document.getElementById('calHodo')?.value || '').trim(),
+                os_item: (document.getElementById('calOS')?.value || '').trim(),
+                matricula: (document.getElementById('calMatricula')?.value || '').trim(),
+                nome: (document.getElementById('calNome')?.value || '').trim(),
+                data_ini: (document.getElementById('calDataIni')?.value || '').trim(),
+                hora_ini: (document.getElementById('calHoraIni')?.value || '').trim(),
+                data_fim: (document.getElementById('calDataFim')?.value || '').trim(),
+                hora_fim: (document.getElementById('calHoraFim')?.value || '').trim()
+            };
+            const pos = {};
+            ['1de','1di','2de','2di','3de','3di','4de','4di','1ee','1ei','2ee','2ei','3ee','3ei','4ee','4ei','est1','est2'].forEach(k => {
+                pos[k] = (document.getElementById('pos_' + k)?.value || '').trim();
+            });
+            const sulcoIds = ['1de','1di','2de','2di','3de','3di','4de','4di','1ei','1ee','2ei','2ee','3ei','3ee','4ei','4ee'];
+            const sulco = {};
+            sulcoIds.forEach(k => {
+                const a = (document.getElementById('sulco_' + k + '_a')?.value || '').trim();
+                const b = (document.getElementById('sulco_' + k + '_b')?.value || '').trim();
+                sulco[k] = { a, b };
+            });
+            sulco.est = (document.getElementById('sulco_est')?.value || '').trim();
+            const calibIds = ['1de','1di','2de','2di','3de','3di','4de','4di','1ei','1ee','2ei','2ee','3ei','3ee','4ei','4ee','est1','est2'];
+            const calibragem = {};
+            calibIds.forEach(k => {
+                const encon = (document.getElementById('calib_' + k + '_encon')?.value || '').trim();
+                const colo = (document.getElementById('calib_' + k + '_colo')?.value || '').trim();
+                calibragem[k] = { encon, colo };
+            });
+            const observacoes = (document.getElementById('calObservacoes')?.value || '').trim();
+            return { header, pos, sulco, calibragem, observacoes };
+        }
+
+        async function saveCalibragem() {
+            try {
+                const btn = document.getElementById('calBtnSalvar');
+                if (btn) btn.disabled = true;
+                const data = collectCalibragemData();
+                if (!data.header.frota || !data.header.equipamento || !data.header.data_ini) { showCustomAlert('Preencha Frota, Equipamento e Data Inicial.'); if (btn) btn.disabled = false; return; }
+                const user = (typeof currentUser !== 'undefined' && currentUser) || getCachedUser() || getOfflineUser();
+                const isAuthenticated = !!(user && user.id && user.id !== 'offline');
+                const local_id = (crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString());
+                const record = { local_id, created_at: new Date().toISOString(), user_id: user.id, ...data };
+                if (isOnline() && isAuthenticated) {
+                    const { error } = await supabase.from('calibragem').upsert([record], { onConflict: 'local_id' });
+                    if (error) {
+                        queueCalibragem({ ...record, offline: true });
+                        showFloatingNotification('warning', 'Falha ao salvar online. Salvo offline e será sincronizado.');
+                    } else {
+                        showFloatingNotification('success', 'Calibragem salva.');
+                        clearCalibragemForm();
+                    }
+                } else {
+                    queueCalibragem({ ...record, offline: true });
+                    const msg = !isOnline() ? 'Sem internet. Salvo offline e será sincronizado.' : 'Usuário não autenticado. Salvo offline e será sincronizado.';
+                    showFloatingNotification('warning', msg);
+                    clearCalibragemForm();
+                }
+                const st = document.getElementById('calibragemStatus');
+                if (st) st.textContent = 'Não esqueça de imprimir como necessário.';
+                if (btn) btn.disabled = false;
+            } catch(_) {}
+        }
+
+        function clearCalibragemForm() {
+            try {
+                const ids = [
+                    'calFrotaSelect','calFrotaCustom','calEquipamento','calHodo','calOS','calMatricula','calNome','calDataIni','calHoraIni','calDataFim','calHoraFim'
+                ];
+                ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+                ['pos_','sulco_','calib_'].forEach(prefix => {
+                    const inputs = Array.from(document.querySelectorAll('input[id^="' + prefix + '"]'));
+                    inputs.forEach(el => { el.value = ''; });
+                });
+                const obs = document.getElementById('calObservacoes');
+                if (obs) obs.value = '';
+                initCalibragemForm();
+            } catch(_) {}
+        }
+
+        async function syncPendingCalibragem() {
+            const queue = getPendingCalibragem();
+            if (!isOnline() || queue.length === 0) return;
+            const remaining = [];
+            for (const item of queue) {
+                try {
+                    const { error } = await supabase.from('calibragem').upsert([item], { onConflict: 'local_id' });
+                    if (error) throw error;
+                } catch (e) {
+                    remaining.push(item);
+                }
+            }
+            setPendingCalibragem(remaining);
+            if (remaining.length === 0) showFloatingNotification('success', 'Calibragens sincronizadas');
+        }
+
+        function initControle3pForm() {
+            try {
+                const u = (typeof currentUser !== 'undefined' && currentUser) || getCachedUser() || getOfflineUser();
+                const nm = document.getElementById('c3pNome');
+                if (nm) nm.value = getDisplayName(u);
+                const now = new Date();
+                const d = now.toISOString().split('T')[0];
+                const t = now.toTimeString().slice(0,5);
+                const di = document.getElementById('c3pDataIni');
+                const hi = document.getElementById('c3pHoraIni');
+                const df = document.getElementById('c3pDataFim');
+                const hf = document.getElementById('c3pHoraFim');
+                if (di) di.value = d;
+                if (hi) hi.value = t;
+                if (df) df.value = d;
+                if (hf) hf.value = t;
+                const body = document.getElementById('ctrl3pTableBody');
+                if (body) {
+                    const positions = ['1º DE','1º DI','1º EE','1º EI','2º DE','2º DI','2º EE','2º EI','3º DE','3º DI','3º EE','3º EI','4º DE','4º DI','4º EE','4º EI'];
+                    body.innerHTML = positions.map((pos, idx)=>{
+                        const id = idx+1;
+                        return `
+                            <tr>
+                                <td class="px-2 py-2 text-gray-700 dark:text-gray-300">${id}</td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="posicao" value="${pos}" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="fogo" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="medida" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="fabricante" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="modelo" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="indice" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="dot" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="sulco1" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="sulco2" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="sulco3" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                                <td class="px-2 py-2"><input data-id="${id}" data-field="pressao" class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+                const eqSel = document.getElementById('c3pEquipamento');
+                const apply = (v) => {
+                    const vv = String(v || '').toLowerCase();
+                    populateFrotaOptionsFor(vv || 'caminhao', 'c3pFrotaSelect', 'c3pFrotaCustom');
+                };
+                const bindF = () => bindFrotaSelectFor('c3pFrotaSelect','c3pFrotaCustom');
+                if (eqSel) {
+                    loadEquipments().then(() => { apply(eqSel.value); bindF(); });
+                    eqSel.addEventListener('change', () => apply(eqSel.value));
+                } else {
+                    loadEquipments().then(() => { populateFrotaOptionsFor('caminhao','c3pFrotaSelect','c3pFrotaCustom'); bindF(); });
+                }
+                const st = document.getElementById('controle3pStatus');
+                if (st) st.textContent = '';
+            } catch(_) {}
+        }
+
+        function collectControle3pData() {
+            const header = {
+                frota: (() => { const sel = document.getElementById('c3pFrotaSelect'); const cus = document.getElementById('c3pFrotaCustom'); return ((sel?.value === 'custom' ? (cus?.value||'') : (sel?.value||'')) || '').trim(); })(),
+                equipamento: (document.getElementById('c3pEquipamento')?.value || '').trim(),
+                hodo: (document.getElementById('c3pHodo')?.value || '').trim(),
+                os_item: (document.getElementById('c3pOS')?.value || '').trim(),
+                matricula: (document.getElementById('c3pMatricula')?.value || '').trim(),
+                nome: (document.getElementById('c3pNome')?.value || '').trim(),
+                data_ini: (document.getElementById('c3pDataIni')?.value || '').trim(),
+                hora_ini: (document.getElementById('c3pHoraIni')?.value || '').trim(),
+                data_fim: (document.getElementById('c3pDataFim')?.value || '').trim(),
+                hora_fim: (document.getElementById('c3pHoraFim')?.value || '').trim()
+            };
+            const rows = Array.from(document.querySelectorAll('#ctrl3pTableBody input')).reduce((acc, el)=>{
+                const id = el.getAttribute('data-id');
+                const field = el.getAttribute('data-field');
+                if (!acc[id]) acc[id] = { seq: parseInt(id,10) };
+                acc[id][field] = (el.value||'').trim();
+                return acc;
+            }, {});
+            return { header, rows: Object.values(rows) };
+        }
+
+        async function saveControle3p() {
+            try {
+                const btn = document.getElementById('c3pBtnSalvar');
+                if (btn) btn.disabled = true;
+                const data = collectControle3pData();
+                if (!data.header.frota || !data.header.equipamento || !data.header.data_ini) { showCustomAlert('Preencha Frota, Equipamento e Data Inicial.'); if (btn) btn.disabled = false; return; }
+                const user = (typeof currentUser !== 'undefined' && currentUser) || getCachedUser() || getOfflineUser();
+                const isAuthenticated = !!(user && user.id && user.id !== 'offline');
+                const local_id = (crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString());
+                const record = { local_id, created_at: new Date().toISOString(), user_id: user.id, ...data };
+                if (isOnline() && isAuthenticated) {
+                    const { error } = await supabase.from('controle_3p').upsert([record], { onConflict: 'local_id' });
+                    if (error) {
+                        queueControle3p({ ...record, offline: true });
+                        showFloatingNotification('warning', 'Falha ao salvar online. Salvo offline e será sincronizado.');
+                    } else {
+                        showFloatingNotification('success', 'Ficha 3P salva.');
+                        clearControle3pForm();
+                    }
+                } else {
+                    queueControle3p({ ...record, offline: true });
+                    const msg = !isOnline() ? 'Sem internet. Salvo offline e será sincronizado.' : 'Usuário não autenticado. Salvo offline e será sincronizado.';
+                    showFloatingNotification('warning', msg);
+                    clearControle3pForm();
+                }
+                const st = document.getElementById('controle3pStatus');
+                if (st) st.textContent = 'Não esqueça de imprimir como necessário.';
+                if (btn) btn.disabled = false;
+            } catch(_) {}
+        }
+
+        function clearControle3pForm() {
+            try {
+                const ids = ['c3pFrotaSelect','c3pFrotaCustom','c3pEquipamento','c3pHodo','c3pOS','c3pMatricula','c3pNome','c3pDataIni','c3pHoraIni','c3pDataFim','c3pHoraFim'];
+                ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+                const body = document.getElementById('ctrl3pTableBody');
+                if (body) body.innerHTML = '';
+                initControle3pForm();
+            } catch(_) {}
+        }
+
+        async function syncPendingControle3p() {
+            const queue = getPendingControle3p();
+            if (!isOnline() || queue.length === 0) return;
+            const remaining = [];
+            for (const item of queue) {
+                try {
+                    const { error } = await supabase.from('controle_3p').upsert([item], { onConflict: 'local_id' });
+                    if (error) throw error;
+                } catch (e) {
+                    remaining.push(item);
+                }
+            }
+            setPendingControle3p(remaining);
+            if (remaining.length === 0) showFloatingNotification('success', 'Fichas 3P sincronizadas');
+        }
+
         // Report generation functions
         function generateReport() {
             const type = document.getElementById('reportType').value;
@@ -5674,6 +7285,37 @@
                 });
             } catch (_) {}
         }
+        function printRecord() {
+            try {
+                const title = document.getElementById('recordModalTitle')?.textContent || 'Registro';
+                const content = document.getElementById('recordDetails')?.innerHTML || '';
+                const w = window.open('', '_blank');
+                if (!w) return;
+                w.document.write(`<!doctype html><html><head><meta charset='utf-8'><title>${title}</title><style>
+                    body{font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; padding: 24px; color:#111827}
+                    h1{font-size:20px;margin:0 0 12px}
+                    .section{margin-top:16px}
+                    table{width:100%;border-collapse:collapse;font-size:12px}
+                    th,td{border:1px solid #e5e7eb;padding:6px;text-align:left}
+                    .muted{color:#6B7280;font-size:12px}
+                </style></head><body><h1>${title}</h1>${content}</body></html>`);
+                w.document.close();
+                w.focus();
+                w.print();
+            } catch(_) {}
+        }
     </script>
+    <div id="recordModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 hidden p-4">
+        <div class="record-modal bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full sm:max-w-2xl max-h-[80vh] sm:max-h-[85vh] overflow-y-auto mx-0 sm:mx-4 fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 id="recordModalTitle" class="text-lg font-semibold text-gray-900 dark:text-white">Registro</h3>
+                <div class="flex gap-2">
+                    <button id="printRecordBtn" class="px-3 py-2 bg-primary text-white rounded-md">Imprimir</button>
+                    <button onclick="closeRecordModal()" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300">Fechar</button>
+                </div>
+            </div>
+            <div id="recordDetails" class="space-y-4"></div>
+        </div>
+    </div>
 </body>
 </html>
