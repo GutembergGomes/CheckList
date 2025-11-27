@@ -4666,6 +4666,7 @@
             startPolling();
             if (isRestrictedUser()) { showSection('cct_coque'); }
             if (isAdmin()) { const b = document.getElementById('adminNavBtn'); if (b) b.classList.remove('hidden'); }
+            bindDraftPersistence();
         }
 
         // Alternar entre login e cadastro
@@ -6014,6 +6015,11 @@
             if (d) { const t = new Date().toISOString().split('T')[0]; d.value = t; d.max = t; }
             clearIrrResults();
             toggleMobileBar(true);
+            try {
+                const bind = (id, evt='input') => { const el = document.getElementById(id); if (el && !el._draftBound) { el.addEventListener(evt, saveIrrDraft); el._draftBound = true; } };
+                bind('irrDataInspecao','change'); bind('irrMecanico'); bind('irrReformaStatus','change'); bind('irrFrotaSelect','change'); bind('irrFrotaCustom');
+                restoreIrrDraft();
+            } catch(_) {}
         }
 
         function generateIrrChecklistItems(type) {
@@ -6077,6 +6083,51 @@
             }
         }
 
+        function saveIrrDraft() {
+            try {
+                const draft = {
+                    tipo: irrCurrentInspection.tipo,
+                    data: document.getElementById('irrDataInspecao')?.value || '',
+                    mecanico: document.getElementById('irrMecanico')?.value || '',
+                    frotaSel: document.getElementById('irrFrotaSelect')?.value || '',
+                    frotaCustom: document.getElementById('irrFrotaCustom')?.value || '',
+                    reforma: document.getElementById('irrReformaStatus')?.value || 'nao',
+                    items: Array.isArray(irrCurrentInspection.items) ? irrCurrentInspection.items.map(i => ({ id:i.id, status:i.status, note:i.note, photos:i.photos||[] })) : []
+                };
+                localStorage.setItem('irrDraft', JSON.stringify(draft));
+            } catch(_) {}
+        }
+
+        function restoreIrrDraft() {
+            try {
+                const raw = localStorage.getItem('irrDraft');
+                if (!raw) return;
+                const draft = JSON.parse(raw);
+                if (!draft || draft.tipo !== irrCurrentInspection.tipo) return;
+                const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+                setVal('irrDataInspecao', draft.data||'');
+                setVal('irrMecanico', draft.mecanico||'');
+                const fSel = document.getElementById('irrFrotaSelect');
+                const fCus = document.getElementById('irrFrotaCustom');
+                if (fSel) { fSel.value = draft.frotaSel||''; }
+                if (fCus) { fCus.value = draft.frotaCustom||''; if ((draft.frotaSel||'') === 'custom') fCus.classList.remove('hidden'); }
+                const refEl = document.getElementById('irrReformaStatus'); if (refEl) refEl.value = draft.reforma||'nao';
+                if (Array.isArray(draft.items)) {
+                    draft.items.forEach(it => {
+                        const status = it.status;
+                        if (status === 'ok' || status === 'notok' || status === 'na') {
+                            const radios = document.querySelectorAll(`input[name="irr_item_${it.id}"]`);
+                            radios.forEach(r => { r.checked = (r.value === status); });
+                            updateIrrItemStatus(it.id, status);
+                        }
+                        if (typeof it.note === 'string') { updateIrrItemNote(it.id, it.note); const nb = document.getElementById('irr_note_'+it.id); if (nb && status === 'notok') nb.classList.remove('hidden'); }
+                        if (Array.isArray(it.photos) && it.photos.length) { irrCurrentInspection.items[it.id].photos = it.photos.slice(0,6); renderIrrItemPhotos(it.id); }
+                    });
+                }
+                calculateIrrResults();
+            } catch(_) {}
+        }
+
         function updateIrrItemStatus(itemId, status) {
             irrCurrentInspection.items[itemId].status = status;
             const noteBox = document.getElementById('irr_note_'+itemId);
@@ -6084,9 +6135,10 @@
                 if (status === 'notok') noteBox.classList.remove('hidden'); else { noteBox.classList.add('hidden'); updateIrrItemNote(itemId, ''); }
             }
             calculateIrrResults();
+            saveIrrDraft();
         }
 
-        function updateIrrItemNote(itemId, value) { irrCurrentInspection.items[itemId].note = value || ''; }
+        function updateIrrItemNote(itemId, value) { irrCurrentInspection.items[itemId].note = value || ''; saveIrrDraft(); }
 
         async function handleIrrItemPhoto(itemId, fileList) {
             if (!fileList || fileList.length === 0) return;
@@ -6105,6 +6157,7 @@
                                 if (!Array.isArray(irrCurrentInspection.items[itemId].photos)) irrCurrentInspection.items[itemId].photos = [];
                                 irrCurrentInspection.items[itemId].photos.push(url);
                                 renderIrrItemPhotos(itemId);
+                                saveIrrDraft();
                                 continue;
                             }
                         }
@@ -6116,6 +6169,7 @@
                             if (!Array.isArray(irrCurrentInspection.items[itemId].photos)) irrCurrentInspection.items[itemId].photos = [];
                             irrCurrentInspection.items[itemId].photos.push(url);
                             renderIrrItemPhotos(itemId);
+                            saveIrrDraft();
                             resolve();
                         };
                         reader.readAsDataURL(f);
@@ -6129,6 +6183,7 @@
                                 if (!Array.isArray(irrCurrentInspection.items[itemId].photos)) irrCurrentInspection.items[itemId].photos = [];
                                 irrCurrentInspection.items[itemId].photos.push(url2);
                                 renderIrrItemPhotos(itemId);
+                                saveIrrDraft();
                                 resolve();
                             };
                             reader2.readAsDataURL(f);
@@ -6669,6 +6724,11 @@
                 const u = (typeof currentUser !== 'undefined' && currentUser) || getCachedUser() || getOfflineUser();
                 mechEl.value = getDisplayName(u);
             }
+            try {
+                const bind = (id, evt='input') => { const el = document.getElementById(id); if (el && !el._draftBound) { el.addEventListener(evt, saveCCTDraft); el._draftBound = true; } };
+                bind('dataInspecao','change'); bind('mecanico'); bind('observacao'); bind('reformaStatus','change'); bind('frotaSelect','change'); bind('frotaCustom');
+                restoreCCTDraft();
+            } catch(_) {}
         }
 
         function selectFromCCT(type) {
@@ -6752,8 +6812,55 @@
                 `;
                 itemsWrap.appendChild(secNoteDiv);
                 index++;
-            });
+                });
+            }
         }
+
+        function saveCCTDraft() {
+            try {
+                const draft = {
+                    tipo: currentEquipment,
+                    data: document.getElementById('dataInspecao')?.value || '',
+                    mecanico: document.getElementById('mecanico')?.value || '',
+                    observacao: document.getElementById('observacao')?.value || '',
+                    reforma: document.getElementById('reformaStatus')?.value || 'nao',
+                    frotaSel: document.getElementById('frotaSelect')?.value || '',
+                    frotaCustom: document.getElementById('frotaCustom')?.value || '',
+                    items: Array.isArray(currentInspection.items) ? currentInspection.items.map(i => ({ id:i.id, status:i.status, note:i.note, photos:i.photos||[] })) : []
+                };
+                localStorage.setItem('cctDraft', JSON.stringify(draft));
+            } catch(_) {}
+        }
+
+        function restoreCCTDraft() {
+            try {
+                const raw = localStorage.getItem('cctDraft');
+                if (!raw) return;
+                const draft = JSON.parse(raw);
+                if (!draft || draft.tipo !== currentEquipment) return;
+                const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+                setVal('dataInspecao', draft.data||'');
+                setVal('mecanico', draft.mecanico||'');
+                setVal('observacao', draft.observacao||'');
+                const refEl = document.getElementById('reformaStatus'); if (refEl) refEl.value = draft.reforma||'nao';
+                const fSel = document.getElementById('frotaSelect');
+                const fCus = document.getElementById('frotaCustom');
+                if (fSel) { fSel.value = draft.frotaSel||''; }
+                if (fCus) { fCus.value = draft.frotaCustom||''; if ((draft.frotaSel||'') === 'custom') fCus.classList.remove('hidden'); }
+                if (Array.isArray(draft.items)) {
+                    draft.items.forEach(it => {
+                        const status = it.status;
+                        if (status === 'ok' || status === 'notok' || status === 'na') {
+                            const radios = document.querySelectorAll(`input[name="item_${it.id}"]`);
+                            radios.forEach(r => { r.checked = (r.value === status); });
+                            updateItemStatus(it.id, status);
+                        }
+                        if (typeof it.note === 'string') { updateItemNote(it.id, it.note); const nb = document.getElementById('note_'+it.id); if (nb && status === 'notok') nb.classList.remove('hidden'); }
+                        if (Array.isArray(it.photos) && it.photos.length) { currentInspection.items[it.id].photos = it.photos.slice(0,6); renderItemPhotos(it.id); }
+                    });
+                }
+                calculateResults();
+            } catch(_) {}
         }
 
         function toggleChecklistSection(id) {
@@ -6830,6 +6937,7 @@
             const photos = currentInspection.items[itemId].photos || [];
             if (photos[idx] != null) { photos.splice(idx, 1); }
             renderItemPhotos(itemId);
+            saveCCTDraft();
         }
 
         function updateItemStatus(itemId, status) {
@@ -6839,10 +6947,12 @@
                 if (status === 'notok') noteBox.classList.remove('hidden'); else { noteBox.classList.add('hidden'); updateItemNote(itemId, ''); }
             }
             calculateResults();
+            saveCCTDraft();
         }
 
         function updateItemNote(itemId, value) {
             currentInspection.items[itemId].note = value || '';
+            saveCCTDraft();
         }
 
         function calculateResults() {
@@ -9393,3 +9503,11 @@
 </body>
 </html>
        
+        function bindDraftPersistence() {
+            if (window._draftBound) return;
+            try {
+                window.addEventListener('beforeunload', function(){ try{ saveCCTDraft(); }catch(_){} try{ saveIrrDraft(); }catch(_){} });
+                document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') { try{ saveCCTDraft(); }catch(_){} try{ saveIrrDraft(); }catch(_){} } });
+            } catch(_) {}
+            window._draftBound = true;
+        }
