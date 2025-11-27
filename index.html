@@ -7830,7 +7830,7 @@
 
         function initializeCharts() {
             ensureChartJs().then(() => {
-            const sel = document.getElementById('chartPeriod');
+            const sel = viewMode === 'cct' ? document.getElementById('chartPeriodCCT') : document.getElementById('chartPeriod');
             populateAnalyticsFilters();
             const days = sel ? parseInt(sel.value, 10) : 30;
             buildCharts(days);
@@ -7845,7 +7845,7 @@
             }
             const eqSel = viewMode === 'cct' ? document.getElementById('equipmentFilterCCT') : document.getElementById('equipmentFilter');
             const ldSel = viewMode === 'cct' ? document.getElementById('leaderFilterCCT') : document.getElementById('leaderFilter');
-            const clearBtn = document.getElementById('clearAnalyticsFilters');
+            const clearBtn = viewMode === 'cct' ? document.getElementById('clearAnalyticsFiltersCCT') : document.getElementById('clearAnalyticsFilters');
             [eqSel, ldSel].forEach(el => {
                 if (el && !el._bound) {
                     el.addEventListener('change', () => {
@@ -7917,9 +7917,19 @@
             }
             const equipCtx = document.getElementById('equipmentChart');
             if (equipCtx && typeof Chart !== 'undefined') {
-                const mapLabels = { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', plantadora: 'Plantadoras', distribuidora: 'Distribuidoras', transbordo: 'Transbordos', motobombas: 'MotoBombas', hidroroll: 'Hidro Roll', tortao: 'Tortão' };
-                const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','cct_coque','transbordo','motobombas','hidroroll','tortao'];
-                const counts = { caminhao: 0, trator: 0, colhedora: 0, reboque: 0, plantadora: 0, distribuidora: 0, cct_coque: 0, transbordo: 0, motobombas: 0, hidroroll: 0, tortao: 0 };
+                const isCCT = viewMode === 'cct';
+                const isIRR = viewMode === 'irr';
+                const mapLabels = isCCT
+                    ? { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', plantadora: 'Plantadoras', distribuidora: 'Distribuidoras', transbordo: 'Transbordos', tortao: 'Tortão' }
+                    : isIRR
+                        ? { motobombas: 'MotoBombas', hidroroll: 'Hidro Roll' }
+                        : { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', plantadora: 'Plantadoras', distribuidora: 'Distribuidoras', transbordo: 'Transbordos', motobombas: 'MotoBombas', hidroroll: 'Hidro Roll', tortao: 'Tortão' };
+                const order = isCCT
+                    ? ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo','tortao']
+                    : isIRR
+                        ? ['motobombas','hidroroll']
+                        : ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo','motobombas','hidroroll','tortao'];
+                const counts = order.reduce((acc,k)=>{ acc[k]=0; return acc; },{});
                 filtered.forEach(i => { if (counts[i.tipo] !== undefined) counts[i.tipo]++; });
                 const labelsEquip = order.map(k => mapLabels[k]);
                 const dataEquip = order.map(k => counts[k]);
@@ -7929,12 +7939,13 @@
                         type: 'doughnut',
                         data: { labels: labelsEquip, datasets: [{ data: dataEquip, backgroundColor: colors }] },
                         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, onClick: (evt, elements) => {
-                            const eqSel = document.getElementById('equipmentFilter');
+                            const eqSel = isCCT ? document.getElementById('equipmentFilterCCT') : document.getElementById('equipmentFilter');
                             if (!elements || elements.length === 0 || !eqSel) return;
                             const idx = elements[0].index;
-                            const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','cct_coque','transbordo','motobombas','hidroroll','tortao'];
+                            const order = isCCT ? ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo','tortao'] : (isIRR ? ['motobombas','hidroroll'] : ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo','motobombas','hidroroll','tortao']);
                             eqSel.value = order[idx] || 'all';
-                            const d = document.getElementById('chartPeriod') ? parseInt(document.getElementById('chartPeriod').value, 10) : 30;
+                            const dSel = isCCT ? document.getElementById('chartPeriodCCT') : document.getElementById('chartPeriod');
+                            const d = dSel ? parseInt(dSel.value, 10) : 30;
                             buildCharts(d);
                             updateAnalyticsSummary(d);
                             updateAnalytics();
@@ -7952,8 +7963,8 @@
             const end = new Date();
             const start = new Date();
             start.setDate(end.getDate() - days + 1);
-            const eqSel = document.getElementById('equipmentFilter');
-            const ldSel = document.getElementById('leaderFilter');
+            const eqSel = viewMode === 'cct' ? document.getElementById('equipmentFilterCCT') : document.getElementById('equipmentFilter');
+            const ldSel = viewMode === 'cct' ? document.getElementById('leaderFilterCCT') : document.getElementById('leaderFilter');
             const eqFilter = eqSel ? eqSel.value : 'all';
             const ldFilter = ldSel ? ldSel.value : 'all';
             const all = viewMode === 'cct' ? inspections.slice() : (viewMode === 'irr' ? (Array.isArray(irrigInspections) ? irrigInspections.slice() : []) : getAllInspectionsCombined());
@@ -8164,8 +8175,8 @@
             const containerTop = document.getElementById('topMecanicos');
             const badge = document.getElementById('criticalCountBadge');
             const cardCrit = document.getElementById('criticalCountCard');
-            const eqSel = document.getElementById('equipmentFilter');
-            const ldSel = document.getElementById('leaderFilter');
+            const eqSel = viewMode === 'cct' ? document.getElementById('equipmentFilterCCT') : document.getElementById('equipmentFilter');
+            const ldSel = viewMode === 'cct' ? document.getElementById('leaderFilterCCT') : document.getElementById('leaderFilter');
             const eqFilter = eqSel ? eqSel.value : 'all';
             const ldFilter = ldSel ? ldSel.value : 'all';
             const all = viewMode === 'cct' ? inspections.slice() : (viewMode === 'irr' ? (Array.isArray(irrigInspections) ? irrigInspections.slice() : []) : getAllInspectionsCombined());
@@ -9373,72 +9384,4 @@
     </div>
 </body>
 </html>
-        function restoreGlobalFilters() {
-            try {
-                const tipoSel = document.getElementById('filtroTipo');
-                if (tipoSel) {
-                    const box = tipoSel.closest('.bg-white');
-                    if (box) box.classList.remove('hidden');
-                    const ensure = (val, label) => {
-                        if (!tipoSel.querySelector(`option[value="${val}"]`)) {
-                            const opt = document.createElement('option');
-                            opt.value = val; opt.textContent = label; tipoSel.appendChild(opt);
-                        }
-                    };
-                    
-                }
-                const eqSel = document.getElementById('equipmentFilter');
-                if (eqSel) {
-                    const wrap = eqSel.closest('.flex');
-                    if (wrap) wrap.classList.remove('hidden');
-                    const ensure2 = (val, label) => {
-                        if (!eqSel.querySelector(`option[value="${val}"]`)) {
-                            const opt = document.createElement('option');
-                            opt.value = val; opt.textContent = label; eqSel.appendChild(opt);
-                        }
-                    };
-                    
-                }
-            } catch(_) {}
-        }
-        function adminCopyAccessControlsSQL() {
-            const sql = [
-                'begin;',
-                'create table if not exists public.access_controls (',
-                '  email text primary key,',
-                "  role text default 'restricted',",
-                "  allowed_sections text[] default '{}',",
-                "  allowed_subsections jsonb default '{}'::jsonb,",
-                '  created_at timestamptz default now()',
-                ');',
-                'alter table public.access_controls enable row level security;',
-                "create policy \"ac_select_auth\" on public.access_controls for select using (auth.role() = 'authenticated');",
-                "create policy \"ac_insert_admins\" on public.access_controls for insert with check (exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
-                "create policy \"ac_update_admins\" on public.access_controls for update using (exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
-                "create policy \"ac_delete_admins\" on public.access_controls for delete using (exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
-                'alter publication supabase_realtime add table public.access_controls;',
-                'commit;'
-            ].join('\n');
-            const tryClipboard = async () => {
-                try { await navigator.clipboard.writeText(sql); showFloatingNotification('success', 'SQL copiado'); }
-                catch(_) {
-                    const ta = document.createElement('textarea'); ta.value = sql; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showFloatingNotification('success', 'SQL copiado'); } catch(e) { showCustomAlert(sql); } ta.remove();
-                }
-            };
-            tryClipboard();
-        }
-        function editAccessRule(email) {
-            const e = (email||'').toLowerCase();
-            const rule = getAccessRuleFor(e);
-            if (!rule) return;
-            const emailEl = document.getElementById('adminEmailInput');
-            if (emailEl) emailEl.value = rule.email || e;
-            Array.from(document.querySelectorAll('#adminSectionsSelect input[type="checkbox"]')).forEach(b=>{ b.checked=false; });
-            const setChecked = (sel) => { const el = document.querySelector(sel); if (el) { el.checked = true; el.dispatchEvent(new Event('change')); } };
-            (rule.allowed_sections||[]).forEach(sec => { setChecked(`#adminSectionsSelect input[value="${sec}"]`); });
-            const cctSubs = (rule.allowed_subsections && rule.allowed_subsections['cct_coque']) || [];
-            cctSubs.forEach(v => { const cb = document.querySelector(`#adminSectionsSelect input[data-section="cct"][value="${v}"]`); if (cb) cb.checked = true; });
-            const irrSubs = (rule.allowed_subsections && rule.allowed_subsections['irrigacao']) || [];
-            irrSubs.forEach(v => { const cb = document.querySelector(`#adminSectionsSelect input[data-section="irr"][value="${v}"]`); if (cb) cb.checked = true; });
-            showFloatingNotification('success', 'Regra carregada para edição');
-        }
+       
