@@ -447,6 +447,71 @@
                             </button>
                         </div>
                     </div>
+                    <div id="irrChecklistForm" class="hidden mt-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white" id="irrChecklistTitle">Checklist • Irrigação</h3>
+                                <div class="flex items-center gap-3">
+                                    <label class="text-sm text-gray-700 dark:text-gray-300">Equipamento em reforma?</label>
+                                    <select id="irrReformaStatus" class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                        <option value="nao" selected>Não</option>
+                                        <option value="sim">Sim</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data</label>
+                                        <input type="date" id="irrDataInspecao" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frota</label>
+                                        <div class="flex gap-2">
+                                            <select id="irrFrotaSelect" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                                <option value="">Selecione uma frota</option>
+                                                <option value="custom">Outro (digitar)</option>
+                                            </select>
+                                            <button type="button" onclick="showIrrSubsection('equipamentos')" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Gerenciar</button>
+                                        </div>
+                                        <input type="text" id="irrFrotaCustom" placeholder="Digite a identificação da frota" class="mt-2 hidden w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Líder</label>
+                                        <input type="text" id="irrMecanico" placeholder="Nome do líder responsável" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    </div>
+                                </div>
+                                <div class="mb-8">
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Itens de Verificação</h4>
+                                    <div id="irrChecklistItems" class="space-y-3"></div>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Resultado</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="irrItensOK">0</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">Itens OK</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-red-600 dark:text-red-400" id="irrItensNaoOK">0</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">Itens NÃO OK</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-primary" id="irrPercentual">0%</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">Percentual</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white" id="irrNivelManutencao">Nível de Manutenção: -</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col sm:flex-row gap-3">
+                                    <button onclick="clearIrrForm()" class="px-6 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600">Limpar</button>
+                                    <button onclick="saveIrrInspection()" class="px-6 py-3 bg-primary text-white rounded-md hover:bg-primary-dark">Salvar Inspeção</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -459,8 +524,11 @@
                         <button onclick="showSection('dashboard')" class="nav-btn active border-b-2 border-primary text-primary px-1 py-4 text-sm font-medium">
                             Dashboard
                         </button>
-                        <button onclick="showSection('nova-inspecao')" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium">
-                            Nova Inspeção
+                        <button onclick="showSection('cct_coque')" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium">
+                            CCT
+                        </button>
+                        <button onclick="showSection('irrigacao')" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium">
+                            IRRIGAÇÃO
                         </button>
                         <button onclick="showSection('historico')" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium">
                             Histórico
@@ -471,6 +539,7 @@
                         <button onclick="showSection('relatorios')" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium">
                             Relatórios
                         </button>
+                        
                         <button onclick="showSection('equipamentos')" class="nav-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-1 py-4 text-sm font-medium">
                             Equipamentos
                         </button>
@@ -766,8 +835,528 @@
                 </div>
             </section>
 
+            <section id="irrigacao" class="section-content hidden">
+                <div class="mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">IRRIGAÇÃO</h2>
+                            <p class="text-gray-600 dark:text-gray-400">Operações e análise do módulo de irrigação</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="showIrrSubsection('inicio')" class="irr-sub-btn px-3 py-2 text-sm border-b-2 border-primary text-primary">Nova Inspeção</button>
+                        <button onclick="showIrrSubsection('historico')" class="irr-sub-btn px-3 py-2 text-sm border-b-2 border-transparent text-gray-600 dark:text-gray-300">Histórico</button>
+                        <button onclick="showIrrSubsection('analytics')" class="irr-sub-btn px-3 py-2 text-sm border-b-2 border-transparent text-gray-600 dark:text-gray-300">Analytics</button>
+                        <button onclick="showIrrSubsection('relatorios')" class="irr-sub-btn px-3 py-2 text-sm border-b-2 border-transparent text-gray-600 dark:text-gray-300">Relatórios</button>
+                        <button onclick="showIrrSubsection('equipamentos')" class="irr-sub-btn px-3 py-2 text-sm border-b-2 border-transparent text-gray-600 dark:text-gray-300">Equipamentos</button>
+                    </div>
+                </div>
+                <div id="irr-sub-inicio" class="">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Nova Inspeção • Irrigação</h3>
+                        <div id="irrEquipCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div onclick="selectIrrEquipment('motobombas')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-rose-100 dark:bg-rose-900 rounded-lg flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a7 7 0 100 14h6a3 3 0 000-6h-1a4 4 0 01-4-4V4z"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">MotoBombas</h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Checklist detalhado conforme PDF</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div onclick="selectIrrEquipment('hidroroll')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h10M4 17h8"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Hidro Roll</h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Checklist detalhado conforme PDF</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="irr-sub-historico" class="hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Histórico • Irrigação</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo</label>
+                                <select id="irrFiltroTipo" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="">Todos</option>
+                                    <option value="motobombas">MotoBombas</option>
+                                    <option value="hidroroll">Hidro Roll</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data Inicial</label>
+                                <input type="date" id="irrFiltroDataInicial" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data Final</label>
+                                <input type="date" id="irrFiltroDataFinal" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="filterIrrHistory()" class="w-full px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark">Filtrar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Data</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tipo</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Frota</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Líder</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">% OK</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="irrHistoryBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="irr-sub-analytics" class="hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Analytics • Irrigação</h3>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <select id="irrChartPeriod" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                                    <option value="7">Últimos 7 dias</option>
+                                    <option value="30" selected>Últimos 30 dias</option>
+                                    <option value="90">Últimos 90 dias</option>
+                                </select>
+                                <select id="irrEquipmentFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                                    <option value="all" selected>Todos equipamentos</option>
+                                    <option value="motobombas">MotoBombas</option>
+                                    <option value="hidroroll">Hidro Roll</option>
+                                </select>
+                                <select id="irrLeaderFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                                    <option value="all" selected>Todos líderes</option>
+                                </select>
+                                <button onclick="clearIrrAnalyticsFilters()" class="text-sm px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Limpar</button>
+                                <button onclick="updateIrrAnalytics(); updateIrrAnalyticsSummary();" class="text-sm px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Atualizar</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl text-white">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-blue-100 text-sm font-medium">Taxa de Aprovação</p>
+                                        <p class="text-3xl font-bold" id="irrApprovalRate">0%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl text-white">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-green-100 text-sm font-medium">Tempo Médio</p>
+                                        <p class="text-3xl font-bold" id="irrAvgTime">0min</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 rounded-xl text-white">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-yellow-100 text-sm font-medium">Críticos</p>
+                                        <p class="text-3xl font-bold" id="irrCriticalCountCard">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-xl text-white">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-purple-100 text-sm font-medium">Produtividade</p>
+                                        <p class="text-3xl font-bold" id="irrProductivity">0%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                            <div class="relative h-40 sm:h-64">
+                                <canvas id="irrPerformanceChart"></canvas>
+                            </div>
+                            <div class="relative h-40 sm:h-64">
+                                <canvas id="irrEquipmentChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                            <div class="xl:col-span-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Problemas Críticos</h3>
+                                    <span id="irrCriticalCountBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">0 ativos</span>
+                                </div>
+                                <div class="space-y-4" id="irrCriticalIssues"></div>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Top Líderes</h3>
+                                <div class="space-y-4" id="irrTopMecanicos"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="irr-sub-relatorios" class="hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Relatórios • Irrigação</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="lg:col-span-2">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de Relatório</label>
+                                        <select id="irrReportType" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                            <option value="geral" selected>Relatório Geral</option>
+                                            <option value="equipamento">Por Equipamento</option>
+                                            <option value="mecanico">Por Líder</option>
+                                            <option value="periodo">Por Período</option>
+                                            <option value="criticos">Problemas Críticos</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Período</label>
+                                        <select id="irrReportPeriod" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                            <option value="7">Últimos 7 dias</option>
+                                            <option value="30" selected>Últimos 30 dias</option>
+                                            <option value="90">Últimos 90 dias</option>
+                                            <option value="custom">Personalizado</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Formato</label>
+                                        <select id="irrReportFormat" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                            <option value="csv" selected>CSV</option>
+                                            <option value="excel">Excel</option>
+                                            <option value="pdf">PDF</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-end gap-3">
+                                        <button onclick="generateIrrReport()" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark">Gerar Relatório</button>
+                                        <button onclick="scheduleIrrReport()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Agendar Envio</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-4">Atalhos</h4>
+                                <div class="grid grid-cols-1 gap-3">
+                                    <button onclick="generateIrrQuickReport('resumo')" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Resumo</button>
+                                    <button onclick="generateIrrQuickReport('detalhado')" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Detalhado</button>
+                                    <button onclick="generateIrrQuickReport('equipamentos')" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Equipamentos</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl text-white cursor-pointer card-hover" onclick="generateIrrQuickReport('summary')">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-blue-400 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold">Resumo Executivo</h3>
+                                    <p class="text-blue-200 text-sm">Visão geral das operações</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl text-white cursor-pointer card-hover" onclick="generateIrrQuickReport('performance')">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-green-400 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold">Performance</h3>
+                                    <p class="text-green-200 text-sm">Análise de produtividade</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-red-500 to-red-600 p-6 rounded-xl text-white cursor-pointer card-hover" onclick="generateIrrQuickReport('maintenance')">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-red-400 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.268 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold">Manutenções</h3>
+                                    <p class="text-red-200 text-sm">Relatório de problemas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-xl text-white cursor-pointer card-hover" onclick="generateIrrQuickReport('trends')">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-purple-400 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold">Tendências</h3>
+                                    <p class="text-purple-200 text-sm">Análise temporal</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 rounded-xl text-white cursor-pointer card-hover" onclick="generateIrrQuickReport('compliance')">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-yellow-400 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold">Conformidade</h3>
+                                    <p class="text-yellow-200 text-sm">Relatório de compliance</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 rounded-xl text-white cursor-pointer card-hover" onclick="generateIrrQuickReport('costs')">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-indigo-400 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold">Custos</h3>
+                                    <p class="text-indigo-200 text-sm">Análise financeira</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="irr-sub-equipamentos" class="hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Equipamentos • Irrigação</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Cadastro e gestão de equipamentos de irrigação, separados do CCT.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CCT e Coque Section -->
+            <section id="cct_coque" class="section-content hidden">
+                <div class="mb-6">
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="showCCTSubsection('inicio')" class="cct-sub-btn px-3 py-2 text-sm border-b-2 border-primary text-primary">Início</button>
+                        <button onclick="showCCTSubsection('historico')" class="cct-sub-btn px-3 py-2 text-sm border-b-2 border-transparent text-gray-600 dark:text-gray-300">Histórico</button>
+                        <button onclick="showCCTSubsection('analytics')" class="cct-sub-btn px-3 py-2 text-sm border-b-2 border-transparent text-gray-600 dark:text-gray-300">Analytics</button>
+                        <button onclick="showCCTSubsection('relatorios')" class="cct-sub-btn px-3 py-2 text-sm border-b-2 border-transparent text-gray-600 dark:text-gray-300">Relatórios</button>
+                        <button onclick="showCCTSubsection('equipamentos')" class="cct-sub-btn px-3 py-2 text-sm border-b-2 border-transparent text-gray-600 dark:text-gray-300">Equipamentos</button>
+                    </div>
+                </div>
+                <div id="cct-sub-historico" class="hidden"></div>
+                <div id="cct-sub-analytics" class="hidden"></div>
+                <div id="cct-sub-relatorios" class="hidden"></div>
+                <div id="cct-sub-equipamentos" class="hidden"></div>
+                <div id="equipmentSelection">
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Nova Inspeção</h2>
+                        <p class="text-gray-600 dark:text-gray-400">Selecione o tipo de equipamento para iniciar a inspeção</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div onclick="selectFromCCT('caminhao')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0a2 2 0 01-2-2v-2a2 2 0 00-2-2H8z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Caminhão</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklist completo para liberação de caminhões</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="selectFromCCT('trator')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Trator</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklist para liberação de tratores agrícolas</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="selectFromCCT('colhedora')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Colhedora</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklist para colhedoras de cana</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="selectFromCCT('plantadora')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12M6 12h12"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Plantadora de Cana</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklist de reforma/entressafra</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="selectFromCCT('distribuidora')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-cyan-100 dark:bg-cyan-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Distribuidora de Cana</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklist de reforma/entressafra</p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div onclick="selectFromCCT('cobridores')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-fuchsia-100 dark:bg-fuchsia-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-fuchsia-600 dark:text-fuchsia-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12M6 12h12"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Cobridores</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklist de reforma/entressafra</p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div onclick="selectFromCCT('reboque')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0a2 2 0 01-2-2v-2a2 2 0 00-2-2H8z"/>
+                                        </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Reboque</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklist para reboques e semi-reboques</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="selectFromCCT('transbordo')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16v6H4zM4 14h16v6H4z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Transbordo</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklist de manutenção de transbordos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div onclick="selectFromCCT('tortao')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12M6 12h12"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Tortão</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Checklist conforme PDF, por seção</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="checklistForm" class="hidden">
+                    <div class="mb-6">
+                        <button onclick="backToSelection()" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            Voltar à seleção
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white" id="checklistTitle">Checklist</h3>
+                            <div class="flex items-center gap-3">
+                                <label class="text-sm text-gray-700 dark:text-gray-300">Equipamento em reforma?</label>
+                                <select id="reformaStatus" class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    <option value="nao" selected>Não</option>
+                                    <option value="sim">Sim</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data</label>
+                                    <input type="date" id="dataInspecao" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frota</label>
+                                    <div class="flex gap-2">
+                                        <select id="frotaSelect" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <option value="">Selecione uma frota</option>
+                                            <option value="custom">Outro (digitar)</option>
+                                        </select>
+                                        <button type="button" onclick="showSection('equipamentos')" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Gerenciar</button>
+                                    </div>
+                                    <input type="text" id="frotaCustom" placeholder="Digite a identificação da frota" class="mt-2 hidden w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Líder</label>
+                                    <input type="text" id="mecanico" placeholder="Nome do líder responsável" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                            </div>
+                            <div class="mb-8">
+                                <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Itens de Verificação</h4>
+                                <div id="checklistItems" class="space-y-3"></div>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
+                                <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Resultado da Inspeção</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="itensOK">0</div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">Itens OK</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-red-600 dark:text-red-400" id="itensNaoOK">0</div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">Itens NÃO OK</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-primary" id="percentual">0%</div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">Percentual</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white" id="nivelManutencao">Nível de Manutenção: -</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <button onclick="clearForm()" class="px-6 py-3 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200">Limpar</button>
+                                <button onclick="saveInspection()" class="px-6 py-3 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors duração-200 font-medium interactive-scale">Salvar Inspeção</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Nova Inspeção Section -->
-            <section id="nova-inspecao" class="section-content hidden">
+            <section id="nova-inspecao-deprecated" class="section-content hidden">
                 <!-- Equipment Selection -->
                 <div id="equipmentSelection">
                     <div class="mb-8">
@@ -832,7 +1421,7 @@
                             </div>
                         </div>
 
-                    <div onclick="selectEquipment('distribuidora')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                        <div onclick="selectEquipment('distribuidora')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
                             <div class="flex items-center space-x-4">
                                 <div class="w-12 h-12 bg-cyan-100 dark:bg-cyan-900 rounded-lg flex items-center justify-center">
                                     <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1048,8 +1637,8 @@
                                 <option value="plantadora">Plantadora</option>
                                 <option value="distribuidora">Distribuidora</option>
                                 <option value="reboque">Reboque</option>
-                                <option value="manutencao">Manutenção</option>
                                 <option value="transbordo">Transbordo</option>
+                                <option value="tortao">Tortão</option>
                             </select>
                         </div>
                         <div>
@@ -1180,16 +1769,17 @@
                                     <option value="30" selected>Últimos 30 dias</option>
                                     <option value="90">Últimos 90 dias</option>
                                 </select>
-                                <select id="equipmentFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
-                                    <option value="all" selected>Todos equipamentos</option>
-                                    <option value="caminhao">Caminhão</option>
-                                    <option value="trator">Trator</option>
-                                    <option value="colhedora">Colhedora</option>
-                                    <option value="reboque">Reboque</option>
-                                    <option value="plantadora">Plantadora</option>
-                                    <option value="distribuidora">Distribuidora</option>
-                                    <option value="transbordo">Transbordo</option>
-                                </select>
+                        <select id="equipmentFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                            <option value="all" selected>Todos equipamentos</option>
+                            <option value="caminhao">Caminhão</option>
+                            <option value="trator">Trator</option>
+                            <option value="colhedora">Colhedora</option>
+                            <option value="reboque">Reboque</option>
+                            <option value="plantadora">Plantadora</option>
+                            <option value="distribuidora">Distribuidora</option>
+                            <option value="transbordo">Transbordo</option>
+                            <option value="tortao">Tortão</option>
+                        </select>
                                 <select id="leaderFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
                                     <option value="all" selected>Todos líderes</option>
                                 </select>
@@ -1477,7 +2067,6 @@
                                 <option value="plantadora">Plantadora</option>
                                 <option value="distribuidora">Distribuidora</option>
                                 <option value="reboque">Reboque</option>
-                                <option value="manutencao">Manutenção</option>
                                 <option value="transbordo">Transbordo</option>
                                 <option value="outros">Outros</option>
                             </select>
@@ -1516,7 +2105,6 @@
                                 <option value="distribuidora">Distribuidora</option>
                                 <option value="reboque">Reboque</option>
                                 <option value="transbordo">Transbordo</option>
-                                <option value="manutencao">Manutenção</option>
                                 <option value="outros">Outros</option>
                             </select>
                     </div>
@@ -1618,7 +2206,6 @@
                                     <option value="plantadora">Plantadora</option>
                                     <option value="distribuidora">Distribuidora</option>
                                     <option value="reboque">Reboque</option>
-                                    <option value="manutencao">Manutenção</option>
                                 </select>
                             </div>
                             <div>
@@ -1709,7 +2296,6 @@
                                     <option value="plantadora">Plantadora</option>
                                     <option value="distribuidora">Distribuidora</option>
                                     <option value="reboque">Reboque</option>
-                                    <option value="manutencao">Manutenção</option>
                                 </select>
                             </div>
                             <div>
@@ -1771,7 +2357,6 @@
                                     <option value="plantadora">Plantadora</option>
                                     <option value="distribuidora">Distribuidora</option>
                                     <option value="reboque">Reboque</option>
-                                    <option value="manutencao">Manutenção</option>
                                 </select>
                             </div>
                             <div>
@@ -1855,7 +2440,6 @@
                                     <option value="plantadora">Plantadora</option>
                                     <option value="distribuidora">Distribuidora</option>
                                     <option value="reboque">Reboque</option>
-                                    <option value="manutencao">Manutenção</option>
                                 </select>
                             </div>
                             <div>
@@ -2427,6 +3011,7 @@
             <div class="glass-morphism p-6 rounded-xl shadow-lg max-w-lg w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Editar Inspeção</h3>
                 <input type="hidden" id="editId" />
+                <input type="hidden" id="editSource" />
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Data</label>
@@ -2464,6 +3049,7 @@
         
         // Estado global da aplicação
         let currentUser = null;
+        let viewMode = 'global';
         let currentEquipment = '';
         let inspections = [];
         let equipments = [];
@@ -2488,6 +3074,11 @@
         function getPendingInspections() { try { return JSON.parse(localStorage.getItem('pendingInspections')) || []; } catch(_) { return []; } }
         function setPendingInspections(list) { try { localStorage.setItem('pendingInspections', JSON.stringify(list)); } catch(_) {} }
         function queueInspection(item) { const q = getPendingInspections(); q.push(item); setPendingInspections(q); }
+        function getCachedIrrInspections() { try { return JSON.parse(localStorage.getItem('cachedIrrInspections')) || []; } catch(_) { return []; } }
+        function setCachedIrrInspections(list) { try { localStorage.setItem('cachedIrrInspections', JSON.stringify(list)); } catch(_) {} }
+        function getPendingIrrInspections() { try { return JSON.parse(localStorage.getItem('pendingIrrInspections')) || []; } catch(_) { return []; } }
+        function setPendingIrrInspections(list) { try { localStorage.setItem('pendingIrrInspections', JSON.stringify(list)); } catch(_) {} }
+        function queueIrrInspection(item) { const q = getPendingIrrInspections(); q.push(item); setPendingIrrInspections(q); }
         function getCachedEquipments() { try { return JSON.parse(localStorage.getItem('cachedEquipments')) || []; } catch(_) { return []; } }
         function setCachedEquipments(list) { try { localStorage.setItem('cachedEquipments', JSON.stringify(list)); } catch(_) {} }
         function getPendingEquipments() { try { return JSON.parse(localStorage.getItem('pendingEquipments')) || []; } catch(_) { return []; } }
@@ -2909,6 +3500,58 @@
                 await loadEquipments();
                 populateEquipmentList();
                 showFloatingNotification('success', 'Transbordos cadastrados');
+            }
+        }
+        async function seedCobridores() {
+            if (!isOnline()) return;
+            const list = [
+                { tipo: 'cobridores', frota: '4105', descricao: 'COBRIDOR', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'cobridores', frota: '6315', descricao: 'COBRIDOR', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'cobridores', frota: '6316', descricao: 'COBRIDOR', status: 'ativo', created_at: new Date().toISOString() }
+            ];
+            const frotas = list.map(t => t.frota);
+            const { data: existing, error } = await supabase
+                .from('equipments')
+                .select('frota,tipo')
+                .eq('tipo', 'cobridores')
+                .in('frota', frotas);
+            if (error) return;
+            const existingSet = new Set((existing || []).map(e => String(e.frota)));
+            const toInsert = list.filter(t => !existingSet.has(String(t.frota)));
+            if (toInsert.length === 0) return;
+            const { error: insErr } = await supabase
+                .from('equipments')
+                .insert(toInsert);
+            if (!insErr) {
+                await loadEquipments();
+                populateEquipmentList();
+                showFloatingNotification('success', 'Cobridores cadastrados');
+            }
+        }
+        async function seedTortao() {
+            if (!isOnline()) return;
+            const list = [
+                { tipo: 'tortao', frota: '6486', descricao: 'SULCADOR TORTÃO • MF-DYNA', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'tortao', frota: '6506', descricao: 'SULCADOR TORTÃO • MF-DYNA', status: 'ativo', created_at: new Date().toISOString() },
+                { tipo: 'tortao', frota: '6618', descricao: 'SULCADOR TORTÃO • MF-DYNA', status: 'ativo', created_at: new Date().toISOString() }
+            ];
+            const frotas = list.map(t => t.frota);
+            const { data: existing, error } = await supabase
+                .from('equipments')
+                .select('frota,tipo')
+                .eq('tipo', 'tortao')
+                .in('frota', frotas);
+            if (error) return;
+            const existingSet = new Set((existing || []).map(e => String(e.frota)));
+            const toInsert = list.filter(t => !existingSet.has(String(t.frota)));
+            if (toInsert.length === 0) return;
+            const { error: insErr } = await supabase
+                .from('equipments')
+                .insert(toInsert);
+            if (!insErr) {
+                await loadEquipments();
+                populateEquipmentList();
+                showFloatingNotification('success', 'Tortões cadastrados');
             }
         }
         let currentInspection = {
@@ -3692,6 +4335,68 @@
                     }
                 ]
             },
+            tortao: {
+                title: "Checklist de Reforma/Entressafra - Tortão",
+                sections: [
+                    {
+                        name: "PRIMÁRIA",
+                        items: [
+                            "Lavagem geral",
+                            "Lubrificação geral"
+                        ]
+                    },
+                    {
+                        name: "MECÂNICO",
+                        items: [
+                            "Cesto - reparar se necessário",
+                            "Hidráulico",
+                            "Inspeção",
+                            "Tandem - reparar se necessário"
+                        ]
+                    },
+                    {
+                        name: "CALDEIRARIA",
+                        items: [
+                            "Cesto - reparar se necessário",
+                            "Cabeçalho - reparar se necessário"
+                        ]
+                    },
+                    {
+                        name: "PNEUS",
+                        items: [
+                            "Calibrar pneus e medir sulco",
+                            "Colocar tampa de válvula",
+                            "Conferir parafusos e porcas",
+                            "Fazer rodízio",
+                            "Inventariar equipamento",
+                            "Reapertar rodas"
+                        ]
+                    },
+                    {
+                        name: "FUNILARIA",
+                        items: [
+                            "Pintura/Número frota e logotipo"
+                        ]
+                    }
+                ]
+            },
+            cobridores: {
+                title: "Checklist de Reforma/Entressafra - Cobridores",
+                sections: [
+                    {
+                        name: "TIPO DE SERVIÇO",
+                        items: [
+                            "Trocar buchas e braços",
+                            "Trocar discos de corte",
+                            "Montagem",
+                            "Revisar tanques, suportes e fixações; reparar se necessário",
+                            "Corrigir trincas",
+                            "Catalogar peças"
+                        ]
+                    }
+                ]
+            },
+           
             trailer: {
                 title: "Checklist de Liberação - Reboque/Semi-reboque",
                 sections: [
@@ -3827,6 +4532,7 @@
             checkAuthState();
             updateDateTime();
             setInterval(updateDateTime, 60000);
+            hydrateCCTSubsections();
         });
 
         // Inicializar aplicação
@@ -3910,7 +4616,7 @@
             loadInitialData();
             setupRealtime();
             startPolling();
-            if (isRestrictedUser()) { showSection('nova-inspecao'); }
+            if (isRestrictedUser()) { showSection('cct_coque'); }
             if (isAdmin()) { const b = document.getElementById('adminNavBtn'); if (b) b.classList.remove('hidden'); }
         }
 
@@ -4079,9 +4785,17 @@
                     if (resp.error) { throw resp.error; }
                     data = dedupeInspections(resp.data || []);
                     setCachedInspections(data);
+                    try {
+                        const respIrr = await supabase
+                            .from('irrig_inspections')
+                            .select('*')
+                            .order('created_at', { ascending: false });
+                        if (!respIrr.error) { irrigInspections = dedupeInspections(respIrr.data || []); setCachedIrrInspections(irrigInspections); }
+                    } catch (_) {}
                 } else {
                     data = dedupeInspections(getCachedInspections());
                     showFloatingNotification('warning', 'Sem internet. Exibindo dados em cache.');
+                    irrigInspections = dedupeInspections(getCachedIrrInspections());
                 }
                 inspections = data || [];
                 notifications = getCachedNotifications();
@@ -4094,7 +4808,10 @@
                 await seedDistributors();
                 await seedTrailers();
                 await seedTransbordos();
+                await seedCobridores();
+                await seedTortao();
                 await syncPendingInspections();
+                await syncPendingIrrInspections();
                 await syncPendingEquipments();
                 await syncPendingCalibragem();
                 await syncPendingControle3p();
@@ -4331,7 +5048,9 @@
                 plantadora: ['plantadora','planter'],
                 distribuidora: ['distribuidora','distributor'],
                 manutencao: ['manutencao','maintenance'],
-                transbordo: ['transbordo']
+                transbordo: ['transbordo'],
+                cct_coque: ['cct_coque','cctCoque'],
+                cobridores: ['cobridores']
             };
             return map[t] || [t];
         }
@@ -4837,7 +5556,11 @@
         }
 
         function showSection(sectionId) {
-            if (isRestrictedUser() && !['nova-inspecao','equipamentos','inventario','calibragem','controle3p','historico_pneus'].includes(sectionId)) { showCustomAlert('Acesso restrito.'); sectionId = 'nova-inspecao'; }
+            if (['historico','analytics','relatorios','equipamentos'].includes(sectionId)) {
+                viewMode = 'global';
+                dehydrateCCTSubsections();
+            }
+            if (isRestrictedUser() && !['cct_coque','equipamentos','inventario','calibragem','controle3p','historico_pneus'].includes(sectionId)) { showCustomAlert('Acesso restrito.'); sectionId = 'cct_coque'; }
             if (sectionId === 'admin' && !isAdmin()) { showCustomAlert('Acesso restrito.'); sectionId = 'dashboard'; }
             // Update navigation
             document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -4855,6 +5578,25 @@
             document.querySelectorAll('.section-content').forEach(section => {
                 section.classList.add('hidden');
             });
+            if (sectionId === 'cct_coque') {
+                const targetSection = document.getElementById('cct_coque');
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                    targetSection.classList.add('fade-in');
+                }
+                hydrateCCTSubsections();
+                showCCTSubsection('inicio');
+                return;
+            }
+            if (sectionId === 'irrigacao') {
+                const targetSection2 = document.getElementById('irrigacao');
+                if (targetSection2) {
+                    targetSection2.classList.remove('hidden');
+                    targetSection2.classList.add('fade-in');
+                }
+                showIrrSubsection('inicio');
+                return;
+            }
             
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
@@ -4867,6 +5609,9 @@
             // Reset nova inspeção section
             if (sectionId === 'nova-inspecao') {
                 backToSelection();
+            }
+            if (sectionId === 'historico') {
+                updateHistoryTable();
             }
             if (sectionId === 'analytics') {
                 const sel = document.getElementById('chartPeriod');
@@ -4886,6 +5631,954 @@
             }
         }
 
+        function hydrateCCTSubsections() {
+            const map = ['historico','analytics','relatorios','equipamentos'];
+            map.forEach(id => {
+                const src = document.getElementById(id);
+                const dest = document.getElementById('cct-sub-' + id);
+                if (src && dest && dest.childElementCount === 0) {
+                    while (src.firstChild) { dest.appendChild(src.firstChild); }
+                }
+            });
+        }
+
+        function dehydrateCCTSubsections() {
+            try {
+                const map = ['historico','analytics','relatorios','equipamentos'];
+                map.forEach(id => {
+                    const src = document.getElementById(id);
+                    const dest = document.getElementById('cct-sub-' + id);
+                    if (src && dest && src.childElementCount === 0) {
+                        while (dest.firstChild) { src.appendChild(dest.firstChild); }
+                    }
+                });
+                restoreGlobalFilters();
+            } catch(_) {}
+        }
+
+        function showCCTSubsection(sub) {
+            viewMode = 'cct';
+            document.querySelectorAll('#cct-sub-historico,#cct-sub-analytics,#cct-sub-relatorios,#cct-sub-equipamentos').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.cct-sub-btn').forEach(btn => {
+                btn.classList.remove('border-primary','text-primary');
+                btn.classList.add('border-transparent','text-gray-600');
+            });
+            const eqSel = document.getElementById('equipmentSelection');
+            const form = document.getElementById('checklistForm');
+            if (sub === 'inicio') {
+                if (eqSel) eqSel.classList.remove('hidden');
+                if (form) form.classList.add('hidden');
+                const btn = Array.from(document.querySelectorAll('.cct-sub-btn')).find(b => b.getAttribute('onclick')?.includes("'inicio'"));
+                if (btn) { btn.classList.add('border-primary','text-primary'); btn.classList.remove('border-transparent','text-gray-600'); }
+                return;
+            }
+            if (eqSel) eqSel.classList.add('hidden');
+            if (form) form.classList.add('hidden');
+            const target = document.getElementById('cct-sub-' + sub);
+            if (target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
+            const btn = Array.from(document.querySelectorAll('.cct-sub-btn')).find(b => b.getAttribute('onclick')?.includes("'"+sub+"'"));
+            if (btn) { btn.classList.add('border-primary','text-primary'); btn.classList.remove('border-transparent','text-gray-600'); }
+            if (sub === 'historico') {
+                updateHistoryTable();
+                ensureCCTFilters('historico');
+            }
+            if (sub === 'analytics') {
+                const sel = document.getElementById('chartPeriod');
+                const days = sel ? parseInt(sel.value, 10) : 30;
+                initializeCharts();
+                populateAnalyticsFilters();
+                updateAnalytics();
+                updateAnalyticsSummary(days);
+                ensureCCTFilters('analytics');
+            }
+            if (sub === 'equipamentos') {
+                populateEquipmentList();
+            }
+        }
+
+        function ensureCCTFilters(area) {
+            try {
+                if (area === 'historico') {
+                    const container = document.getElementById('cct-sub-historico');
+                    if (!container) return;
+                    const custom = container.querySelector('#cctFiltroRow');
+                    if (custom) custom.remove();
+                    const tipoSel = container.querySelector('#filtroTipo');
+                    if (tipoSel) {
+                        const box = tipoSel.closest('.bg-white');
+                        if (box) box.classList.remove('hidden');
+                        // Ajusta o label para CCT
+                        const label = box.querySelector('label');
+                        if (label) label.textContent = 'Tipo de Equipamento (CCT)';
+                        // Remove tipos de Irrigação
+                        ['pivot','bombeamento','tubulacoes'].forEach(v => {
+                            const opt = tipoSel.querySelector(`option[value="${v}"]`);
+                            if (opt) opt.remove();
+                        });
+                    }
+                } else if (area === 'analytics') {
+                    const container = document.getElementById('cct-sub-analytics');
+                    if (!container) return;
+                    const globalEq = container.querySelector('#equipmentFilter');
+                    if (globalEq) { const wrap = globalEq.closest('.flex'); if (wrap) wrap.classList.add('hidden'); }
+                    if (!document.getElementById('cctAnalyticsFilters')) {
+                        const row = document.createElement('div');
+                        row.id = 'cctAnalyticsFilters';
+                        row.className = 'mb-4';
+                        row.innerHTML = `
+                            <div class="flex flex-wrap items-center gap-3">
+                                <select id="chartPeriodCCT" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                                    <option value="7">Últimos 7 dias</option>
+                                    <option value="30" selected>Últimos 30 dias</option>
+                                    <option value="90">Últimos 90 dias</option>
+                                </select>
+                                <select id="equipmentFilterCCT" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                                    <option value="all" selected>Todos equipamentos</option>
+                                    <option value="caminhao">Caminhão</option>
+                                    <option value="trator">Trator</option>
+                                    <option value="colhedora">Colhedora</option>
+                                    <option value="reboque">Reboque</option>
+                                    <option value="plantadora">Plantadora</option>
+                                    <option value="distribuidora">Distribuidora</option>
+                                    <option value="cobridores">Cobridores</option>
+                                    <option value="transbordo">Transbordo</option>
+                                    <option value="tortao">Tortão</option>
+                                </select>
+                                <select id="leaderFilterCCT" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
+                                    <option value="all" selected>Todos líderes</option>
+                                </select>
+                                <button id="clearAnalyticsFiltersCCT" class="text-sm px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Limpar</button>
+                            </div>`;
+                        container.insertBefore(row, container.firstChild);
+                        const btn = document.getElementById('clearAnalyticsFiltersCCT');
+                        if (btn) btn.addEventListener('click', () => {
+                            const p = document.getElementById('chartPeriodCCT');
+                            const e = document.getElementById('equipmentFilterCCT');
+                            const l = document.getElementById('leaderFilterCCT');
+                            if (p) p.value = '30'; if (e) e.value = 'all'; if (l) l.value = 'all';
+                            const days = 30; buildCharts(days); updateAnalyticsSummary(days); updateAnalytics();
+                        });
+                    }
+                }
+            } catch(_) {}
+        }
+
+        function filterHistoryCCT() {
+            const tipoEl = document.getElementById('filtroTipoCCT');
+            const diEl = document.getElementById('filtroDataInicialCCT');
+            const dfEl = document.getElementById('filtroDataFinalCCT');
+            const tipo = tipoEl ? tipoEl.value : '';
+            const di = diEl ? diEl.value : '';
+            const df = dfEl ? dfEl.value : '';
+            const diTime = di ? dateOnlyToLocalDate(di).getTime() : null;
+            const dfTime = df ? dateOnlyToLocalDate(df).getTime() : null;
+            const all = inspections.slice();
+            const filtered = all.filter(i => {
+                const matchesTipo = !tipo || i.tipo === tipo;
+                const t = dateOnlyToLocalDate(i.data).getTime();
+                const afterStart = diTime == null || t >= diTime;
+                const beforeEnd = dfTime == null || t <= dfTime;
+                return matchesTipo && afterStart && beforeEnd;
+            });
+            updateHistoryTable(filtered);
+        }
+
+        function showIrrSubsection(sub) {
+            viewMode = 'irr';
+            document.querySelectorAll('#irr-sub-inicio,#irr-sub-historico,#irr-sub-analytics,#irr-sub-relatorios,#irr-sub-equipamentos').forEach(el => el.classList.add('hidden'));
+            const irrForm = document.getElementById('irrChecklistForm');
+            if (irrForm) irrForm.classList.add('hidden');
+            document.querySelectorAll('.irr-sub-btn').forEach(btn => {
+                btn.classList.remove('border-primary','text-primary');
+                btn.classList.add('border-transparent','text-gray-600');
+            });
+            if (sub === 'inicio') {
+                const start = document.getElementById('irr-sub-inicio');
+                if (start) {
+                    start.classList.remove('hidden');
+                    start.classList.add('fade-in');
+                    const cards = document.getElementById('irrEquipCards');
+                    if (cards) cards.classList.remove('hidden');
+                    if (irrForm) irrForm.classList.add('hidden');
+                }
+                const btn = Array.from(document.querySelectorAll('.irr-sub-btn')).find(b => b.getAttribute('onclick')?.includes("'inicio'"));
+                if (btn) { btn.classList.add('border-primary','text-primary'); btn.classList.remove('border-transparent','text-gray-600'); }
+                return;
+            }
+            const target = document.getElementById('irr-sub-' + sub);
+            if (target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
+            const btn = Array.from(document.querySelectorAll('.irr-sub-btn')).find(b => b.getAttribute('onclick')?.includes("'"+sub+"'"));
+            if (btn) { btn.classList.add('border-primary','text-primary'); btn.classList.remove('border-transparent','text-gray-600'); }
+            if (sub === 'equipamentos') { populateIrrEquipmentList(); }
+            if (sub === 'historico') { renderIrrHistory(); }
+            if (sub === 'analytics') { populateIrrLeaderFilter(); initializeIrrCharts(); updateIrrAnalytics(); updateIrrAnalyticsSummary(); }
+        }
+
+        let irrigInspections = [];
+        let irrigEquipments = [];
+        let irrPhotoSessionId = null;
+        const irrigEquipmentConfigs = {
+            motobombas: {
+                sections: [
+                    {
+                        name: 'TIPO DE SERVIÇO',
+                        items: [
+                            'Verificar tanque',
+                            'Verificar cinta do tanque - reparar se necessário',
+                            'Verificar entrada de ar no sistema',
+                            'Verificar lava radiador',
+                            'Verificar vazamento no radiador',
+                            'Verificar bomba de centrífuga',
+                            'Verificar gaxeta',
+                            'Verificar buchas e folga na chaveta',
+                            'Verificar parafusos e trincas da caixa e sucção',
+                            'Verificar vazamentos no motor',
+                            'Verificar vazamento na bomba motor',
+                            'Verificar altura dos pneus',
+                            'Realizar manutenção primária',
+                            'Verificar eixos e folga do cabeçalho',
+                            'Verificar guincho de levante do mangote',
+                            'Verificar cabo de aço e catraca do guincho',
+                            'Verificar medidor de pressão de óleo do motor',
+                            'Verificar relógio hidrômetro do motor',
+                            'Verificar relógio amperímetro da parte elétrica',
+                            'Verificar relógio de temperatura do motor',
+                            'Verificar vela eletrônica',
+                            'Verificar altura dos pneus',
+                            'Realizar inventário de peças',
+                            'Verificar pino de freio',
+                            'Verificar partes móveis pintura e proteção',
+                            'Verificar mangueira e proteções laterais',
+                            'Revisar montador',
+                            'Revisar motor de partida',
+                            'Revisar chicote da bateria, suporte e fixação',
+                            'Revisar horímetro',
+                            'Revisar painel de instrumentos',
+                            'Teste de sensores',
+                            'Verificar entrada de ar no mangote de sucção',
+                            'Verificar abraçadeiras do mangote de sucção',
+                            'Verificar trincas no cano de saída inox',
+                            'Verificar válvula de saída',
+                            'Verificar folga nos cubos',
+                            'Verificar retentores com vazamento',
+                            'Verificar embuchamento',
+                            'Verificar parafusos da roda',
+                            'Verificar folgas na roda'
+                        ]
+                    }
+                ]
+            },
+            hidroroll: {
+                sections: [
+                    {
+                        name: 'TIPO DE SERVIÇO',
+                        items: [
+                            'Verificar pinos e folga do cabeçalho',
+                            'Verificar rala de giro',
+                            'Verificar parafusos da rala',
+                            'Verificar suporte e pino do giro',
+                            'Verificar estrutura do chassi',
+                            'Verificar desgaste e trincas da cremalheira',
+                            'Verificar folga no pino de recuo',
+                            'Verificar folga das alavancas da marcha',
+                            'Verificar funcionamento do farol de sinalização',
+                            'Verificar instalação do by pass',
+                            'Verificar painel de instrumentos e operação',
+                            'Verificar giroflex',
+                            'Verificar faróis (sinalizações e iluminação)',
+                            'Revisar alternador e baterias',
+                            'Verificar carenagens',
+                            'Verificar rolamentos',
+                            'Verificar desgaste da chaveta do guia',
+                            'Verificar desgaste da rosca do guia',
+                            'Verificar regular, limpar e lubrificar corrente do guia',
+                            'Verificar cavalete de desarme',
+                            'Verificar limpeza da sapata da ancoragem',
+                            'Verificar trocar juntas e abraçadeiras',
+                            'Verificar aspersor',
+                            'Verificar caixa do painel',
+                            'Verificar funcionamento do painel',
+                            'Verificar proteção dos cabos do painel',
+                            'Verificar sensores',
+                            'Verificar suspiro de óleo do redutor',
+                            'Verificar vazamento no retentor do redutor',
+                            'Verificar folga no eixo do redutor',
+                            'Verificar sistema de freio do redutor',
+                            'Verificar redutor e corrente do guia',
+                            'Verificar fixação do moto redutor',
+                            'Verificar válvula do moto redutor',
+                            'Verificar partes móveis pintura e proteção',
+                            'Verificar pino de freio',
+                            'Verificar selo mecânico da turbina',
+                            'Verificar correia, esticador e polia da turbina',
+                            'Verificar vazamentos nas mangueiras',
+                            'Verificar sistema by pass',
+                            'Verificar regular e limpar rolo do guia da mangueira',
+                            'Verificar cubos do redutor',
+                            'Verificar parafusos do cubo',
+                            'Reapertar rodas',
+                            'Conferir parafusos e porcas',
+                            'Colocar tampa de válvula',
+                            'Calibrar pneus e medir sulco',
+                            'Inventariar pneus equipamento',
+                            'Desmontar, lavar peças, examinar, engraxar e montar (cubos de roda)'
+                        ]
+                    }
+                ]
+            }
+        };
+
+        let irrCurrentInspection = { tipo:'', frota:'', mecanico:'', data:'', reforma:'nao', items:[], results:{ ok:0, notOk:0, percentage:0 } };
+
+        function selectIrrEquipment(type) {
+            irrCurrentInspection = { tipo:type, frota:'', mecanico:'', data:'', reforma:'nao', items:[], results:{ ok:0, notOk:0, percentage:0 } };
+            const f = document.getElementById('irrChecklistForm');
+            const sel = document.getElementById('irr-sub-inicio');
+            if (sel) {
+                const cards = document.getElementById('irrEquipCards');
+                if (cards) cards.classList.add('hidden');
+                if (f) sel.appendChild(f);
+            }
+            if (f) { f.classList.remove('hidden'); f.classList.add('fade-in'); }
+            const titles = { motobombas:'Checklist • MotoBombas', hidroroll:'Checklist • Hidro Roll' };
+            const tt = document.getElementById('irrChecklistTitle');
+            if (tt) tt.textContent = titles[type] || 'Checklist • Irrigação';
+            irrPhotoSessionId = (crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()));
+            generateIrrChecklistItems(type);
+            irrPopulateFrotaOptions();
+            irrBindFrotaSelect();
+            const mechEl = document.getElementById('irrMecanico');
+            if (mechEl) {
+                const u = (typeof currentUser !== 'undefined' && currentUser) || getCachedUser() || getOfflineUser();
+                mechEl.value = getDisplayName(u);
+            }
+            const d = document.getElementById('irrDataInspecao');
+            if (d) { const t = new Date().toISOString().split('T')[0]; d.value = t; d.max = t; }
+            clearIrrResults();
+            toggleMobileBar(true);
+        }
+
+        function generateIrrChecklistItems(type) {
+            const container = document.getElementById('irrChecklistItems');
+            const config = irrigEquipmentConfigs[type];
+            if (!container) return;
+            container.innerHTML = '';
+            irrCurrentInspection.items = [];
+            let index = 0;
+            const isMobile = window.innerWidth < 640;
+            if (config && Array.isArray(config.sections)) {
+                config.sections.forEach(section => {
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'mb-6';
+                    const secId = 'irr_section_'+index+'_'+Math.random().toString(36).slice(2);
+                    sectionDiv.innerHTML = `
+                        <button class="w-full flex items-center justify-between px-4 py-2 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md" onclick="toggleChecklistSection('${secId}')">
+                            <h5 class="text-sm font-semibold text-green-800 dark:text-green-200">${section.name}</h5>
+                            <svg class="w-4 h-4 text-green-700 dark:text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div id="${secId}" class="${isMobile ? 'hidden' : ''} space-y-2 mt-2"></div>
+                    `;
+                    container.appendChild(sectionDiv);
+                    const itemsWrap = sectionDiv.querySelector('#'+secId);
+                    section.items.forEach(item => {
+                        const itemData = { id:index, name:item, section:section.name, status:null, note:'', photos:[] };
+                        irrCurrentInspection.items.push(itemData);
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg';
+                        itemDiv.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-900 dark:text-white">${item}</span>
+                                <div class="flex space-x-3">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="irr_item_${index}" value="ok" onchange="updateIrrItemStatus(${index}, 'ok')" class="form-radio h-6 w-6 sm:h-4 sm:w-4 text-primary">
+                                        <span class="ml-2 text-sm text-green-600 dark:text-green-400">OK</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="irr_item_${index}" value="notok" onchange="updateIrrItemStatus(${index}, 'notok')" class="form-radio h-6 w-6 sm:h-4 sm:w-4 text-primary">
+                                        <span class="ml-2 text-sm text-red-600 dark:text-red-400">NÃO OK</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mt-3 hidden" id="irr_note_${index}">
+                                <textarea rows="2" placeholder="Observação deste item (opcional)" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" oninput="updateIrrItemNote(${index}, this.value)"></textarea>
+                            </div>
+                            <div class="mt-3">
+                                <input type="file" accept="image/*" capture="environment" class="hidden" id="irr_photo_input_${index}" multiple onchange="handleIrrItemPhoto(${index}, this.files)">
+                                <button type="button" class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600" onclick="document.getElementById('irr_photo_input_${index}').click()">Adicionar foto</button>
+                                <div id="irr_photos_${index}" class="mt-2 flex gap-2 flex-wrap"></div>
+                            </div>
+                        `;
+                        itemsWrap.appendChild(itemDiv);
+                        index++;
+                    });
+                });
+            }
+        }
+
+        function updateIrrItemStatus(itemId, status) {
+            irrCurrentInspection.items[itemId].status = status;
+            const noteBox = document.getElementById('irr_note_'+itemId);
+            if (noteBox) {
+                if (status === 'notok') noteBox.classList.remove('hidden'); else { noteBox.classList.add('hidden'); updateIrrItemNote(itemId, ''); }
+            }
+            calculateIrrResults();
+        }
+
+        function updateIrrItemNote(itemId, value) { irrCurrentInspection.items[itemId].note = value || ''; }
+
+        async function handleIrrItemPhoto(itemId, fileList) {
+            if (!fileList || fileList.length === 0) return;
+            const files = Array.from(fileList).slice(0, 6);
+            for (const f of files) {
+                try {
+                    const canUpload = isOnline() && currentUser && currentUser.id && INSPECTION_PHOTOS_BUCKET;
+                    if (canUpload) {
+                        const safeName = (f.name || 'foto').replace(/[^A-Za-z0-9._-]/g, '_');
+                        const key = `${irrPhotoSessionId}/${itemId}/${Date.now()}_${Math.random().toString(36).slice(2)}_${safeName}`;
+                        const up = await supabase.storage.from(INSPECTION_PHOTOS_BUCKET).upload(key, f, { contentType: f.type || 'image/jpeg', upsert: true });
+                        if (up && !up.error) {
+                            const pub = supabase.storage.from(INSPECTION_PHOTOS_BUCKET).getPublicUrl(key);
+                            const url = String((pub && pub.data && pub.data.publicUrl) || '');
+                            if (url) {
+                                if (!Array.isArray(irrCurrentInspection.items[itemId].photos)) irrCurrentInspection.items[itemId].photos = [];
+                                irrCurrentInspection.items[itemId].photos.push(url);
+                                renderIrrItemPhotos(itemId);
+                                continue;
+                            }
+                        }
+                    }
+                    const reader = new FileReader();
+                    await new Promise((resolve) => {
+                        reader.onload = () => {
+                            const url = String(reader.result || '');
+                            if (!Array.isArray(irrCurrentInspection.items[itemId].photos)) irrCurrentInspection.items[itemId].photos = [];
+                            irrCurrentInspection.items[itemId].photos.push(url);
+                            renderIrrItemPhotos(itemId);
+                            resolve();
+                        };
+                        reader.readAsDataURL(f);
+                    });
+                } catch (_) {
+                    try {
+                        const reader2 = new FileReader();
+                        await new Promise((resolve) => {
+                            reader2.onload = () => {
+                                const url2 = String(reader2.result || '');
+                                if (!Array.isArray(irrCurrentInspection.items[itemId].photos)) irrCurrentInspection.items[itemId].photos = [];
+                                irrCurrentInspection.items[itemId].photos.push(url2);
+                                renderIrrItemPhotos(itemId);
+                                resolve();
+                            };
+                            reader2.readAsDataURL(f);
+                        });
+                    } catch (_) {}
+                }
+            }
+            const pi = document.getElementById(`irr_photo_input_${itemId}`);
+            if (pi) pi.value = '';
+        }
+
+        function renderIrrItemPhotos(itemId) {
+            const wrap = document.getElementById(`irr_photos_${itemId}`);
+            if (!wrap) return;
+            const photos = Array.isArray(irrCurrentInspection.items[itemId].photos) ? irrCurrentInspection.items[itemId].photos : [];
+            wrap.innerHTML = photos.map((src, idx) => `
+                <div class="relative">
+                    <img src="${src}" class="w-16 h-16 object-cover rounded-md border border-gray-200 dark:border-gray-600" />
+                    <button type="button" class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-600 text-white text-xs" onclick="removeIrrItemPhoto(${itemId}, ${idx})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function removeIrrItemPhoto(itemId, idx) {
+            const photos = irrCurrentInspection.items[itemId].photos || [];
+            if (photos[idx] != null) { photos.splice(idx, 1); }
+            renderIrrItemPhotos(itemId);
+        }
+
+        function calculateIrrResults() {
+            let ok = 0, notOk = 0;
+            irrCurrentInspection.items.forEach(item => { if (item.status === 'ok') ok++; else if (item.status === 'notok') notOk++; });
+            const total = ok + notOk;
+            const percentage = total > 0 ? Math.round((ok / total) * 100) : 0;
+            irrCurrentInspection.results = { ok, notOk, percentage };
+            const iok = document.getElementById('irrItensOK'); if (iok) iok.textContent = ok;
+            const inok = document.getElementById('irrItensNaoOK'); if (inok) inok.textContent = notOk;
+            const per = document.getElementById('irrPercentual'); if (per) per.textContent = percentage + '%';
+            const nivelEl = document.getElementById('irrNivelManutencao');
+            if (nivelEl) {
+                let nivel = '';
+                if (percentage >= 90) nivel = 'Excelente'; else if (percentage >= 80) nivel = 'Bom'; else if (percentage >= 70) nivel = 'Regular'; else if (percentage > 0) nivel = 'Crítico'; else nivel = '-';
+                nivelEl.textContent = 'Nível de Manutenção: ' + nivel;
+            }
+        }
+
+        function clearIrrResults() {
+            irrCurrentInspection.results = { ok:0, notOk:0, percentage:0 };
+            const iok = document.getElementById('irrItensOK'); if (iok) iok.textContent = '0';
+            const inok = document.getElementById('irrItensNaoOK'); if (inok) inok.textContent = '0';
+            const per = document.getElementById('irrPercentual'); if (per) per.textContent = '0%';
+            const nivelEl = document.getElementById('irrNivelManutencao'); if (nivelEl) nivelEl.textContent = 'Nível de Manutenção: -';
+        }
+
+        function irrPopulateFrotaOptions() {
+            const sel = document.getElementById('irrFrotaSelect');
+            if (!sel) return;
+            while (sel.options.length > 2) sel.remove(2);
+            irrigEquipments.filter(e => e.status !== 'inativo').forEach(e => {
+                const o = document.createElement('option'); o.value = e.frota; o.textContent = e.frota; sel.appendChild(o);
+            });
+        }
+
+        function irrBindFrotaSelect() {
+            const sel = document.getElementById('irrFrotaSelect');
+            const custom = document.getElementById('irrFrotaCustom');
+            if (!sel || !custom) return;
+            sel.onchange = function() {
+                if (sel.value === 'custom') { custom.classList.remove('hidden'); custom.value = ''; }
+                else { custom.classList.add('hidden'); irrCurrentInspection.frota = sel.value; }
+            };
+            custom.oninput = function() { irrCurrentInspection.frota = custom.value; };
+        }
+
+        function clearIrrForm() {
+            const sel = document.getElementById('irrFrotaSelect'); if (sel) sel.value = '';
+            const custom = document.getElementById('irrFrotaCustom'); if (custom) { custom.value=''; custom.classList.add('hidden'); }
+            const mech = document.getElementById('irrMecanico'); if (mech) mech.value='';
+            irrCurrentInspection.items.forEach(i => { i.status = null; i.note=''; });
+            document.querySelectorAll('[id^="irr_note_"]').forEach(n => n.classList.add('hidden'));
+            clearIrrResults();
+        }
+
+        async function saveIrrInspection() {
+            if (savingInspection) return;
+            const date = document.getElementById('irrDataInspecao')?.value || '';
+            const mech = document.getElementById('irrMecanico')?.value || '';
+            const sel = document.getElementById('irrFrotaSelect');
+            const custom = document.getElementById('irrFrotaCustom');
+            const frota = sel && sel.value === 'custom' ? (custom?.value || '') : (sel?.value || '');
+            if (!irrCurrentInspection.tipo) { showCustomAlert('Selecione o tipo de equipamento.'); return; }
+            if (!date || !mech || !frota) { showCustomAlert('Preencha Data, Mecânico e Frota.'); return; }
+            showLoading(true);
+            savingInspection = true;
+            const saveBtns = Array.from(document.querySelectorAll('button[onclick="saveIrrInspection()"]'));
+            saveBtns.forEach(b => { b.disabled = true; });
+            irrCurrentInspection.data = date;
+            irrCurrentInspection.mecanico = mech;
+            irrCurrentInspection.frota = frota;
+            irrCurrentInspection.created_at = new Date().toISOString();
+            irrCurrentInspection.local_id = 'irr_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+            const user = (typeof currentUser !== 'undefined' && currentUser) || getCachedUser() || getOfflineUser();
+            const isAuthenticated = !!(user && user.id && user.id !== 'offline');
+            const record = JSON.parse(JSON.stringify(irrCurrentInspection));
+            record.user_id = user && user.id ? user.id : null;
+            const dbInspection = { data: record.data, tipo: record.tipo, frota: record.frota, mecanico: record.mecanico, observacao: record.observacao, items: record.items, results: record.results, user_id: record.user_id, created_at: record.created_at, local_id: record.local_id };
+            let savedOnline = false;
+            if (isOnline() && isAuthenticated) {
+                try {
+                    const { data: upData, error } = await supabase
+                        .from('irrig_inspections')
+                        .upsert([dbInspection], { onConflict: 'local_id' })
+                        .select();
+                    if (!error && upData && upData[0]) { record.id = upData[0].id; savedOnline = true; }
+                } catch (_) {}
+            }
+            if (!savedOnline) { record.id = record.local_id; queueIrrInspection(dbInspection); }
+            const existingIdx = Array.isArray(irrigInspections) ? irrigInspections.findIndex(i => String(i.local_id) === String(record.local_id)) : -1;
+            if (existingIdx >= 0) irrigInspections[existingIdx] = record; else irrigInspections.push(record);
+            setCachedIrrInspections(irrigInspections);
+            renderIrrHistory();
+            showIrrSubsection('historico');
+            savingInspection = false;
+            saveBtns.forEach(b => { b.disabled = false; });
+            showLoading(false);
+        }
+
+        function populateIrrEquipmentList() {
+            const container = document.querySelector('#irr-sub-equipamentos');
+            if (!container) return;
+            container.innerHTML = '';
+            const wrap = document.createElement('div');
+            wrap.className = 'space-y-6';
+            const form = document.createElement('div');
+            form.className = 'bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700';
+            form.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Novo Equipamento • Irrigação</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo</label>
+                        <select id="irrEquipTipo" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="motobombas">MotoBombas</option>
+                            <option value="hidroroll">Hidro Roll</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frota</label>
+                        <input type="text" id="irrEquipFrota" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Descrição</label>
+                        <input type="text" id="irrEquipDesc" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                        <select id="irrEquipStatus" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="ativo" selected>Ativo</option>
+                            <option value="inativo">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="addIrrEquipment()" class="px-6 py-3 bg-primary text-white rounded-md hover:bg-primary-dark">Salvar</button>
+                    <button onclick="populateIrrEquipmentList()" class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">Atualizar Lista</button>
+                </div>
+            `;
+            wrap.appendChild(form);
+            const list = document.createElement('div');
+            list.className = 'bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700';
+            list.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Frotas Cadastradas • Irrigação</h3>
+                <div id="irrEquipList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            `;
+            wrap.appendChild(list);
+            container.appendChild(wrap);
+            const equipList = document.getElementById('irrEquipList');
+            equipList.innerHTML = '';
+            irrigEquipments.forEach(e => {
+                const card = document.createElement('div');
+                card.className = 'p-4 border border-gray-200 dark:border-gray-700 rounded-lg';
+                card.innerHTML = `<div class="font-semibold">${e.frota}</div><div class="text-sm text-gray-600 dark:text-gray-400">${e.tipo} • ${e.status}</div><div class="text-xs text-gray-500 dark:text-gray-500">${e.desc||''}</div>`;
+                equipList.appendChild(card);
+            });
+        }
+
+        function addIrrEquipment() {
+            const tipo = document.getElementById('irrEquipTipo')?.value || 'motobombas';
+            const frota = document.getElementById('irrEquipFrota')?.value || '';
+            const desc = document.getElementById('irrEquipDesc')?.value || '';
+            const status = document.getElementById('irrEquipStatus')?.value || 'ativo';
+            if (!frota.trim()) return;
+            irrigEquipments.push({ tipo, frota, desc, status });
+            populateIrrEquipmentList();
+        }
+
+        function renderIrrHistory(dataOverride) {
+            const container = document.querySelector('#irr-sub-historico');
+            if (!container) return;
+            const body = document.getElementById('irrHistoryBody');
+            body.innerHTML = '';
+            const data = Array.isArray(dataOverride) ? dataOverride : irrigInspections;
+            if (data.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td'); td.colSpan = 6; td.className = 'px-6 py-8 text-center text-gray-500 dark:text-gray-400'; td.textContent = 'Nenhuma inspeção encontrada';
+                tr.appendChild(td); body.appendChild(tr); return;
+            }
+            data.forEach(i => {
+                const admin = isAdmin();
+                const inspId = String(i.id || i.local_id);
+                const pending = !i.id || String(i.id) === String(i.local_id);
+                const statusBadge = pending
+                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 ml-2">Pendente</span>`
+                    : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 ml-2">Sincronizado</span>`;
+                const actions = admin ? `
+                    <button onclick="openEditInspection('${inspId}')" class="ml-3 text-yellow-600 hover:text-yellow-700 text-sm font-medium">Editar</button>
+                    <button onclick="deleteInspection('${inspId}')" class="ml-3 text-red-600 hover:text-red-700 text-sm font-medium">Excluir</button>
+                ` : '';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">${i.data||'-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">${i.tipo}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">${i.frota||'-'} ${statusBadge}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">${i.mecanico||'-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">${i.results?.percentage||0}%</td>
+                    <td class="px-6 py-4">
+                        <button onclick="viewInspection('${inspId}')" class="text-primary hover:text-primary-dark text-sm font-medium">Ver detalhes</button>
+                        ${actions}
+                    </td>`;
+                body.appendChild(tr);
+            });
+        }
+
+        function filterIrrHistory() {
+            const tipo = document.getElementById('irrFiltroTipo')?.value || '';
+            const di = document.getElementById('irrFiltroDataInicial')?.value || '';
+            const df = document.getElementById('irrFiltroDataFinal')?.value || '';
+            const start = di ? new Date(di) : null;
+            const end = df ? new Date(df) : null;
+            const filtered = irrigInspections.filter(i => {
+                if (tipo && i.tipo !== tipo) return false;
+                if (start) { const id = new Date(i.data); if (id < start) return false; }
+                if (end) { const id2 = new Date(i.data); if (id2 > end) return false; }
+                return true;
+            });
+            renderIrrHistory(filtered);
+        }
+
+        let irrChartsInitialized = false; let irrPerfChart = null; let irrEquipChart = null;
+        function initializeIrrCharts() {
+            if (irrChartsInitialized) return;
+            const perf = document.getElementById('irrPerformanceChart');
+            const equip = document.getElementById('irrEquipmentChart');
+            if (perf && window.Chart) {
+                irrPerfChart = new Chart(perf, { type:'line', data:{ labels:[], datasets:[{ label:'Aprovação', data:[], borderColor:'#5D5CDE' }] }, options:{ responsive:true, maintainAspectRatio:false } });
+            }
+            if (equip && window.Chart) {
+                irrEquipChart = new Chart(equip, { type:'doughnut', data:{ labels:['MotoBombas','Hidro Roll'], datasets:[{ data:[0,0], backgroundColor:['#F43F5E','#10B981'] }] }, options:{ responsive:true, maintainAspectRatio:false } });
+            }
+            irrChartsInitialized = true;
+        }
+
+        function updateIrrAnalytics() {
+            const periodSel = document.getElementById('irrChartPeriod');
+            const days = periodSel ? parseInt(periodSel.value, 10) : 30;
+            const toDate = new Date();
+            const fromDate = new Date(); fromDate.setDate(toDate.getDate() - days);
+            const eq = document.getElementById('irrEquipmentFilter')?.value || 'all';
+            const leader = document.getElementById('irrLeaderFilter')?.value || 'all';
+            const filtered = irrigInspections.filter(i => {
+                if (!i.data) return false;
+                const d = new Date(i.data);
+                if (!(d >= fromDate && d <= toDate)) return false;
+                if (eq !== 'all' && i.tipo !== eq) return false;
+                if (leader !== 'all' && (i.mecanico||'') !== leader) return false;
+                return true;
+            });
+            if (irrPerfChart) {
+                const labels = filtered.map((i, idx) => idx+1);
+                const data = filtered.map(i => i.results?.percentage||0);
+                irrPerfChart.data.labels = labels; irrPerfChart.data.datasets[0].data = data; irrPerfChart.update();
+            }
+            if (irrEquipChart) {
+                const counts = { motobombas:0, hidroroll:0 };
+                filtered.forEach(i => { if (counts[i.tipo] != null) counts[i.tipo]++; });
+                irrEquipChart.data.datasets[0].data = [counts.motobombas, counts.hidroroll];
+                irrEquipChart.update();
+            }
+        }
+
+        function updateIrrAnalyticsSummary() {
+            const periodSel = document.getElementById('irrChartPeriod');
+            const days = periodSel ? parseInt(periodSel.value, 10) : 30;
+            const toDate = new Date();
+            const fromDate = new Date(); fromDate.setDate(toDate.getDate() - days);
+            const eq = document.getElementById('irrEquipmentFilter')?.value || 'all';
+            const leader = document.getElementById('irrLeaderFilter')?.value || 'all';
+            const filtered = irrigInspections.filter(i => {
+                if (!i.data) return false;
+                const d = new Date(i.data);
+                if (!(d >= fromDate && d <= toDate)) return false;
+                if (eq !== 'all' && i.tipo !== eq) return false;
+                if (leader !== 'all' && (i.mecanico||'') !== leader) return false;
+                return true;
+            });
+            const percentages = filtered.map(i => i.results?.percentage||0);
+            const avg = percentages.length ? Math.round(percentages.reduce((a,b)=>a+b,0)/percentages.length) : 0;
+            const criticalCount = filtered.reduce((acc,i)=> acc + (i.results?.notOk>0 ? 1 : 0), 0);
+            const productivity = avg;
+            const rateEl = document.getElementById('irrApprovalRate'); if (rateEl) rateEl.textContent = avg + '%';
+            const avgTimeEl = document.getElementById('irrAvgTime'); if (avgTimeEl) avgTimeEl.textContent = '0min';
+            const critCardEl = document.getElementById('irrCriticalCountCard'); if (critCardEl) critCardEl.textContent = String(criticalCount);
+            const prodEl = document.getElementById('irrProductivity'); if (prodEl) prodEl.textContent = productivity + '%';
+            const critBadgeEl = document.getElementById('irrCriticalCountBadge'); if (critBadgeEl) critBadgeEl.textContent = criticalCount + ' ativos';
+            const issues = document.getElementById('irrCriticalIssues');
+            if (issues) {
+                issues.innerHTML = '';
+                const recent = filtered.filter(i => (i.results?.notOk||0)>0).slice(-3).reverse();
+                if (recent.length === 0) {
+                    const d = document.createElement('div'); d.className = 'text-gray-500 dark:text-gray-400'; d.textContent = 'Nenhum problema crítico no período'; issues.appendChild(d);
+                } else {
+                    recent.forEach(i => {
+                        const card = document.createElement('div'); card.className = 'p-4 border border-gray-200 dark:border-gray-700 rounded-lg';
+                        card.innerHTML = `<div class="font-semibold text-gray-900 dark:text-white">${i.tipo} • ${i.frota||'-'}</div><div class="text-sm text-gray-600 dark:text-gray-400">${i.data||'-'} • Líder: ${i.mecanico||'-'}</div><div class="mt-2 text-sm"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">${i.results?.notOk||0} não ok</span></div>`; issues.appendChild(card);
+                    });
+                }
+            }
+            const top = document.getElementById('irrTopMecanicos');
+            if (top) {
+                top.innerHTML = '';
+                const byLeader = {};
+                filtered.forEach(i => {
+                    const k = i.mecanico||'-';
+                    if (!byLeader[k]) byLeader[k] = []; byLeader[k].push(i.results?.percentage||0);
+                });
+                const pairs = Object.entries(byLeader).map(([name, arr]) => ({ name, avg: Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) }));
+                pairs.sort((a,b)=> b.avg - a.avg);
+                pairs.slice(0,5).forEach(p => {
+                    const row = document.createElement('div'); row.className = 'flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg';
+                    row.innerHTML = `<span class="text-gray-900 dark:text-white">${p.name}</span><span class="text-sm font-semibold text-green-600 dark:text-green-400">${p.avg}%</span>`; top.appendChild(row);
+                });
+                if (pairs.length === 0) { const r = document.createElement('div'); r.className='text-gray-500 dark:text-gray-400'; r.textContent='Sem dados para líderes'; top.appendChild(r); }
+            }
+        }
+
+        function populateIrrLeaderFilter() {
+            const sel = document.getElementById('irrLeaderFilter'); if (!sel) return;
+            const set = new Set(); irrigInspections.forEach(i => { if ((i.mecanico||'').trim()) set.add(i.mecanico.trim()); });
+            const current = sel.value;
+            sel.innerHTML = '<option value="all" selected>Todos líderes</option>';
+            Array.from(set).sort().forEach(name => { const o=document.createElement('option'); o.value=name; o.textContent=name; sel.appendChild(o); });
+            sel.value = current && current !== '' ? current : 'all';
+        }
+
+        function clearIrrAnalyticsFilters() {
+            const periodSel = document.getElementById('irrChartPeriod'); if (periodSel) periodSel.value = '30';
+            const eqSel = document.getElementById('irrEquipmentFilter'); if (eqSel) eqSel.value = 'all';
+            const leaderSel = document.getElementById('irrLeaderFilter'); if (leaderSel) leaderSel.value = 'all';
+        }
+
+        function generateIrrReportCSV(rows, filename) {
+            const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+            const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = filename || 'relatorio_irrigacao.csv'; a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function generateIrrReport() {
+            const type = document.getElementById('irrReportType')?.value || 'geral';
+            const period = document.getElementById('irrReportPeriod')?.value || '30';
+            let format = document.getElementById('irrReportFormat')?.value || 'csv';
+            const supported = ['csv','excel','pdf','json'];
+            if (!supported.includes(format)) { format = 'csv'; }
+            const daysMap = { '7': 7, '30': 30, '90': 90 };
+            const days = daysMap[period] || 30;
+            const end = new Date();
+            const start = new Date();
+            start.setDate(end.getDate() - days + 1);
+            const filtered = irrigInspections.filter(i => {
+                const d = new Date(i.data || new Date());
+                return d >= start && d <= end;
+            });
+            const total = filtered.length;
+            const avg = total ? Math.round(filtered.reduce((s,i)=>s+(i.results?.percentage||0),0)/total) : 0;
+            const counts = { motobombas:0, hidroroll:0 };
+            filtered.forEach(i => { if (counts[i.tipo] !== undefined) counts[i.tipo]++; });
+            if (format === 'json') {
+                const payload = { type, period, summary: { total, average: avg, counts }, inspections: filtered };
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `relatorio_irrigacao_${type}_${period}.json`; a.click(); URL.revokeObjectURL(a.href);
+            } else if (format === 'csv') {
+                const header = ['data','tipo','frota','lider','ok','nao_ok','percentual','observacao'];
+                const rows = filtered.map(i => {
+                    const obs = i.observacao || (Array.isArray(i.items) ? ((i.items.find(it => String(it.name) === 'Observação')?.note) || '') : '');
+                    const esc = (v) => { const s = String(v ?? ''); if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replaceAll('"', '""') + '"'; return s; };
+                    return [esc(i.data), esc(i.tipo), esc(i.frota), esc(i.mecanico), esc(i.results?.ok||0), esc(i.results?.notOk||0), esc(i.results?.percentage||0), esc(obs)].join(',');
+                });
+                const csv = [header.join(','), ...rows].join('\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `relatorio_irrigacao_${type}_${period}.csv`; a.click(); URL.revokeObjectURL(a.href);
+            } else if (format === 'excel') {
+                const header = ['Data','Tipo','Frota','Líder','OK','NÃO OK','Percentual'];
+                const rows = filtered.map(i => `
+                    <tr>
+                        <td>${i.data}</td>
+                        <td>${i.tipo}</td>
+                        <td>${i.frota}</td>
+                        <td>${i.mecanico}</td>
+                        <td>${i.results?.ok||0}</td>
+                        <td>${i.results?.notOk||0}</td>
+                        <td>${i.results?.percentage||0}</td>
+                    </tr>
+                `).join('');
+                const html = `
+                    <html><head><meta charset="utf-8" /></head><body>
+                        <table border="1">
+                            <thead><tr>${header.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </body></html>
+                `;
+                const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `relatorio_irrigacao_${type}_${period}.xls`; a.click(); URL.revokeObjectURL(a.href);
+            } else if (format === 'pdf') {
+                const rows = filtered.map(i => `
+                    <tr>
+                        <td>${formatDateBR(i.data)}</td>
+                        <td>${i.tipo}</td>
+                        <td>${i.frota}</td>
+                        <td>${i.mecanico}</td>
+                        <td>${i.results?.ok||0}</td>
+                        <td>${i.results?.notOk||0}</td>
+                        <td>${i.results?.percentage||0}%</td>
+                    </tr>
+                `).join('');
+                const dist = counts;
+                const dateRange = `${start.toLocaleDateString('pt-BR')} — ${end.toLocaleDateString('pt-BR')}`;
+                const doc = `
+                    <html><head>
+                        <meta charset="utf-8" />
+                        <title>Relatório</title>
+                        <style>
+                            @page { size: A4 portrait; margin: 12mm; }
+                            * { box-sizing: border-box; }
+                            body { font-family: Inter, Arial, sans-serif; padding: 0; color: #111827; }
+                            .container { max-width: 940px; margin: 0 auto; padding: 24px; }
+                            .header { display:flex; justify-content: space-between; align-items:center; margin-bottom: 16px; }
+                            .brand { display:flex; align-items:center; gap:10px; }
+                            .logo { width:28px; height:28px; border-radius:8px; background:#5D5CDE; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; }
+                            .title { font-size: 18px; font-weight: 700; }
+                            .subtitle { font-size: 12px; color:#6B7280; }
+                            .kpis { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:12px; margin: 18px 0; }
+                            .card { border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff; }
+                            .card h4 { margin:0; font-size:12px; color:#6B7280; }
+                            .card .value { font-size:20px; font-weight:700; margin-top:6px; }
+                            .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+                            .chip { font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid #e5e7eb; color:#374151; background:#f9fafb; }
+                            .table-wrap { margin-top: 16px; }
+                            table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+                            thead th { background: #f3f4f6; text-align: left; font-size: 11px; color:#374151; border-bottom:1px solid #e5e7eb; }
+                            th, td { border: 1px solid #e5e7eb; padding: 8px 10px; font-size: 11px; word-break: break-word; }
+                            tbody tr:nth-child(odd) { background: #fafafa; }
+                            .footer { margin-top: 18px; font-size: 11px; color:#6B7280; text-align:right; }
+                            @media screen { body { background:#f3f4f6; } .container { background:#fff; padding:24px; box-shadow: 0 1px 6px rgba(0,0,0,0.08); } }
+                        </style>
+                    </head><body onload="window.print()">
+                        <div class="container">
+                            <div class="header">
+                                <div class="brand"><div class="logo">GG</div><div><div class="title">GGOMES-LOG • Relatório ${type} (Irrigação)</div><div class="subtitle">${dateRange}</div></div></div>
+                                <div class="subtitle">Gerado em ${new Date().toLocaleString('pt-BR')}</div>
+                            </div>
+                            <div class="kpis">
+                                <div class="card"><h4>Total</h4><div class="value">${total}</div></div>
+                                <div class="card"><h4>Média de aprovação</h4><div class="value">${avg}%</div></div>
+                                <div class="card"><h4>Distribuição</h4>
+                            <div class="chips">
+                                        <span class="chip">MotoBombas: ${dist.motobombas}</span>
+                                        <span class="chip">Hidro Roll: ${dist.hidroroll}</span>
+                                        <span class="chip">Tortão: ${dist.tortao}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr><th>Data</th><th>Tipo</th><th>Frota</th><th>Líder</th><th>OK</th><th>NÃO OK</th><th>%</th></tr>
+                                    </thead>
+                                    <tbody>${rows}</tbody>
+                                </table>
+                            </div>
+                            <div class="footer">Sistema de Checklist • ${new Date().getFullYear()}</div>
+                        </div>
+                    </body></html>
+                `;
+                const w = window.open('', '_blank'); if (w) { w.document.write(doc); w.document.close(); }
+            } else { showFloatingNotification('warning', 'Formato não suportado. Use CSV, Excel ou PDF.'); }
+        }
+
+        function generateIrrQuickReport(type) {
+            const sel = document.getElementById('irrReportType');
+            const per = document.getElementById('irrReportPeriod');
+            const fmt = document.getElementById('irrReportFormat');
+            if (sel) sel.value = type;
+            if (per) per.value = '30';
+            if (fmt) fmt.value = 'csv';
+            generateIrrReport();
+        }
+
+        function scheduleIrrReport() {
+            showFloatingNotification('info', 'Agendamento de relatório de irrigação será implementado em breve.');
+        }
+
         function selectEquipment(type) {
             currentEquipment = type;
             document.getElementById('equipmentSelection').classList.add('hidden');
@@ -4897,9 +6590,10 @@
                     colhedora: 'Checklist - Colhedora',
                     reboque: 'Checklist - Reboque',
                     transbordo: 'Checklist - Transbordo',
-                    manutencao: 'Checklist - Manutenção',
                     plantadora: 'Checklist - Plantadora de Cana',
-                    distribuidora: 'Checklist - Distribuidora de Cana'
+                    distribuidora: 'Checklist - Distribuidora de Cana',
+                    cobridores: 'Checklist - Cobridores',
+                    tortao: 'Checklist - Tortão',
                 };
             document.getElementById('checklistTitle').textContent = titles[type] || 'Checklist';
             generateChecklistItems(type);
@@ -4915,10 +6609,17 @@
             }
         }
 
+        function selectFromCCT(type) {
+            showSection('cct_coque');
+            backToSelection();
+            selectEquipment(type);
+        }
+
         function generateChecklistItems(type) {
             const container = document.getElementById('checklistItems');
-            const map = { caminhao: 'truck', trator: 'tractor', colhedora: 'harvester', reboque: 'trailer', manutencao: 'maintenance', plantadora: 'planter', distribuidora: 'distributor' };
+            const map = { caminhao: 'truck', trator: 'tractor', colhedora: 'harvester', reboque: 'trailer', manutencao: 'maintenance', plantadora: 'planter', distribuidora: 'distributor', cct_coque: 'cctCoque', tortao: 'tortao' };
             map.transbordo = 'transbordo';
+            map.cobridores = 'cobridores';
             const key = map[type];
             const config = key ? equipmentConfigs[key] : null;
             container.innerHTML = '';
@@ -5155,31 +6856,33 @@
 
         function updateStats() {
             const today = new Date().toISOString().split('T')[0];
-            const todayInspections = inspections.filter(inspection => 
-                inspection.data === today
-            );
+            const all = viewMode === 'cct' ? inspections.slice() : (viewMode === 'irr' ? (Array.isArray(irrigInspections) ? irrigInspections.slice() : []) : getAllInspectionsCombined());
+            const todayInspections = all.filter(inspection => inspection.data === today);
             
             // Count by equipment type
             const counts = {
-                caminhao: inspections.filter(i => i.tipo === 'caminhao').length,
-                trator: inspections.filter(i => i.tipo === 'trator').length,
-                colhedora: inspections.filter(i => i.tipo === 'colhedora').length,
-                plantadora: inspections.filter(i => i.tipo === 'plantadora').length,
-                distribuidora: inspections.filter(i => i.tipo === 'distribuidora').length,
-                reboque: inspections.filter(i => i.tipo === 'reboque').length,
-                transbordo: inspections.filter(i => i.tipo === 'transbordo').length
+                caminhao: all.filter(i => i.tipo === 'caminhao').length,
+                trator: all.filter(i => i.tipo === 'trator').length,
+                colhedora: all.filter(i => i.tipo === 'colhedora').length,
+                plantadora: all.filter(i => i.tipo === 'plantadora').length,
+                distribuidora: all.filter(i => i.tipo === 'distribuidora').length,
+                reboque: all.filter(i => i.tipo === 'reboque').length,
+                cct_coque: all.filter(i => i.tipo === 'cct_coque').length,
+                transbordo: all.filter(i => i.tipo === 'transbordo').length,
+                motobombas: all.filter(i => i.tipo === 'motobombas').length,
+                hidroroll: all.filter(i => i.tipo === 'hidroroll').length
             };
             
             const totalEquipments = Object.values(counts).reduce((a, b) => a + b, 0);
-            const avgLevel = inspections.length > 0 ? 
-                Math.round(inspections.reduce((sum, i) => sum + i.results.percentage, 0) / inspections.length) : 0;
+            const avgLevel = all.length > 0 ? 
+                Math.round(all.reduce((sum, i) => sum + (i.results?.percentage||0), 0) / all.length) : 0;
             const todayOk = todayInspections.reduce((s, i) => s + (i.results?.ok || 0), 0);
             const todayNotOk = todayInspections.reduce((s, i) => s + (i.results?.notOk || 0), 0);
             const todayTotal = todayOk + todayNotOk;
             const taxaHoje = todayTotal > 0 ? Math.round((todayOk / todayTotal) * 100) : 0;
             
             // Update dashboard
-            document.getElementById('totalInspecoes').textContent = inspections.length;
+            document.getElementById('totalInspecoes').textContent = all.length;
             document.getElementById('inspecoesHoje').textContent = todayInspections.length;
             document.getElementById('equipamentosAtivos').textContent = totalEquipments;
             document.getElementById('nivelMedio').textContent = avgLevel + '%';
@@ -5209,6 +6912,24 @@
             populateAnalyticsFilters();
         }
 
+        function getAllInspectionsCombined() {
+            try {
+                const base = Array.isArray(inspections) ? inspections.slice() : [];
+                const irr = Array.isArray(irrigInspections) ? irrigInspections.slice() : [];
+                return base.concat(irr.map(i => ({
+                    id: i.id || null,
+                    local_id: i.local_id || ('irr_' + (i.data || '') + '_' + Math.random().toString(36).slice(2)),
+                    data: i.data,
+                    tipo: i.tipo,
+                    frota: i.frota,
+                    mecanico: i.mecanico,
+                    items: i.items,
+                    results: i.results,
+                    created_at: i.created_at || i.data
+                })));
+            } catch(_) { return Array.isArray(inspections) ? inspections.slice() : []; }
+        }
+
         function updateRing(id, percentage) {
             const circle = document.getElementById(id);
             if (!circle) return;
@@ -5224,7 +6945,8 @@
 
         function updateRecentInspections() {
             const container = document.getElementById('inspecoesRecentes');
-            const recent = inspections.slice().sort((a,b) => {
+            const all = viewMode === 'cct' ? inspections.slice() : (viewMode === 'irr' ? (Array.isArray(irrigInspections) ? irrigInspections.slice() : []) : getAllInspectionsCombined());
+            const recent = all.slice().sort((a,b) => {
                 const ta = new Date(a.created_at || a.data).getTime();
                 const tb = new Date(b.created_at || b.data).getTime();
                 return tb - ta;
@@ -5262,7 +6984,12 @@
             }).join('');
         }
 
-        function updateHistoryTable(list = inspections) {
+        function updateHistoryTable(list) {
+            if (!list) {
+                if (viewMode === 'cct') list = inspections.slice();
+                else if (viewMode === 'irr') list = (Array.isArray(irrigInspections) ? irrigInspections.slice() : []);
+                else list = getAllInspectionsCombined();
+            }
             const tbody = document.getElementById('historyTableBody');
             if (!list || list.length === 0) {
                 tbody.innerHTML = `
@@ -5330,7 +7057,8 @@
             const df = document.getElementById('filtroDataFinal').value;
             const diTime = di ? dateOnlyToLocalDate(di).getTime() : null;
             const dfTime = df ? dateOnlyToLocalDate(df).getTime() : null;
-            const filtered = inspections.filter(i => {
+            const all = viewMode === 'cct' ? inspections.slice() : (viewMode === 'irr' ? (Array.isArray(irrigInspections) ? irrigInspections.slice() : []) : getAllInspectionsCombined());
+            const filtered = all.filter(i => {
                 const matchesTipo = !tipo || i.tipo === tipo;
                 const t = dateOnlyToLocalDate(i.data).getTime();
                 const afterStart = diTime == null || t >= diTime;
@@ -5398,10 +7126,16 @@
         function openEditInspection(id) {
             if (!isAdmin()) { showCustomAlert('Acesso restrito.'); return; }
             const matchId = String(id);
-            const inspection = inspections.find(i => String(i.id) === matchId) || inspections.find(i => String(i.local_id) === matchId);
+            let source = 'cct';
+            let inspection = inspections.find(i => String(i.id) === matchId) || inspections.find(i => String(i.local_id) === matchId);
+            if (!inspection && Array.isArray(irrigInspections)) {
+                inspection = irrigInspections.find(i => String(i.id) === matchId) || irrigInspections.find(i => String(i.local_id) === matchId);
+                if (inspection) source = 'irr';
+            }
             if (!inspection) { showCustomAlert('Inspeção não encontrada'); return; }
             const modal = document.getElementById('editModal');
             document.getElementById('editId').value = matchId;
+            const srcEl = document.getElementById('editSource'); if (srcEl) srcEl.value = source;
             document.getElementById('editData').value = inspection.data;
             document.getElementById('editFrota').value = inspection.frota;
             document.getElementById('editMecanico').value = inspection.mecanico;
@@ -5415,6 +7149,7 @@
         async function saveEditInspection() {
             if (!isAdmin()) { showCustomAlert('Acesso restrito.'); return; }
             const id = String(document.getElementById('editId').value || '');
+            const source = String(document.getElementById('editSource').value || 'cct');
             const data = document.getElementById('editData').value;
             const frota = document.getElementById('editFrota').value.trim();
             const mecanico = document.getElementById('editMecanico').value.trim();
@@ -5422,15 +7157,31 @@
             if (!id || !data || !frota || !mecanico) { showCustomAlert('Preencha todos os campos.'); return; }
             showLoading(true);
             try {
-                const idx = inspections.findIndex(i => String(i.id) === id || String(i.local_id) === id);
-                if (idx < 0) { throw new Error('Inspeção não encontrada'); }
-                inspections[idx].frota = frota;
-                inspections[idx].mecanico = mecanico;
-                inspections[idx].observacao = observacao;
-                setCachedInspections(inspections);
-                if (isOnline() && currentUser && currentUser.id && inspections[idx].id) {
-                    const { error } = await supabase.from('inspections').update({ frota, mecanico, observacao }).eq('id', inspections[idx].id);
-                    if (error) throw error;
+                if (source === 'irr') {
+                    const idxIrr = Array.isArray(irrigInspections) ? irrigInspections.findIndex(i => String(i.id) === id || String(i.local_id) === id) : -1;
+                    if (idxIrr < 0) { throw new Error('Inspeção de irrigação não encontrada'); }
+                    irrigInspections[idxIrr].data = data;
+                    irrigInspections[idxIrr].frota = frota;
+                    irrigInspections[idxIrr].mecanico = mecanico;
+                    irrigInspections[idxIrr].observacao = observacao;
+                    setCachedIrrInspections(irrigInspections);
+                    if (isOnline() && (currentUser || getCachedUser())) {
+                        const rec = irrigInspections[idxIrr];
+                        const dbInspection = { data: rec.data, tipo: rec.tipo, frota: rec.frota, mecanico: rec.mecanico, observacao: rec.observacao, items: rec.items, results: rec.results, user_id: rec.user_id, created_at: rec.created_at, local_id: rec.local_id };
+                        const { error } = await supabase.from('irrig_inspections').upsert([dbInspection], { onConflict: 'local_id' });
+                        if (error) { queueIrrInspection(dbInspection); }
+                    }
+                } else {
+                    const idx = inspections.findIndex(i => String(i.id) === id || String(i.local_id) === id);
+                    if (idx < 0) { throw new Error('Inspeção não encontrada'); }
+                    inspections[idx].frota = frota;
+                    inspections[idx].mecanico = mecanico;
+                    inspections[idx].observacao = observacao;
+                    setCachedInspections(inspections);
+                    if (isOnline() && currentUser && currentUser.id && inspections[idx].id) {
+                        const { error } = await supabase.from('inspections').update({ frota, mecanico, observacao }).eq('id', inspections[idx].id);
+                        if (error) throw error;
+                    }
                 }
                 updateStats();
                 updateAnalytics();
@@ -5447,15 +7198,32 @@
             const matchId = String(id);
             showLoading(true);
             try {
-                const idx = inspections.findIndex(i => String(i.id) === matchId || String(i.local_id) === matchId);
-                if (idx < 0) { throw new Error('Inspeção não encontrada'); }
-                const record = inspections[idx];
-                if (isOnline() && currentUser && currentUser.id && record.id) {
-                    const { error } = await supabase.from('inspections').delete().eq('id', record.id);
-                    if (error) throw error;
+                let removed = false;
+                const idxC = inspections.findIndex(i => String(i.id) === matchId || String(i.local_id) === matchId);
+                if (idxC >= 0) {
+                    const record = inspections[idxC];
+                    if (isOnline() && currentUser && currentUser.id && record.id) {
+                        const { error } = await supabase.from('inspections').delete().eq('id', record.id);
+                        if (error) throw error;
+                    }
+                    inspections.splice(idxC, 1);
+                    setCachedInspections(inspections);
+                    removed = true;
                 }
-                inspections.splice(idx, 1);
-                setCachedInspections(inspections);
+                if (!removed && Array.isArray(irrigInspections)) {
+                    const idxI = irrigInspections.findIndex(i => String(i.id) === matchId || String(i.local_id) === matchId);
+                    if (idxI >= 0) {
+                        const recordI = irrigInspections[idxI];
+                        if (isOnline() && currentUser && currentUser.id && recordI.id) {
+                            const { error } = await supabase.from('irrig_inspections').delete().eq('id', recordI.id);
+                            if (error) throw error;
+                        }
+                        irrigInspections.splice(idxI, 1);
+                        setCachedIrrInspections(irrigInspections);
+                        removed = true;
+                    }
+                }
+                if (!removed) { throw new Error('Inspeção não encontrada'); }
                 updateStats();
                 updateAnalytics();
                 updateHistoryTable();
@@ -5469,7 +7237,8 @@
         function viewInspection(id) {
             if (isRestrictedUser()) { showCustomAlert('Acesso restrito.'); return; }
             const matchId = String(id);
-            const inspection = inspections.find(i => String(i.id) === matchId) || inspections.find(i => String(i.local_id) === matchId);
+            const all = getAllInspectionsCombined();
+            const inspection = all.find(i => String(i.id) === matchId) || all.find(i => String(i.local_id) === matchId);
             if (!inspection) return;
             currentInspectionId = matchId;
             const details = document.getElementById('inspectionDetails');
@@ -5991,8 +7760,8 @@
                 });
                 sel._bound = true;
             }
-            const eqSel = document.getElementById('equipmentFilter');
-            const ldSel = document.getElementById('leaderFilter');
+            const eqSel = viewMode === 'cct' ? document.getElementById('equipmentFilterCCT') : document.getElementById('equipmentFilter');
+            const ldSel = viewMode === 'cct' ? document.getElementById('leaderFilterCCT') : document.getElementById('leaderFilter');
             const clearBtn = document.getElementById('clearAnalyticsFilters');
             [eqSel, ldSel].forEach(el => {
                 if (el && !el._bound) {
@@ -6025,11 +7794,12 @@
             const end = new Date();
             const start = new Date();
             start.setDate(end.getDate() - days + 1);
-            const eqSel = document.getElementById('equipmentFilter');
-            const ldSel = document.getElementById('leaderFilter');
+            const eqSel = viewMode === 'cct' ? document.getElementById('equipmentFilterCCT') : document.getElementById('equipmentFilter');
+            const ldSel = viewMode === 'cct' ? document.getElementById('leaderFilterCCT') : document.getElementById('leaderFilter');
             const eqFilter = eqSel ? eqSel.value : 'all';
             const ldFilter = ldSel ? ldSel.value : 'all';
-            const filtered = inspections.filter(i => {
+            const all = viewMode === 'cct' ? inspections.slice() : (viewMode === 'irr' ? (Array.isArray(irrigInspections) ? irrigInspections.slice() : []) : getAllInspectionsCombined());
+            const filtered = all.filter(i => {
                 const d = dateOnlyToLocalDate(i.data);
                 const inRange = d >= start && d <= end;
                 const byEq = eqFilter === 'all' ? true : i.tipo === eqFilter;
@@ -6064,13 +7834,13 @@
             }
             const equipCtx = document.getElementById('equipmentChart');
             if (equipCtx && typeof Chart !== 'undefined') {
-                const mapLabels = { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', plantadora: 'Plantadoras', distribuidora: 'Distribuidoras', transbordo: 'Transbordos' };
-                const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo'];
-                const counts = { caminhao: 0, trator: 0, colhedora: 0, reboque: 0, plantadora: 0, distribuidora: 0, transbordo: 0 };
+                const mapLabels = { caminhao: 'Caminhões', trator: 'Tratores', colhedora: 'Colhedoras', reboque: 'Reboques', plantadora: 'Plantadoras', distribuidora: 'Distribuidoras', transbordo: 'Transbordos', motobombas: 'MotoBombas', hidroroll: 'Hidro Roll', tortao: 'Tortão' };
+                const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','cct_coque','transbordo','motobombas','hidroroll','tortao'];
+                const counts = { caminhao: 0, trator: 0, colhedora: 0, reboque: 0, plantadora: 0, distribuidora: 0, cct_coque: 0, transbordo: 0, motobombas: 0, hidroroll: 0, tortao: 0 };
                 filtered.forEach(i => { if (counts[i.tipo] !== undefined) counts[i.tipo]++; });
                 const labelsEquip = order.map(k => mapLabels[k]);
                 const dataEquip = order.map(k => counts[k]);
-                const colors = ['#3B82F6','#10B981','#8B5CF6','#F59E0B','#06B6D4','#FB923C','#F472B6','#0EA5E9'];
+                const colors = ['#3B82F6','#10B981','#8B5CF6','#F59E0B','#06B6D4','#FB923C','#F97316','#F472B6','#0EA5E9','#22C55E','#0EA5E9'];
                 if (!equipmentChart) {
                     equipmentChart = new Chart(equipCtx, {
                         type: 'doughnut',
@@ -6079,7 +7849,7 @@
                             const eqSel = document.getElementById('equipmentFilter');
                             if (!elements || elements.length === 0 || !eqSel) return;
                             const idx = elements[0].index;
-                            const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','transbordo'];
+                            const order = ['caminhao','trator','colhedora','reboque','plantadora','distribuidora','cct_coque','transbordo','motobombas','hidroroll','tortao'];
                             eqSel.value = order[idx] || 'all';
                             const d = document.getElementById('chartPeriod') ? parseInt(document.getElementById('chartPeriod').value, 10) : 30;
                             buildCharts(d);
@@ -6103,7 +7873,8 @@
             const ldSel = document.getElementById('leaderFilter');
             const eqFilter = eqSel ? eqSel.value : 'all';
             const ldFilter = ldSel ? ldSel.value : 'all';
-            const filtered = inspections.filter(i => {
+            const all = viewMode === 'cct' ? inspections.slice() : (viewMode === 'irr' ? (Array.isArray(irrigInspections) ? irrigInspections.slice() : []) : getAllInspectionsCombined());
+            const filtered = all.filter(i => {
                 const d = new Date(i.created_at || i.data);
                 const inRange = d >= start && d <= end;
                 const byEq = eqFilter === 'all' ? true : i.tipo === eqFilter;
@@ -6147,14 +7918,13 @@
         }
 
         function populateAnalyticsFilters() {
-            const ldSel = document.getElementById('leaderFilter');
+            const ldSel = viewMode === 'cct' ? document.getElementById('leaderFilterCCT') : document.getElementById('leaderFilter');
             if (!ldSel) return;
-            const leaders = Array.from(new Set((inspections || []).map(i => i.mecanico).filter(Boolean))).sort();
+            const all = viewMode === 'cct' ? inspections.slice() : (viewMode === 'irr' ? (Array.isArray(irrigInspections) ? irrigInspections.slice() : []) : getAllInspectionsCombined());
+            const leaders = Array.from(new Set((all || []).map(i => i.mecanico).filter(Boolean))).sort();
             const current = ldSel.value;
             ldSel.innerHTML = '<option value="all" selected>Todos líderes</option>' + leaders.map(l => `<option value="${l}">${l}</option>`).join('');
-            if (current && current !== 'all') {
-                ldSel.value = current;
-            }
+            if (current && current !== 'all') { ldSel.value = current; }
         }
 
         function downloadChart(canvasId, name) {
@@ -6248,6 +8018,23 @@
             syncingInspections = false;
         }
 
+        async function syncPendingIrrInspections() {
+            const queue = getPendingIrrInspections();
+            if (!isOnline() || queue.length === 0) return;
+            setPendingIrrInspections([]);
+            const remaining = [];
+            for (const item of queue) {
+                try {
+                    const { error } = await supabase
+                        .from('irrig_inspections')
+                        .upsert([{ data: item.data, tipo: item.tipo, frota: item.frota, mecanico: item.mecanico, observacao: item.observacao, items: item.items, results: item.results, user_id: item.user_id, created_at: item.created_at, local_id: item.local_id }], { onConflict: 'local_id' });
+                    if (error) throw error;
+                } catch (_) { remaining.push(item); }
+            }
+            setPendingIrrInspections(remaining);
+            if (remaining.length === 0) showFloatingNotification('success', 'Irrigação sincronizada'); else showFloatingNotification('warning', 'Irrigação com itens pendentes');
+        }
+
         async function syncPendingEquipments() {
             const queue = getPendingEquipments();
             if (!isOnline() || queue.length === 0) return;
@@ -6272,7 +8059,8 @@
             if (typeof Chart === 'undefined') { ensureChartJs().then(() => updateSparkline()); return; }
             const ctx = document.getElementById('inspecoesSparkline');
             if (!ctx || typeof Chart === 'undefined') return;
-            const last = inspections.slice(-7);
+            const all = getAllInspectionsCombined();
+            const last = all.slice(-7);
             const data = last.map(i => i.results?.percentage || 0);
             const labels = last.map(i => formatDateBR(i.data));
             if (!sparklineChart) {
@@ -6297,7 +8085,8 @@
             const ldSel = document.getElementById('leaderFilter');
             const eqFilter = eqSel ? eqSel.value : 'all';
             const ldFilter = ldSel ? ldSel.value : 'all';
-            const filteredAll = inspections.filter(i => {
+            const all = viewMode === 'cct' ? inspections.slice() : (viewMode === 'irr' ? (Array.isArray(irrigInspections) ? irrigInspections.slice() : []) : getAllInspectionsCombined());
+            const filteredAll = all.filter(i => {
                 const byEq = eqFilter === 'all' ? true : i.tipo === eqFilter;
                 const byLd = ldFilter === 'all' ? true : (i.mecanico || '') === ldFilter;
                 return byEq && byLd;
@@ -6715,13 +8504,14 @@
             const end = new Date();
             const start = new Date();
             start.setDate(end.getDate() - days + 1);
-            const filtered = inspections.filter(i => {
+            const all = getAllInspectionsCombined();
+            const filtered = all.filter(i => {
                 const d = dateOnlyToLocalDate(i.data);
                 return d >= start && d <= end;
             });
             const total = filtered.length;
             const avg = total ? Math.round(filtered.reduce((s,i)=>s+(i.results?.percentage||0),0)/total) : 0;
-            const counts = { caminhao: 0, trator: 0, colhedora: 0, plantadora: 0, distribuidora: 0, reboque: 0, manutencao: 0 };
+            const counts = { caminhao: 0, trator: 0, colhedora: 0, plantadora: 0, distribuidora: 0, reboque: 0, manutencao: 0, motobombas: 0, hidroroll: 0, tortao: 0 };
             filtered.forEach(i => { if (counts[i.tipo] !== undefined) counts[i.tipo]++; });
             if (format === 'json') {
                 const payload = {
@@ -6858,6 +8648,8 @@
                                         <span class="chip">Distribuidoras: ${dist.distribuidora}</span>
                                         <span class="chip">Reboques: ${dist.reboque}</span>
                                         <span class="chip">Manutenção: ${dist.manutencao}</span>
+                                        <span class="chip">MotoBombas: ${dist.motobombas}</span>
+                                        <span class="chip">Hidro Roll: ${dist.hidroroll}</span>
                                     </div>
                                 </div>
                             </div>
@@ -7319,3 +9111,31 @@
     </div>
 </body>
 </html>
+        function restoreGlobalFilters() {
+            try {
+                const tipoSel = document.getElementById('filtroTipo');
+                if (tipoSel) {
+                    const box = tipoSel.closest('.bg-white');
+                    if (box) box.classList.remove('hidden');
+                    const ensure = (val, label) => {
+                        if (!tipoSel.querySelector(`option[value="${val}"]`)) {
+                            const opt = document.createElement('option');
+                            opt.value = val; opt.textContent = label; tipoSel.appendChild(opt);
+                        }
+                    };
+                    
+                }
+                const eqSel = document.getElementById('equipmentFilter');
+                if (eqSel) {
+                    const wrap = eqSel.closest('.flex');
+                    if (wrap) wrap.classList.remove('hidden');
+                    const ensure2 = (val, label) => {
+                        if (!eqSel.querySelector(`option[value="${val}"]`)) {
+                            const opt = document.createElement('option');
+                            opt.value = val; opt.textContent = label; eqSel.appendChild(opt);
+                        }
+                    };
+                    
+                }
+            } catch(_) {}
+        }
