@@ -4664,7 +4664,9 @@
             loadInitialData();
             setupRealtime();
             startPolling();
-            if (isRestrictedUser()) { showSection('cct_coque'); }
+            const last = localStorage.getItem('lastSection');
+            if (last) { showSection(last); }
+            else if (isRestrictedUser()) { showSection('cct_coque'); }
             if (isAdmin()) { const b = document.getElementById('adminNavBtn'); if (b) b.classList.remove('hidden'); }
             bindDraftPersistence();
         }
@@ -4982,6 +4984,7 @@
                     }
                     await loadInitialData();
                     showModal('successModal');
+                    try { localStorage.removeItem('cctDraft'); } catch(_) {}
                     clearForm();
                     backToSelection();
                     showFloatingNotification('success', 'Inspeção salva com sucesso!');
@@ -4993,6 +4996,7 @@
                     
                     updateStats();
                     updateAnalytics();
+                    try { localStorage.removeItem('cctDraft'); } catch(_) {}
                     clearForm();
                     backToSelection();
                     const msg = !isOnline() ? 'Sem internet. Inspeção salva offline e será sincronizada.' : 'Usuário não autenticado. Inspeção salva offline e será sincronizada.';
@@ -5006,6 +5010,7 @@
                 updateStats();
                 updateAnalytics();
                 showFloatingNotification('warning', 'Falha ao salvar online. Inspeção salva offline e será sincronizada.');
+                try { localStorage.removeItem('cctDraft'); } catch(_) {}
                 clearForm();
                 backToSelection();
             } finally {
@@ -5453,6 +5458,7 @@
 
         async function deleteCalibragem(localId) {
             try {
+                if (!confirm('Deseja excluir este lançamento de calibragem?')) return;
                 let q = getPendingCalibragem();
                 const idx = q.findIndex(i => String(i.local_id) === String(localId));
                 if (idx >= 0) { q.splice(idx,1); setPendingCalibragem(q); }
@@ -5464,6 +5470,7 @@
 
         async function deleteControle3p(localId) {
             try {
+                if (!confirm('Deseja excluir esta Ficha 3P?')) return;
                 let q = getPendingControle3p();
                 const idx = q.findIndex(i => String(i.local_id) === String(localId));
                 if (idx >= 0) { q.splice(idx,1); setPendingControle3p(q); }
@@ -5634,7 +5641,9 @@
                     targetSection.classList.add('fade-in');
                 }
                 hydrateCCTSubsections();
-                showCCTSubsection('inicio');
+                const lastSub = localStorage.getItem('lastSubCCT') || 'inicio';
+                showCCTSubsection(lastSub);
+                try { localStorage.setItem('lastSection','cct_coque'); } catch(_) {}
                 return;
             }
             if (sectionId === 'irrigacao') {
@@ -5643,7 +5652,9 @@
                     targetSection2.classList.remove('hidden');
                     targetSection2.classList.add('fade-in');
                 }
-                showIrrSubsection('inicio');
+                const lastSub2 = localStorage.getItem('lastSubIRR') || 'inicio';
+                showIrrSubsection(lastSub2);
+                try { localStorage.setItem('lastSection','irrigacao'); } catch(_) {}
                 return;
             }
             
@@ -5652,6 +5663,7 @@
                 targetSection.classList.remove('hidden');
                 targetSection.classList.add('fade-in');
             }
+            try { localStorage.setItem('lastSection', sectionId); } catch(_) {}
             if (sectionId === 'admin') { renderAccessControls(); bindAdminActions(); }
             if (sectionId === 'historico_pneus') { initHistoricoPneus(); }
 
@@ -5724,6 +5736,7 @@
                 if (form) form.classList.add('hidden');
                 const btn = Array.from(document.querySelectorAll('.cct-sub-btn')).find(b => b.getAttribute('onclick')?.includes("'inicio'"));
                 if (btn) { btn.classList.add('border-primary','text-primary'); btn.classList.remove('border-transparent','text-gray-600'); }
+                try { localStorage.setItem('lastSection','cct_coque'); localStorage.setItem('lastSubCCT','inicio'); } catch(_) {}
                 return;
             }
             if (eqSel) eqSel.classList.add('hidden');
@@ -5748,6 +5761,7 @@
             if (sub === 'equipamentos') {
                 populateEquipmentList();
             }
+            try { localStorage.setItem('lastSection','cct_coque'); localStorage.setItem('lastSubCCT', sub); } catch(_) {}
         }
 
         function ensureCCTFilters(area) {
@@ -5862,6 +5876,7 @@
                 }
                 const btn = Array.from(document.querySelectorAll('.irr-sub-btn')).find(b => b.getAttribute('onclick')?.includes("'inicio'"));
                 if (btn) { btn.classList.add('border-primary','text-primary'); btn.classList.remove('border-transparent','text-gray-600'); }
+                try { localStorage.setItem('lastSection','irrigacao'); localStorage.setItem('lastSubIRR','inicio'); } catch(_) {}
                 return;
             }
             const target = document.getElementById('irr-sub-' + sub);
@@ -5871,6 +5886,7 @@
             if (sub === 'equipamentos') { populateIrrEquipmentList(); }
             if (sub === 'historico') { renderIrrHistory(); }
             if (sub === 'analytics') { populateIrrLeaderFilter(); initializeIrrCharts(); updateIrrAnalytics(); updateIrrAnalyticsSummary(); }
+            try { localStorage.setItem('lastSection','irrigacao'); localStorage.setItem('lastSubIRR', sub); } catch(_) {}
         }
 
         let irrigInspections = [];
@@ -6018,7 +6034,17 @@
             try {
                 const bind = (id, evt='input') => { const el = document.getElementById(id); if (el && !el._draftBound) { el.addEventListener(evt, saveIrrDraft); el._draftBound = true; } };
                 bind('irrDataInspecao','change'); bind('irrMecanico'); bind('irrReformaStatus','change'); bind('irrFrotaSelect','change'); bind('irrFrotaCustom');
-                restoreIrrDraft();
+                const raw = localStorage.getItem('irrDraft');
+                if (raw) {
+                    const dft = JSON.parse(raw);
+                    if (dft && dft.tipo === type) {
+                        const ok = confirm('Encontramos um rascunho anterior de Irrigação. Deseja retomar?');
+                        if (ok) restoreIrrDraft(); else { try { localStorage.removeItem('irrDraft'); } catch(_) {} clearIrrResults(); }
+                    } else if (dft && dft.tipo && dft.tipo !== type) {
+                        const ok2 = confirm('Existe rascunho de outro tipo. Deseja descartar?');
+                        if (ok2) { try { localStorage.removeItem('irrDraft'); } catch(_) {} clearIrrResults(); }
+                    }
+                }
             } catch(_) {}
         }
 
@@ -6306,6 +6332,7 @@
             setCachedIrrInspections(irrigInspections);
             renderIrrHistory();
             showIrrSubsection('historico');
+            try { localStorage.removeItem('irrDraft'); } catch(_) {}
             savingInspection = false;
             saveBtns.forEach(b => { b.disabled = false; });
             showLoading(false);
@@ -6727,7 +6754,17 @@
             try {
                 const bind = (id, evt='input') => { const el = document.getElementById(id); if (el && !el._draftBound) { el.addEventListener(evt, saveCCTDraft); el._draftBound = true; } };
                 bind('dataInspecao','change'); bind('mecanico'); bind('observacao'); bind('reformaStatus','change'); bind('frotaSelect','change'); bind('frotaCustom');
-                restoreCCTDraft();
+                const raw = localStorage.getItem('cctDraft');
+                if (raw) {
+                    const d = JSON.parse(raw);
+                    if (d && d.tipo === currentEquipment) {
+                        const ok = confirm('Encontramos um rascunho anterior. Deseja retomar?');
+                        if (ok) restoreCCTDraft(); else { try { localStorage.removeItem('cctDraft'); } catch(_) {} clearForm(); }
+                    } else if (d && d.tipo && d.tipo !== currentEquipment) {
+                        const ok2 = confirm('Existe rascunho de outro equipamento. Deseja descartar?');
+                        if (ok2) { try { localStorage.removeItem('cctDraft'); } catch(_) {} clearForm(); }
+                    }
+                }
             } catch(_) {}
         }
 
@@ -7399,6 +7436,7 @@
             const matchId = String(id);
             showLoading(true);
             try {
+                if (!confirm('Deseja excluir esta inspeção?')) { showLoading(false); return; }
                 let removed = false;
                 const idxC = inspections.findIndex(i => String(i.id) === matchId || String(i.local_id) === matchId);
                 if (idxC >= 0) {
@@ -9503,11 +9541,4 @@
 </body>
 </html>
        
-        function bindDraftPersistence() {
-            if (window._draftBound) return;
-            try {
-                window.addEventListener('beforeunload', function(){ try{ saveCCTDraft(); }catch(_){} try{ saveIrrDraft(); }catch(_){} });
-                document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') { try{ saveCCTDraft(); }catch(_){} try{ saveIrrDraft(); }catch(_){} } });
-            } catch(_) {}
-            window._draftBound = true;
-        }
+       
