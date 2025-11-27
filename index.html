@@ -1621,7 +1621,9 @@
                             <div class="flex gap-3">
                                 <button id="adminSaveRuleBtn" class="px-4 py-2 bg-primary text-white rounded-md">Salvar Regra</button>
                                 <button id="adminClearBtn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300">Limpar</button>
+                                <button id="adminDiagnoseBtn" class="px-4 py-2 bg-yellow-600 text-white rounded-md">Diagnosticar tabela</button>
                             </div>
+                            <div id="adminAccessControlsStatus" class="text-xs text-gray-600 dark:text-gray-300"></div>
                         </div>
                     </div>
                     <div class="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
@@ -1651,6 +1653,13 @@
                             <button id="adminCopyUsersSqlBtn" class="px-4 py-2 bg-primary text-white rounded-md">Copiar SQL de criação</button>
                             <button id="adminCopyAuthSyncSqlBtn" class="px-4 py-2 bg-yellow-600 text-white rounded-md">Copiar SQL de migração (auth→users)</button>
                             <button id="adminRunAuthSyncBtn" class="px-4 py-2 bg-green-600 text-white rounded-md">Executar sincronização</button>
+                        </div>
+                    </div>
+                    <div class="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Guia: Regras de Acesso (SQL)</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Se ao salvar regras aparecer erro da tabela <code>access_controls</code>, copie e execute este SQL no Supabase.</p>
+                        <div class="flex gap-3">
+                            <button id="adminCopyAccessControlsSqlBtn" class="px-4 py-2 bg-primary text-white rounded-md">Copiar SQL de criação</button>
                         </div>
                     </div>
                 </div>
@@ -7130,16 +7139,31 @@
             return !!(u && u.email === 'gutemberggg10@gmail.com');
         }
 
-        function getCachedAccessControls() { try { return JSON.parse(localStorage.getItem('accessControls')) || []; } catch(_) { return []; } }
-        function setCachedAccessControls(list) { try { localStorage.setItem('accessControls', JSON.stringify(list)); } catch(_) {} }
+        let accessControls = [];
+        function getCachedAccessControls() { return accessControls; }
+        function setCachedAccessControls(list) { accessControls = Array.isArray(list) ? list : []; }
         async function loadAccessControls() {
-            let rules = getCachedAccessControls();
+            let rules = [];
             if (isOnline()) {
                 try {
                     const resp = await supabase.from('access_controls').select('*').order('created_at', { ascending: false });
-                    if (!resp.error) { rules = resp.data || rules; setCachedAccessControls(rules); }
-                } catch (_) {}
+                    const statusEl = document.getElementById('adminAccessControlsStatus');
+                    if (!resp.error) {
+                        rules = resp.data || [];
+                        if (statusEl) statusEl.textContent = `Regras carregadas do servidor (${rules.length})`;
+                    } else {
+                        const msg = resp.error?.message || 'Tabela access_controls indisponível. Use o guia abaixo para criação.';
+                        const det = resp.error?.details ? ` Detalhes: ${resp.error.details}` : '';
+                        if (statusEl) statusEl.textContent = `${msg}.${det}`.trim();
+                    }
+                } catch (e) {
+                    rules = [];
+                    const statusEl = document.getElementById('adminAccessControlsStatus');
+                    const msg = e?.message || 'Erro ao carregar regras do servidor.';
+                    if (statusEl) statusEl.textContent = msg;
+                }
             }
+            setCachedAccessControls(rules);
             return rules;
         }
         function getAccessRuleFor(email) {
@@ -7148,13 +7172,16 @@
             return rules.find(r => (r.email || '').toLowerCase() === e) || null;
         }
         function isRestrictedUser() {
-            const u = currentUser || getCachedUser();
-            const rule = u ? getAccessRuleFor(u.email) : null;
-            return !!(rule && (rule.role || 'restricted') === 'restricted');
+            const email = ((currentUser||getCachedUser()||{}).email || '').toLowerCase();
+            const rule = getAccessRuleFor(email);
+            return !!(rule && ((rule.role || 'restricted') === 'restricted'));
         }
         function getAllowedSectionsFor(email) {
             const rule = getAccessRuleFor(email);
-            return (rule && Array.isArray(rule.allowed_sections) && rule.allowed_sections.length) ? rule.allowed_sections : ['cct_coque','irrigacao','equipamentos','inventario','calibragem','controle3p'];
+            if (rule && Array.isArray(rule.allowed_sections) && rule.allowed_sections.length) return rule.allowed_sections;
+            const all = ['dashboard','historico','analytics','relatorios','nova-inspecao','equipamentos','inventario','calibragem','controle3p','cct_coque','irrigacao'];
+            if (isAdmin()) return all.concat(['admin']);
+            return all; // sem regra: usuário não-restrito (exceto admin)
         }
 
         function getAllowedSubsectionsFor(email, section) {
@@ -8843,31 +8870,126 @@
             if (cctParent && cctParent.checked) { allowedSubsections['cct_coque'] = cctSubs.filter(b => b.checked).map(b => b.value); }
             if (irrParent && irrParent.checked) { allowedSubsections['irrigacao'] = irrSubs.filter(b => b.checked).map(b => b.value); }
             if (!email || allowed.length === 0) { showCustomAlert('Informe o email e selecione pelo menos uma seção.'); return; }
-            const rule = { email, role: 'restricted', allowed_sections: allowed, allowed_subsections: allowedSubsections, created_at: new Date().toISOString() };
-            let rules = getCachedAccessControls();
-            const idx = rules.findIndex(r => (r.email||'').toLowerCase() === email);
-            if (idx >= 0) rules[idx] = rule; else rules.unshift(rule);
-            setCachedAccessControls(rules);
-            renderAccessControls();
-            if (isOnline()) {
-                try {
-                    const resp = await supabase.from('access_controls').upsert([rule], { onConflict: 'email' });
-                    if (resp.error) showFloatingNotification('warning', 'Salvo localmente. Tabela access_controls não disponível.'); else showFloatingNotification('success', 'Regra salva');
-                } catch (_) {}
+            if (!isOnline()) { showFloatingNotification('warning', 'Sem internet. Não foi possível salvar regras.'); return; }
+            let hasAllowedSubsections = true;
+            try {
+                const probe = await supabase.from('access_controls').select('allowed_subsections').limit(1);
+                if (probe.error) { hasAllowedSubsections = false; }
+            } catch(_) { hasAllowedSubsections = false; }
+            const rule = hasAllowedSubsections
+                ? { email, role: 'restricted', allowed_sections: allowed, allowed_subsections: allowedSubsections, created_at: new Date().toISOString() }
+                : { email, role: 'restricted', allowed_sections: allowed, created_at: new Date().toISOString() };
+            try {
+                const statusEl = document.getElementById('adminAccessControlsStatus');
+                const exists = await supabase.from('access_controls').select('email').eq('email', email).limit(1);
+                if (exists.error) {
+                    const msg = exists.error?.message || 'Falha ao verificar existência no servidor';
+                    const det = exists.error?.details ? ` (${exists.error.details})` : '';
+                    if (statusEl) statusEl.textContent = `Erro: ${msg}${det}`;
+                    showFloatingNotification('warning', 'Falha ao verificar existência no servidor');
+                    return;
+                }
+                if (Array.isArray(exists.data) && exists.data.length > 0) {
+                    const upd = hasAllowedSubsections
+                        ? { role: 'restricted', allowed_sections: allowed, allowed_subsections: allowedSubsections }
+                        : { role: 'restricted', allowed_sections: allowed };
+                    const updResp = await supabase.from('access_controls').update(upd).eq('email', email);
+                    if (updResp.error) {
+                        const msg = updResp.error?.message || 'Falha ao atualizar regras no servidor';
+                        const det = updResp.error?.details ? ` (${updResp.error.details})` : '';
+                        if (statusEl) statusEl.textContent = `Erro: ${msg}${det}. Use o guia abaixo para criar/ajustar a tabela.`;
+                        showFloatingNotification('warning', 'Falha ao atualizar regras no servidor');
+                        return;
+                    }
+                } else {
+                    const insResp = await supabase.from('access_controls').insert([rule]);
+                    if (insResp.error) {
+                        const msg = insResp.error?.message || 'Falha ao inserir regras no servidor';
+                        const det = insResp.error?.details ? ` (${insResp.error.details})` : '';
+                        const code = insResp.error?.code ? ` [${insResp.error.code}]` : '';
+                        if (statusEl) statusEl.textContent = `Erro: ${msg}${det}${code}. Use o guia abaixo para criar/ajustar a tabela.`;
+                        showFloatingNotification('warning', `Falha ao inserir regras: ${msg}${det}${code}`);
+                        return;
+                    }
+                }
+                showFloatingNotification('success', 'Regra salva');
+                if (statusEl) statusEl.textContent = hasAllowedSubsections ? 'Regra salva no servidor.' : 'Regra salva (sem allowed_subsections). Crie a coluna via SQL se precisar subseções.';
+                await loadAccessControls();
+                renderAccessControls();
+                applyAccessControls();
+            } catch(e) {
+                const statusEl = document.getElementById('adminAccessControlsStatus');
+                const msg = e?.message || 'Erro ao salvar regras no servidor.';
+                if (statusEl) statusEl.textContent = msg;
+                showFloatingNotification('error', 'Erro ao salvar regras');
             }
-            applyAccessControls();
         }
 
         async function deleteAccessRule(email) {
             const e = (email||'').toLowerCase();
-            let rules = getCachedAccessControls();
-            rules = rules.filter(r => (r.email||'').toLowerCase() !== e);
-            setCachedAccessControls(rules);
-            renderAccessControls();
-            if (isOnline()) {
-                try { await supabase.from('access_controls').delete().eq('email', e); } catch (_) {}
-            }
-            applyAccessControls();
+            if (!isOnline()) { showFloatingNotification('warning', 'Sem internet. Não foi possível remover regras.'); return; }
+            try {
+                const statusEl = document.getElementById('adminAccessControlsStatus');
+                const pre = await supabase.from('access_controls').select('email').eq('email', e).limit(1);
+                if (pre.error) {
+                    const msg = pre.error?.message || 'Falha ao verificar regra';
+                    const det = pre.error?.details ? ` (${pre.error.details})` : '';
+                    const code = pre.error?.code ? ` [${pre.error.code}]` : '';
+                    if (statusEl) statusEl.textContent = `Erro: ${msg}${det}${code}`;
+                    showFloatingNotification('warning', `Falha ao verificar regra: ${msg}${det}${code}`);
+                    return;
+                }
+                const exists = Array.isArray(pre.data) && pre.data.length > 0;
+                const resp = await supabase.from('access_controls').delete().eq('email', e).select('email');
+                if (resp.error) {
+                    const statusEl = document.getElementById('adminAccessControlsStatus');
+                    const msg = resp.error?.message || 'Falha ao remover regras no servidor';
+                    const det = resp.error?.details ? ` (${resp.error.details})` : '';
+                    const code = resp.error?.code ? ` [${resp.error.code}]` : '';
+                    if (statusEl) statusEl.textContent = `Erro ao remover: ${msg}${det}${code}. Ajuste políticas de delete em access_controls.`;
+                    showFloatingNotification('warning', `Falha ao remover regras: ${msg}${det}${code}`);
+                    return;
+                }
+                const deletedCount = Array.isArray(resp.data) ? resp.data.length : 0;
+                if (exists && deletedCount === 0) {
+                    let hasAllowedSubsections = true;
+                    try { const probe = await supabase.from('access_controls').select('allowed_subsections').limit(1); if (probe.error) hasAllowedSubsections = false; } catch(_) { hasAllowedSubsections = false; }
+                    const fallbackUpd = hasAllowedSubsections ? { role: 'unrestricted', allowed_sections: [], allowed_subsections: {} } : { role: 'unrestricted', allowed_sections: [] };
+                    const upd = await supabase.from('access_controls').update(fallbackUpd).eq('email', e).select('email');
+                    if (upd.error) {
+                        const msg = upd.error?.message || 'Falha ao desativar restrição por update';
+                        const det = upd.error?.details ? ` (${upd.error.details})` : '';
+                        const code = upd.error?.code ? ` [${upd.error.code}]` : '';
+                        if (statusEl) statusEl.textContent = `Delete negado e update falhou: ${msg}${det}${code}`;
+                        showFloatingNotification('warning', 'Sem permissão para remover (RLS) e update falhou.');
+                        return;
+                    }
+                    const post2 = await supabase.from('access_controls').select('*').eq('email', e).limit(1);
+                    if (!post2.error && Array.isArray(post2.data) && post2.data[0] && (post2.data[0].role||'') !== 'restricted') {
+                        showFloatingNotification('success', 'Restrição desativada (sem permissão de delete).');
+                        await loadAccessControls();
+                        renderAccessControls();
+                        applyAccessControls();
+                        return;
+                    }
+                    if (statusEl) statusEl.textContent = 'Delete negado e update não confirmou desativação. Ajuste RLS.';
+                    showFloatingNotification('warning', 'Sem permissão para remover (RLS) ou regra não encontrada.');
+                    return;
+                }
+                const post = await supabase.from('access_controls').select('email').eq('email', e).limit(1);
+                if (!post.error && Array.isArray(post.data) && post.data.length === 0) {
+                    showFloatingNotification('success', 'Regra removida');
+                    await loadAccessControls();
+                    renderAccessControls();
+                    applyAccessControls();
+                } else {
+                    const msg = post.error?.message || 'Regra ainda presente após tentativa de remoção';
+                    const det = post.error?.details ? ` (${post.error.details})` : '';
+                    const code = post.error?.code ? ` [${post.error.code}]` : '';
+                    if (statusEl) statusEl.textContent = `Remoção não confirmada: ${msg}${det}${code}`;
+                    showFloatingNotification('warning', 'Remoção não confirmada');
+                }
+            } catch(_) { showFloatingNotification('error', 'Erro ao remover regras'); }
         }
 
         function renderAccessControls() {
@@ -8883,7 +9005,10 @@
                         ${r.allowed_subsections && (r.allowed_subsections['cct_coque']||[]).length ? `<div class="text-[11px] text-gray-500 dark:text-gray-400">CCT: ${(r.allowed_subsections['cct_coque']||[]).join(', ')}</div>` : ''}
                         ${r.allowed_subsections && (r.allowed_subsections['irrigacao']||[]).length ? `<div class="text-[11px] text-gray-500 dark:text-gray-400">IRRIGAÇÃO: ${(r.allowed_subsections['irrigacao']||[]).join(', ')}</div>` : ''}
                     </div>
-                    <button class="px-3 py-1 text-sm bg-red-600 text-white rounded-md" onclick="deleteAccessRule('${r.email}')">Remover</button>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 text-sm bg-gray-700 text-white rounded-md" onclick="editAccessRule('${r.email}')">Editar</button>
+                        <button class="px-3 py-1 text-sm bg-red-600 text-white rounded-md" onclick="deleteAccessRule('${r.email}')">Remover</button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -8895,12 +9020,39 @@
             const g = document.getElementById('adminCopyUsersSqlBtn');
             const gs = document.getElementById('adminCopyAuthSyncSqlBtn');
             const rs = document.getElementById('adminRunAuthSyncBtn');
+            const ac = document.getElementById('adminCopyAccessControlsSqlBtn');
+            const dg = document.getElementById('adminDiagnoseBtn');
             if (s && !s._bound) { s.addEventListener('click', saveAccessRule); s._bound = true; }
             if (c && !c._bound) { c.addEventListener('click', function(){ const e=document.getElementById('adminEmailInput'); if(e) e.value=''; Array.from(document.querySelectorAll('#adminSectionsSelect input[type="checkbox"]')).forEach(b=>{ b.checked=false; }); const d1=document.getElementById('adminSectionsCCTDetail'); if(d1) d1.classList.add('hidden'); const d2=document.getElementById('adminSectionsIRRDetail'); if(d2) d2.classList.add('hidden'); }); c._bound=true; }
             if (f && !f._bound) { f.addEventListener('click', adminForceRefresh); f._bound = true; }
             if (g && !g._bound) { g.addEventListener('click', adminCopyUsersSQL); g._bound = true; }
             if (gs && !gs._bound) { gs.addEventListener('click', adminCopyAuthSyncSQL); gs._bound = true; }
             if (rs && !rs._bound) { rs.addEventListener('click', adminRunAuthSync); rs._bound = true; }
+            if (ac && !ac._bound) { ac.addEventListener('click', function(){
+                const sql = [
+                    'begin;',
+                    'create table if not exists public.access_controls (',
+                    '  email text primary key,',
+                    "  role text default 'restricted',",
+                    "  allowed_sections text[] default '{}',",
+                    "  allowed_subsections jsonb default '{}'::jsonb,",
+                    '  created_at timestamptz default now()',
+                    ');',
+                    'alter table public.access_controls enable row level security;',
+                    "create policy \"ac_select_auth\" on public.access_controls for select using (auth.role() = 'authenticated');",
+                    "create policy \"ac_insert_write\" on public.access_controls for insert with check ((auth.jwt()->>'email' = 'gutemberggg10@gmail.com') OR exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
+                    "create policy \"ac_update_write\" on public.access_controls for update using ((auth.jwt()->>'email' = 'gutemberggg10@gmail.com') OR exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
+                    "create policy \"ac_delete_write\" on public.access_controls for delete using ((auth.jwt()->>'email' = 'gutemberggg10@gmail.com') OR exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
+                    'alter publication supabase_realtime add table public.access_controls;',
+                    'commit;'
+                ].join('\n');
+                const tryClipboard = async () => {
+                    try { await navigator.clipboard.writeText(sql); showFloatingNotification('success', 'SQL copiado'); }
+                    catch(_) { const ta = document.createElement('textarea'); ta.value = sql; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showFloatingNotification('success', 'SQL copiado'); } catch(e) { showCustomAlert(sql); } ta.remove(); }
+                };
+                tryClipboard();
+            }); ac._bound = true; }
+            if (dg && !dg._bound) { dg.addEventListener('click', adminDiagnoseAccessControls); dg._bound = true; }
             const cct = document.querySelector('#adminSectionsSelect input[value="cct_coque"]');
             const irr = document.querySelector('#adminSectionsSelect input[value="irrigacao"]');
             const cctDetail = document.getElementById('adminSectionsCCTDetail');
@@ -8910,6 +9062,41 @@
             if (irr && !irr._bound) { irr.addEventListener('change', toggleDetails); irr._bound = true; }
             toggleDetails();
             loadUsers();
+        }
+
+        async function adminDiagnoseAccessControls() {
+            const statusEl = document.getElementById('adminAccessControlsStatus');
+            try {
+                const online = isOnline();
+                const u = currentUser || getCachedUser() || {};
+                const admin = isAdmin();
+                let approved = null;
+                if (online && u.email) {
+                    const ur = await supabase.from('users').select('approved').eq('email', u.email).limit(1);
+                    if (!ur.error && Array.isArray(ur.data) && ur.data[0]) { approved = !!ur.data[0].approved; }
+                }
+                let acMsg = '';
+                let count = 0;
+                if (online) {
+                    const ar = await supabase.from('access_controls').select('email');
+                    if (!ar.error) { count = (ar.data || []).length; acMsg = `Tabela ok (${count})`; }
+                    else { const msg = ar.error?.message || 'Erro ao acessar access_controls'; const det = ar.error?.details ? ` (${ar.error.details})` : ''; acMsg = `${msg}${det}`; }
+                }
+                const parts = [];
+                parts.push(`Online: ${online ? 'sim' : 'não'}`);
+                parts.push(`Usuário: ${(u.email||'')}`);
+                parts.push(`Admin: ${admin ? 'sim' : 'não'}`);
+                if (approved !== null) parts.push(`Approved: ${approved ? 'sim' : 'não'}`);
+                if (acMsg) parts.push(`access_controls: ${acMsg}`);
+                if (writeMsg) parts.push(`write: ${writeMsg}`);
+                const txt = parts.join(' | ');
+                if (statusEl) statusEl.textContent = txt;
+                showFloatingNotification('success', 'Diagnóstico concluído');
+            } catch (e) {
+                const msg = e?.message || 'Falha no diagnóstico';
+                if (statusEl) statusEl.textContent = msg;
+                showFloatingNotification('error', 'Falha no diagnóstico');
+            }
         }
 
         function adminCopyUsersSQL() {
@@ -8985,8 +9172,22 @@
         async function loadUsers() {
             try {
                 if (isOnline()) {
-                    const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
-                    if (!error) { usersList = data || []; renderAdminUsers(); return; }
+                    let { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+                    if (!error) {
+                        usersList = data || [];
+                        const onlineCount = Object.keys(onlineUsers || {}).length;
+                        if (isAdmin() && (!usersList.length || (onlineCount > usersList.length))) {
+                            try {
+                                const rpc = await supabase.rpc('sync_users_from_auth');
+                                if (!rpc.error) {
+                                    const r2 = await supabase.from('users').select('*').order('created_at', { ascending: false });
+                                    if (!r2.error) { usersList = r2.data || usersList; }
+                                }
+                            } catch(_) {}
+                        }
+                        renderAdminUsers();
+                        return;
+                    }
                     usersList = [];
                     renderAdminUsers('Tabela users não disponível ou sem acesso.');
                     return;
@@ -8999,38 +9200,26 @@
             const wrap = document.getElementById('adminUsersList');
             if (!wrap) return;
             const note = message ? `<div class="text-xs text-yellow-700 dark:text-yellow-300 mb-2">${message}</div>` : '';
-            if (!usersList || usersList.length === 0) {
-                const onlineOnly = Object.values(onlineUsers || {});
-                if (onlineOnly.length === 0) { wrap.innerHTML = note + '<div class="text-sm text-gray-500 dark:text-gray-400">Nenhum usuário encontrado</div>'; return; }
-                wrap.innerHTML = note + onlineOnly.map(u => {
-                    const onlineBadge = '<span class="ml-2 inline-block w-2 h-2 rounded-full bg-green-500" title="online"></span>';
-                    const status = 'Online • origem: presença';
-                    const name = u.name || (u.email || '');
-                    const email = u.email || '';
-                    return `
-                        <div class="p-3 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-between">
-                            <div>
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">${name}${onlineBadge}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">${email} • ${status}</div>
-                            </div>
-                            <div class="flex items-center gap-2"><span class="text-xs text-gray-500">Aguardando cadastro</span></div>
-                        </div>
-                    `;
-                }).join('');
-                return;
-            }
-            wrap.innerHTML = note + usersList.map(u => {
+            const unionMap = {};
+            (usersList || []).forEach(u => { if (u && u.email) unionMap[u.email] = u; });
+            Object.keys(onlineUsers || {}).forEach(e => { if (!unionMap[e]) unionMap[e] = { email: e, name: (onlineUsers[e] || {}).name }; });
+            const merged = Object.values(unionMap);
+            if (!merged || merged.length === 0) { wrap.innerHTML = note + '<div class="text-sm text-gray-500 dark:text-gray-400">Nenhum usuário encontrado</div>'; return; }
+            wrap.innerHTML = note + merged.map(u => {
                 const online = !!onlineUsers[u.email];
-                const emailConf = !!u.email_confirmed;
-                const approved = !!u.approved;
+                const emailConf = typeof u.email_confirmed === 'boolean' ? u.email_confirmed : false;
+                const approved = typeof u.approved === 'boolean' ? u.approved : false;
                 const onlineBadge = online ? '<span class="ml-2 inline-block w-2 h-2 rounded-full bg-green-500" title="online"></span>' : '<span class="ml-2 inline-block w-2 h-2 rounded-full bg-gray-400" title="offline"></span>';
-                const status = `${emailConf ? 'Email confirmado' : 'Email não confirmado'} • ${approved ? 'Aprovado' : 'Pendente'}`;
-                const actions = approved ? `<button class="px-3 py-1 text-sm bg-yellow-600 text-white rounded-md" onclick="blockUser('${u.email}')">Desativar</button>` : (emailConf ? `<button class="px-3 py-1 text-sm bg-green-600 text-white rounded-md" onclick="approveUser('${u.email}')">Aprovar</button>` : '<span class="text-xs text-gray-500">Aguardando confirmação de email</span>');
+                const fromPresenceOnly = (u.email_confirmed === undefined && u.approved === undefined);
+                const status = fromPresenceOnly ? 'Online • origem: presença' : `${emailConf ? 'Email confirmado' : 'Email não confirmado'} • ${approved ? 'Aprovado' : 'Pendente'}`;
+                const actions = fromPresenceOnly ? '<span class="text-xs text-gray-500">Aguardando cadastro</span>' : (approved ? `<button class="px-3 py-1 text-sm bg-yellow-600 text-white rounded-md" onclick="blockUser('${u.email}')">Desativar</button>` : (emailConf ? `<button class="px-3 py-1 text-sm bg-green-600 text-white rounded-md" onclick="approveUser('${u.email}')">Aprovar</button>` : '<span class="text-xs text-gray-500">Aguardando confirmação de email</span>'));
+                const name = (u.name || u.email || '').toString();
+                const email = (u.email || '').toString();
                 return `
                     <div class="p-3 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-between">
                         <div>
-                            <div class="text-sm font-medium text-gray-900 dark:text-white">${(u.name||u.email)||''}${onlineBadge}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">${u.email} • ${status}</div>
+                            <div class="text-sm font-medium text-gray-900 dark:text-white">${name}${onlineBadge}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">${email} • ${status}</div>
                         </div>
                         <div class="flex items-center gap-2">${actions}</div>
                     </div>
@@ -9211,4 +9400,45 @@
                     
                 }
             } catch(_) {}
+        }
+        function adminCopyAccessControlsSQL() {
+            const sql = [
+                'begin;',
+                'create table if not exists public.access_controls (',
+                '  email text primary key,',
+                "  role text default 'restricted',",
+                "  allowed_sections text[] default '{}',",
+                "  allowed_subsections jsonb default '{}'::jsonb,",
+                '  created_at timestamptz default now()',
+                ');',
+                'alter table public.access_controls enable row level security;',
+                "create policy \"ac_select_auth\" on public.access_controls for select using (auth.role() = 'authenticated');",
+                "create policy \"ac_insert_admins\" on public.access_controls for insert with check (exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
+                "create policy \"ac_update_admins\" on public.access_controls for update using (exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
+                "create policy \"ac_delete_admins\" on public.access_controls for delete using (exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
+                'alter publication supabase_realtime add table public.access_controls;',
+                'commit;'
+            ].join('\n');
+            const tryClipboard = async () => {
+                try { await navigator.clipboard.writeText(sql); showFloatingNotification('success', 'SQL copiado'); }
+                catch(_) {
+                    const ta = document.createElement('textarea'); ta.value = sql; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showFloatingNotification('success', 'SQL copiado'); } catch(e) { showCustomAlert(sql); } ta.remove();
+                }
+            };
+            tryClipboard();
+        }
+        function editAccessRule(email) {
+            const e = (email||'').toLowerCase();
+            const rule = getAccessRuleFor(e);
+            if (!rule) return;
+            const emailEl = document.getElementById('adminEmailInput');
+            if (emailEl) emailEl.value = rule.email || e;
+            Array.from(document.querySelectorAll('#adminSectionsSelect input[type="checkbox"]')).forEach(b=>{ b.checked=false; });
+            const setChecked = (sel) => { const el = document.querySelector(sel); if (el) { el.checked = true; el.dispatchEvent(new Event('change')); } };
+            (rule.allowed_sections||[]).forEach(sec => { setChecked(`#adminSectionsSelect input[value="${sec}"]`); });
+            const cctSubs = (rule.allowed_subsections && rule.allowed_subsections['cct_coque']) || [];
+            cctSubs.forEach(v => { const cb = document.querySelector(`#adminSectionsSelect input[data-section="cct"][value="${v}"]`); if (cb) cb.checked = true; });
+            const irrSubs = (rule.allowed_subsections && rule.allowed_subsections['irrigacao']) || [];
+            irrSubs.forEach(v => { const cb = document.querySelector(`#adminSectionsSelect input[data-section="irr"][value="${v}"]`); if (cb) cb.checked = true; });
+            showFloatingNotification('success', 'Regra carregada para edição');
         }
