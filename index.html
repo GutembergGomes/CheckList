@@ -1567,16 +1567,55 @@
                     <div class="p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Cadastrar/Editar</h3>
                         <div class="space-y-3">
-                            <input id="adminEmailInput" type="email" placeholder="email@dominio.com" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                            <input id="adminEmailInput" type="email" placeholder="email@dominio.com" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400" />
                             <div>
                                 <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">Seções permitidas</p>
-                                <div class="flex flex-wrap gap-3" id="adminSectionsSelect">
-                                    <label class="inline-flex items-center"><input type="checkbox" value="nova-inspecao" class="form-checkbox"><span class="ml-2 text-sm">Nova Inspeção</span></label>
-                                    <label class="inline-flex items-center"><input type="checkbox" value="equipamentos" class="form-checkbox"><span class="ml-2 text-sm">Equipamentos</span></label>
-                                    <label class="inline-flex items-center"><input type="checkbox" value="dashboard" class="form-checkbox"><span class="ml-2 text-sm">Dashboard</span></label>
-                                    <label class="inline-flex items-center"><input type="checkbox" value="historico" class="form-checkbox"><span class="ml-2 text-sm">Histórico</span></label>
-                                    <label class="inline-flex items-center"><input type="checkbox" value="analytics" class="form-checkbox"><span class="ml-2 text-sm">Analytics</span></label>
-                                    <label class="inline-flex items-center"><input type="checkbox" value="relatorios" class="form-checkbox"><span class="ml-2 text-sm">Relatórios</span></label>
+                                <div class="space-y-3 text-gray-700 dark:text-gray-200" id="adminSectionsSelect">
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-600 dark:text-gray-300">CCT</p>
+                                        <div class="flex flex-wrap gap-3 mt-1">
+                                            <label class="inline-flex items-center"><input type="checkbox" value="cct_coque" class="form-checkbox"><span class="ml-2 text-sm">CCT</span></label>
+                                        </div>
+                                        <div id="adminSectionsCCTDetail" class="mt-2 pl-3 border-l border-gray-200 dark:border-gray-700 hidden">
+                                            <p class="text-xs text-gray-600 dark:text-gray-300">Funções CCT</p>
+                                            <div class="flex flex-wrap gap-3 mt-1">
+                                                <label class="inline-flex items-center"><input type="checkbox" data-section="cct" value="historico" class="form-checkbox"><span class="ml-2 text-sm">Histórico</span></label>
+                                                <label class="inline-flex items-center"><input type="checkbox" data-section="cct" value="analytics" class="form-checkbox"><span class="ml-2 text-sm">Analytics</span></label>
+                                                <label class="inline-flex items-center"><input type="checkbox" data-section="cct" value="relatorios" class="form-checkbox"><span class="ml-2 text-sm">Relatórios</span></label>
+                                                <label class="inline-flex items-center"><input type="checkbox" data-section="cct" value="equipamentos" class="form-checkbox"><span class="ml-2 text-sm">Equipamentos</span></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-600 dark:text-gray-300">IRRIGAÇÃO</p>
+                                        <div class="flex flex-wrap gap-3 mt-1">
+                                            <label class="inline-flex items-center"><input type="checkbox" value="irrigacao" class="form-checkbox"><span class="ml-2 text-sm">Irrigação</span></label>
+                                        </div>
+                                        <div id="adminSectionsIRRDetail" class="mt-2 pl-3 border-l border-gray-200 dark:border-gray-700 hidden">
+                                            <p class="text-xs text-gray-600 dark:text-gray-300">Funções Irrigação</p>
+                                            <div class="flex flex-wrap gap-3 mt-1">
+                                                <label class="inline-flex items-center"><input type="checkbox" data-section="irr" value="equipamentos" class="form-checkbox"><span class="ml-2 text-sm">Equipamentos</span></label>
+                                                <label class="inline-flex items-center"><input type="checkbox" data-section="irr" value="historico" class="form-checkbox"><span class="ml-2 text-sm">Histórico</span></label>
+                                                <label class="inline-flex items-center"><input type="checkbox" data-section="irr" value="analytics" class="form-checkbox"><span class="ml-2 text-sm">Analytics</span></label>
+                                                <label class="inline-flex items-center"><input type="checkbox" data-section="irr" value="relatorios" class="form-checkbox"><span class="ml-2 text-sm">Relatórios</span></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-600 dark:text-gray-300">GLOBAL</p>
+                                        <div class="flex flex-wrap gap-3 mt-1">
+                                            <label class="inline-flex items-center"><input type="checkbox" value="dashboard" class="form-checkbox"><span class="ml-2 text-sm">Dashboard</span></label>
+                                            <label class="inline-flex items-center"><input type="checkbox" value="nova-inspecao" class="form-checkbox"><span class="ml-2 text-sm">Nova Inspeção</span></label>
+                                            <label class="inline-flex items-center"><input type="checkbox" value="equipamentos" class="form-checkbox"><span class="ml-2 text-sm">Equipamentos</span></label>
+                                            <label class="inline-flex items-center"><input type="checkbox" value="inventario" class="form-checkbox"><span class="ml-2 text-sm">Inventário de Pneus</span></label>
+                                            <label class="inline-flex items-center"><input type="checkbox" value="calibragem" class="form-checkbox"><span class="ml-2 text-sm">Calibragem</span></label>
+                                            <label class="inline-flex items-center"><input type="checkbox" value="controle3p" class="form-checkbox"><span class="ml-2 text-sm">Controle 3P</span></label>
+                                            <label class="inline-flex items-center"><input type="checkbox" value="historico_pneus" class="form-checkbox"><span class="ml-2 text-sm">Histórico de Pneus</span></label>
+                                            <label class="inline-flex items-center"><input type="checkbox" value="historico" class="form-checkbox"><span class="ml-2 text-sm">Histórico</span></label>
+                                            <label class="inline-flex items-center"><input type="checkbox" value="analytics" class="form-checkbox"><span class="ml-2 text-sm">Analytics</span></label>
+                                            <label class="inline-flex items-center"><input type="checkbox" value="relatorios" class="form-checkbox"><span class="ml-2 text-sm">Relatórios</span></label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="flex gap-3">
@@ -5560,7 +5599,7 @@
                 viewMode = 'global';
                 dehydrateCCTSubsections();
             }
-            if (isRestrictedUser() && !['cct_coque','equipamentos','inventario','calibragem','controle3p','historico_pneus'].includes(sectionId)) { showCustomAlert('Acesso restrito.'); sectionId = 'cct_coque'; }
+            if (isRestrictedUser()) { const allow = getAllowedSectionsFor((currentUser||getCachedUser()||{}).email || ''); if (!allow.includes(sectionId)) { showCustomAlert('Acesso restrito.'); sectionId = allow[0] || 'cct_coque'; } }
             if (sectionId === 'admin' && !isAdmin()) { showCustomAlert('Acesso restrito.'); sectionId = 'dashboard'; }
             // Update navigation
             document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -5658,6 +5697,11 @@
 
         function showCCTSubsection(sub) {
             viewMode = 'cct';
+            if (isRestrictedUser()) {
+                const email = ((currentUser||getCachedUser()||{}).email || '').toLowerCase();
+                const allow = getAllowedSubsectionsFor(email, 'cct_coque');
+                if (sub !== 'inicio' && allow.length && !allow.includes(sub)) { showCustomAlert('Acesso restrito.'); showCCTSubsection('inicio'); return; }
+            }
             document.querySelectorAll('#cct-sub-historico,#cct-sub-analytics,#cct-sub-relatorios,#cct-sub-equipamentos').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.cct-sub-btn').forEach(btn => {
                 btn.classList.remove('border-primary','text-primary');
@@ -5785,6 +5829,11 @@
 
         function showIrrSubsection(sub) {
             viewMode = 'irr';
+            if (isRestrictedUser()) {
+                const email = ((currentUser||getCachedUser()||{}).email || '').toLowerCase();
+                const allow = getAllowedSubsectionsFor(email, 'irrigacao');
+                if (sub !== 'inicio' && allow.length && !allow.includes(sub)) { showCustomAlert('Acesso restrito.'); const start = document.getElementById('irr-sub-inicio'); document.querySelectorAll('#irr-sub-inicio,#irr-sub-historico,#irr-sub-analytics,#irr-sub-relatorios,#irr-sub-equipamentos').forEach(el => el.classList.add('hidden')); if (start) { start.classList.remove('hidden'); start.classList.add('fade-in'); } return; }
+            }
             document.querySelectorAll('#irr-sub-inicio,#irr-sub-historico,#irr-sub-analytics,#irr-sub-relatorios,#irr-sub-equipamentos').forEach(el => el.classList.add('hidden'));
             const irrForm = document.getElementById('irrChecklistForm');
             if (irrForm) irrForm.classList.add('hidden');
@@ -7105,7 +7154,14 @@
         }
         function getAllowedSectionsFor(email) {
             const rule = getAccessRuleFor(email);
-            return (rule && Array.isArray(rule.allowed_sections) && rule.allowed_sections.length) ? rule.allowed_sections : ['nova-inspecao','equipamentos','inventario','calibragem','controle3p'];
+            return (rule && Array.isArray(rule.allowed_sections) && rule.allowed_sections.length) ? rule.allowed_sections : ['cct_coque','irrigacao','equipamentos','inventario','calibragem','controle3p'];
+        }
+
+        function getAllowedSubsectionsFor(email, section) {
+            const rule = getAccessRuleFor(email);
+            const map = rule && rule.allowed_subsections ? rule.allowed_subsections : {};
+            const subs = Array.isArray(map[section]) ? map[section] : [];
+            return subs;
         }
 
         function applyAccessControls() {
@@ -7113,7 +7169,7 @@
             if (adminBtn) { if (isAdmin()) adminBtn.classList.remove('hidden'); else adminBtn.classList.add('hidden'); }
             const restricted = isRestrictedUser();
             const allow = getAllowedSectionsFor((currentUser||getCachedUser()||{}).email || '');
-            const sections = ['dashboard','historico','analytics','relatorios','nova-inspecao','equipamentos','inventario','calibragem','controle3p','admin'];
+            const sections = ['dashboard','historico','analytics','relatorios','nova-inspecao','equipamentos','inventario','calibragem','controle3p','cct_coque','irrigacao','admin'];
             sections.forEach(id => {
                 const btn = id === 'admin' ? document.getElementById('adminNavBtn') : document.querySelector(`button[onclick="showSection('${id}')"]`);
                 if (!btn) return;
@@ -8778,9 +8834,16 @@
             const emailEl = document.getElementById('adminEmailInput');
             const boxes = Array.from(document.querySelectorAll('#adminSectionsSelect input[type="checkbox"]'));
             const email = (emailEl?.value || '').trim().toLowerCase();
-            const allowed = boxes.filter(b => b.checked).map(b => b.value);
+            const allowed = boxes.filter(b => b.checked && !b.dataset.section).map(b => b.value);
+            const allowedSubsections = {};
+            const cctParent = document.querySelector('#adminSectionsSelect input[value="cct_coque"]');
+            const irrParent = document.querySelector('#adminSectionsSelect input[value="irrigacao"]');
+            const cctSubs = Array.from(document.querySelectorAll('#adminSectionsSelect input[data-section="cct"]'));
+            const irrSubs = Array.from(document.querySelectorAll('#adminSectionsSelect input[data-section="irr"]'));
+            if (cctParent && cctParent.checked) { allowedSubsections['cct_coque'] = cctSubs.filter(b => b.checked).map(b => b.value); }
+            if (irrParent && irrParent.checked) { allowedSubsections['irrigacao'] = irrSubs.filter(b => b.checked).map(b => b.value); }
             if (!email || allowed.length === 0) { showCustomAlert('Informe o email e selecione pelo menos uma seção.'); return; }
-            const rule = { email, role: 'restricted', allowed_sections: allowed, created_at: new Date().toISOString() };
+            const rule = { email, role: 'restricted', allowed_sections: allowed, allowed_subsections: allowedSubsections, created_at: new Date().toISOString() };
             let rules = getCachedAccessControls();
             const idx = rules.findIndex(r => (r.email||'').toLowerCase() === email);
             if (idx >= 0) rules[idx] = rule; else rules.unshift(rule);
@@ -8817,6 +8880,8 @@
                     <div>
                         <div class="text-sm font-medium text-gray-900 dark:text-white">${r.email}</div>
                         <div class="text-xs text-gray-500 dark:text-gray-400">${(r.allowed_sections||[]).join(', ')}</div>
+                        ${r.allowed_subsections && (r.allowed_subsections['cct_coque']||[]).length ? `<div class="text-[11px] text-gray-500 dark:text-gray-400">CCT: ${(r.allowed_subsections['cct_coque']||[]).join(', ')}</div>` : ''}
+                        ${r.allowed_subsections && (r.allowed_subsections['irrigacao']||[]).length ? `<div class="text-[11px] text-gray-500 dark:text-gray-400">IRRIGAÇÃO: ${(r.allowed_subsections['irrigacao']||[]).join(', ')}</div>` : ''}
                     </div>
                     <button class="px-3 py-1 text-sm bg-red-600 text-white rounded-md" onclick="deleteAccessRule('${r.email}')">Remover</button>
                 </div>
@@ -8831,11 +8896,19 @@
             const gs = document.getElementById('adminCopyAuthSyncSqlBtn');
             const rs = document.getElementById('adminRunAuthSyncBtn');
             if (s && !s._bound) { s.addEventListener('click', saveAccessRule); s._bound = true; }
-            if (c && !c._bound) { c.addEventListener('click', function(){ const e=document.getElementById('adminEmailInput'); if(e) e.value=''; Array.from(document.querySelectorAll('#adminSectionsSelect input[type="checkbox"]')).forEach(b=>{ b.checked=false; }); }); c._bound=true; }
+            if (c && !c._bound) { c.addEventListener('click', function(){ const e=document.getElementById('adminEmailInput'); if(e) e.value=''; Array.from(document.querySelectorAll('#adminSectionsSelect input[type="checkbox"]')).forEach(b=>{ b.checked=false; }); const d1=document.getElementById('adminSectionsCCTDetail'); if(d1) d1.classList.add('hidden'); const d2=document.getElementById('adminSectionsIRRDetail'); if(d2) d2.classList.add('hidden'); }); c._bound=true; }
             if (f && !f._bound) { f.addEventListener('click', adminForceRefresh); f._bound = true; }
             if (g && !g._bound) { g.addEventListener('click', adminCopyUsersSQL); g._bound = true; }
             if (gs && !gs._bound) { gs.addEventListener('click', adminCopyAuthSyncSQL); gs._bound = true; }
             if (rs && !rs._bound) { rs.addEventListener('click', adminRunAuthSync); rs._bound = true; }
+            const cct = document.querySelector('#adminSectionsSelect input[value="cct_coque"]');
+            const irr = document.querySelector('#adminSectionsSelect input[value="irrigacao"]');
+            const cctDetail = document.getElementById('adminSectionsCCTDetail');
+            const irrDetail = document.getElementById('adminSectionsIRRDetail');
+            function toggleDetails() { if (cct && cctDetail) { if (cct.checked) cctDetail.classList.remove('hidden'); else cctDetail.classList.add('hidden'); } if (irr && irrDetail) { if (irr.checked) irrDetail.classList.remove('hidden'); else irrDetail.classList.add('hidden'); } }
+            if (cct && !cct._bound) { cct.addEventListener('change', toggleDetails); cct._bound = true; }
+            if (irr && !irr._bound) { irr.addEventListener('change', toggleDetails); irr._bound = true; }
+            toggleDetails();
             loadUsers();
         }
 
