@@ -5032,6 +5032,9 @@
                     clearForm();
                     backToSelection();
                     showFloatingNotification('success', 'Inspeção salva com sucesso!');
+                    try { await supabase.from('system_events').insert([{ type:'new_inspection', title:'Nova inspeção', message: `${inspection.tipo||''} • ${inspection.frota||''} • ${inspection.mecanico||''}`, payload: { tipo: inspection.tipo||'', frota: inspection.frota||'', mecanico: inspection.mecanico||'', data: inspection.data||'', local_id: inspection.local_id||'', modulo: 'cct' } }]); } catch(_) {}
+                    try { systemBroadcastChannel && systemBroadcastChannel.send({ type:'broadcast', event:'new_inspection', payload: { modulo:'cct', tipo: inspection.tipo||'', frota: inspection.frota||'', mecanico: inspection.mecanico||'', data: inspection.data||'', local_id: inspection.local_id||'' } }); } catch(_) {}
+                    try { pushNotification('info', 'Nova inspeção', inspection.frota ? `Inspeção lançada para ${inspection.frota}` : 'Inspeção lançada', { modulo:'cct', tipo: inspection.tipo||'', frota: inspection.frota||'', mecanico: inspection.mecanico||'', data: inspection.data||'', local_id: inspection.local_id||'' }); } catch(_) {}
                 } else {
                     const offlineItem = { ...inspection, offline: true };
                     offlineItem.id = offlineItem.local_id;
@@ -5045,6 +5048,7 @@
                     backToSelection();
                     const msg = !isOnline() ? 'Sem internet. Inspeção salva offline e será sincronizada.' : 'Usuário não autenticado. Inspeção salva offline e será sincronizada.';
                     showFloatingNotification('warning', msg);
+                    try { pushNotification('info', 'Nova inspeção (offline)', inspection.frota ? `Inspeção lançada para ${inspection.frota}` : 'Inspeção lançada', { modulo:'cct', tipo: inspection.tipo||'', frota: inspection.frota||'', mecanico: inspection.mecanico||'', data: inspection.data||'', local_id: inspection.local_id||'' }); } catch(_) {}
                 }
             } catch (error) {
                 const offlineItem2 = { ...inspection, offline: true };
@@ -5054,6 +5058,7 @@
                 updateStats();
                 updateAnalytics();
                 showFloatingNotification('warning', 'Falha ao salvar online. Inspeção salva offline e será sincronizada.');
+                try { pushNotification('info', 'Nova inspeção (offline)', inspection.frota ? `Inspeção lançada para ${inspection.frota}` : 'Inspeção lançada'); } catch(_) {}
                 try { localStorage.removeItem('cctDraft'); } catch(_) {}
                 clearForm();
                 backToSelection();
@@ -6407,6 +6412,12 @@
             setCachedIrrInspections(irrigInspections);
             renderIrrHistory();
             updateStats();
+            if (savedOnline) {
+                try { await supabase.from('system_events').insert([{ type:'new_inspection', title:'Nova inspeção (Irrigação)', message: `${record.tipo||''} • ${record.frota||''} • ${record.mecanico||''}`, payload: { tipo: record.tipo||'', frota: record.frota||'', mecanico: record.mecanico||'', data: record.data||'', id: record.id||'', local_id: record.local_id||'', modulo: 'irr' } }]); } catch(_) {}
+                try { systemBroadcastChannel && systemBroadcastChannel.send({ type:'broadcast', event:'new_inspection', payload: { modulo:'irr', tipo: record.tipo||'', frota: record.frota||'', mecanico: record.mecanico||'', data: record.data||'', id: record.id||'', local_id: record.local_id||'' } }); } catch(_) {}
+            }
+            try { pushNotification('info', 'Nova inspeção (Irrigação)', record.frota ? `Inspeção lançada para ${record.frota}` : 'Inspeção lançada', { modulo:'irr', tipo: record.tipo||'', frota: record.frota||'', mecanico: record.mecanico||'', data: record.data||'', id: record.id||'', local_id: record.local_id||'' }); } catch(_) {}
+            showFloatingNotification('success', 'Inspeção de irrigação salva!');
             showIrrSubsection('historico');
             try { localStorage.removeItem('irrDraft'); } catch(_) {}
             savingInspection = false;
@@ -7962,6 +7973,7 @@
                                 <p class="text-sm font-medium text-gray-900 dark:text-white">${notif.title}</p>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">${notif.message}</p>
                                 <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">${formatNotificationTime(notif.created_at || new Date().toISOString())}</p>
+                                ${notif.link ? `<button onclick="openNotificationLink('${notif.id}')" class="mt-2 text-sm text-primary hover:text-primary-dark">Abrir no histórico</button>` : ''}
                             </div>
                             <button onclick="removeNotification('${notif.id}')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -8020,13 +8032,45 @@
             }, duration);
         }
 
-        function pushNotification(type, title, message) {
-            const item = { id: Date.now().toString(), type, title, message, created_at: new Date().toISOString(), read: false };
+        function pushNotification(type, title, message, link) {
+            const item = { id: Date.now().toString(), type, title, message, created_at: new Date().toISOString(), read: false, link: link || null };
             notifications.unshift(item);
             setCachedNotifications(notifications);
             updateNotificationBadge();
             const center = document.getElementById('notificationCenter');
             if (center && !center.classList.contains('hidden')) updateNotificationList();
+        }
+
+        function openNotificationLink(id) {
+            try {
+                const notif = notifications.find(n => n.id === id);
+                if (!notif || !notif.link) return;
+                const l = notif.link;
+                if (l.modulo === 'cct') {
+                    showSection('cct_coque');
+                    showCCTSubsection('historico');
+                } else if (l.modulo === 'irr') {
+                    showSection('irrigacao');
+                    showIrrSubsection('historico');
+                }
+                setTimeout(() => {
+                    const tbody = document.getElementById('historyTableBody');
+                    if (!tbody) return;
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+                    const target = rows.find(tr => {
+                        const tds = tr.querySelectorAll('td');
+                        if (!tds || tds.length < 4) return false;
+                        const tipoCell = (tds[1].textContent||'').toLowerCase();
+                        const frotaCell = (tds[2].textContent||'').toLowerCase();
+                        const mecCell = (tds[3].textContent||'').toLowerCase();
+                        const tipoMatch = !l.tipo || tipoCell.includes((l.tipo||'').toLowerCase());
+                        const frotaMatch = !l.frota || frotaCell.includes((l.frota||'').toLowerCase());
+                        const mecMatch = !l.mecanico || mecCell.includes((l.mecanico||'').toLowerCase());
+                        return tipoMatch && frotaMatch && mecMatch;
+                    });
+                    if (target) { target.scrollIntoView({ behavior:'smooth', block:'center' }); target.classList.add('bg-yellow-50'); setTimeout(()=>{ target.classList.remove('bg-yellow-50'); }, 2500); }
+                }, 250);
+            } catch(_) {}
         }
 
         function markAllNotificationsRead() {
@@ -8315,6 +8359,12 @@
                         const f = r.frota || '';
                         pushNotification('info', 'Nova inspeção', f ? `Inspeção lançada para ${f}` : 'Inspeção lançada');
                     })
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'irrig_inspections' }, (payload) => {
+                        if (!savingInspection) { loadInitialData(); }
+                        const r = payload && payload.new ? payload.new : {};
+                        const f = r.frota || '';
+                        pushNotification('info', 'Nova inspeção (Irrigação)', f ? `Inspeção lançada para ${f}` : 'Inspeção lançada');
+                    })
                     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'equipments' }, (payload) => {
                         loadEquipments().then(() => {
                             populateEquipmentList();
@@ -8329,6 +8379,12 @@
                             showFloatingNotification('warning', 'NOVA ATUALIZAÇÃO DO SISTEMA');
                             pushNotification('info', 'Atualização', 'NOVA ATUALIZAÇÃO DO SISTEMA');
                             setTimeout(() => { try { location.reload(); } catch(_) {} }, 2000);
+                        } else if ((ev.type || '') === 'new_inspection') {
+                            const t = ev.title || 'Nova inspeção';
+                            const m = ev.message || 'Inspeção lançada';
+                            const p = ev.payload || {};
+                            const link = { modulo: p.modulo || 'cct', tipo: p.tipo || '', frota: p.frota || '', mecanico: p.mecanico || '', data: p.data || '', id: p.id || '', local_id: p.local_id || '' };
+                            pushNotification('info', t, m, link);
                         }
                     })
                     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'users' }, () => { loadUsers(); })
@@ -8344,6 +8400,20 @@
                         pushNotification('info', 'Atualização', msg);
                         if (requireConfirm) { showUpdatePrompt(msg); }
                         else { setTimeout(() => { try { location.reload(); } catch(_) {} }, 2000); }
+                    })
+                    .on('broadcast', { event: 'new_inspection' }, (payload) => {
+                        const p = (payload && payload.payload) || {};
+                        const modulo = p.modulo || 'cct';
+                        const tipo = p.tipo || '';
+                        const frota = p.frota || '';
+                        const mecanico = p.mecanico || '';
+                        const data = p.data || '';
+                        const id = p.id || '';
+                        const local_id = p.local_id || '';
+                        const t = modulo === 'irr' ? 'Nova inspeção (Irrigação)' : 'Nova inspeção';
+                        const m = `${tipo} • ${frota} • ${mecanico}`.trim();
+                        const link = { modulo, tipo, frota, mecanico, data, id, local_id };
+                        pushNotification('info', t, m, link);
                     })
                     .subscribe();
             } catch (e) {
@@ -8372,6 +8442,8 @@
                         .from('inspections')
                         .upsert([{ data: item.data, tipo: item.tipo, frota: item.frota, mecanico: item.mecanico, items: item.items, results: item.results, user_id: item.user_id, created_at: item.created_at, local_id: item.local_id }], { onConflict: 'local_id' });
                     if (error) { throw error; }
+                    try { await supabase.from('system_events').insert([{ type:'new_inspection', title:'Nova inspeção', message: `${item.tipo||''} • ${item.frota||''} • ${item.mecanico||''}`, payload: { tipo: item.tipo||'', frota: item.frota||'', mecanico: item.mecanico||'', data: item.data||'', local_id: item.local_id||'', modulo: 'cct' } }]); } catch(_) {}
+                    try { systemBroadcastChannel && systemBroadcastChannel.send({ type:'broadcast', event:'new_inspection', payload: { modulo:'cct', tipo: item.tipo||'', frota: item.frota||'', mecanico: item.mecanico||'', data: item.data||'', local_id: item.local_id||'' } }); } catch(_) {}
                 } catch (e) {
                     remaining.push(item);
                 }
@@ -9324,7 +9396,23 @@
                     "create policy \"ac_insert_write\" on public.access_controls for insert with check ((auth.jwt()->>'email' = 'gutemberggg10@gmail.com') OR exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
                     "create policy \"ac_update_write\" on public.access_controls for update using ((auth.jwt()->>'email' = 'gutemberggg10@gmail.com') OR exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
                     "create policy \"ac_delete_write\" on public.access_controls for delete using ((auth.jwt()->>'email' = 'gutemberggg10@gmail.com') OR exists (select 1 from public.users u where u.email = auth.jwt()->>'email' and u.approved = true));",
+                    'create table if not exists public.system_events (',
+                    '  id bigserial primary key,',
+                    '  type text not null,',
+                    '  title text,',
+                    '  message text,',
+                    "  payload jsonb default '{}'::jsonb,",
+                    '  created_at timestamptz default now()',
+                    ');',
+                    'alter table public.system_events enable row level security;',
+                    "create policy \"se_select_auth\" on public.system_events for select using (auth.role() = 'authenticated');",
+                    "create policy \"se_insert_auth\" on public.system_events for insert with check (auth.role() = 'authenticated');",
                     'alter publication supabase_realtime add table public.access_controls;',
+                    'alter publication supabase_realtime add table public.inspections;',
+                    'alter publication supabase_realtime add table public.irrig_inspections;',
+                    'alter publication supabase_realtime add table public.equipments;',
+                    'alter publication supabase_realtime add table public.system_events;',
+                    'alter publication supabase_realtime add table public.users;',
                     'commit;'
                 ].join('\n');
                 const tryClipboard = async () => {
