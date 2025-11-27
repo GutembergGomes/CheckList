@@ -829,6 +829,50 @@
                                     </div>
                                     <span class="text-2xl font-bold text-gray-900 dark:text-white" id="countReboques">0</span>
                                 </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M6 11h12M8 15h8"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-gray-900 dark:text-white font-medium">Transbordos</span>
+                                    </div>
+                                    <span class="text-2xl font-bold text-gray-900 dark:text-white" id="countTransbordo">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-fuchsia-100 dark:bg-fuchsia-900 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-fuchsia-600 dark:text-fuchsia-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12M6 12h12"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-gray-900 dark:text-white font-medium">Tortão</span>
+                                    </div>
+                                    <span class="text-2xl font-bold text-gray-900 dark:text-white" id="countTortao">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-rose-100 dark:bg-rose-900 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M5 11h14M7 15h10"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-gray-900 dark:text-white font-medium">MotoBombas</span>
+                                    </div>
+                                    <span class="text-2xl font-bold text-gray-900 dark:text-white" id="countMotobombas">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8M8 12h8"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-gray-900 dark:text-white font-medium">Hidro Roll</span>
+                                    </div>
+                                    <span class="text-2xl font-bold text-gray-900 dark:text-white" id="countHidroroll">0</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -5757,6 +5801,7 @@
                 updateAnalytics();
                 updateAnalyticsSummary(days);
                 ensureCCTFilters('analytics');
+                updateModeTypeCounts('cct');
             }
             if (sub === 'equipamentos') {
                 populateEquipmentList();
@@ -5827,6 +5872,22 @@
                             const days = 30; buildCharts(days); updateAnalyticsSummary(days); updateAnalytics();
                         });
                     }
+                    if (!document.getElementById('cctTypeCounts')) {
+                        const grid = document.createElement('div');
+                        grid.id = 'cctTypeCounts';
+                        grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4';
+                        grid.innerHTML = `
+                            <div class="flex items-center justify-between"><span class="text-sm">Caminhões</span><span id="cctCountCaminhoes" class="text-lg font-semibold">0</span></div>
+                            <div class="flex items-center justify-between"><span class="text-sm">Tratores</span><span id="cctCountTratores" class="text-lg font-semibold">0</span></div>
+                            <div class="flex items-center justify-between"><span class="text-sm">Colhedoras</span><span id="cctCountColhedoras" class="text-lg font-semibold">0</span></div>
+                            <div class="flex items-center justify-between"><span class="text-sm">Plantadoras</span><span id="cctCountPlantadoras" class="text-lg font-semibold">0</span></div>
+                            <div class="flex items-center justify-between"><span class="text-sm">Distribuidoras</span><span id="cctCountDistribuidoras" class="text-lg font-semibold">0</span></div>
+                            <div class="flex items-center justify-between"><span class="text-sm">Reboques</span><span id="cctCountReboques" class="text-lg font-semibold">0</span></div>
+                            <div class="flex items-center justify-between"><span class="text-sm">Transbordos</span><span id="cctCountTransbordo" class="text-lg font-semibold">0</span></div>
+                            <div class="flex items-center justify-between"><span class="text-sm">Tortão</span><span id="cctCountTortao" class="text-lg font-semibold">0</span></div>
+                        `;
+                        container.insertBefore(grid, container.firstChild.nextSibling);
+                    }
                 }
             } catch(_) {}
         }
@@ -5886,6 +5947,20 @@
             if (sub === 'equipamentos') { populateIrrEquipmentList(); }
             if (sub === 'historico') { renderIrrHistory(); }
             if (sub === 'analytics') { populateIrrLeaderFilter(); initializeIrrCharts(); updateIrrAnalytics(); updateIrrAnalyticsSummary(); }
+            if (sub === 'analytics') {
+                const container = document.getElementById('irr-sub-analytics');
+                if (container && !document.getElementById('irrTypeCounts')) {
+                    const grid = document.createElement('div');
+                    grid.id = 'irrTypeCounts';
+                    grid.className = 'grid grid-cols-2 gap-4 mb-4';
+                    grid.innerHTML = `
+                        <div class="flex items-center justify-between"><span class="text-sm">MotoBombas</span><span id="irrCountMotobombas" class="text-lg font-semibold">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm">Hidro Roll</span><span id="irrCountHidroroll" class="text-lg font-semibold">0</span></div>
+                    `;
+                    container.insertBefore(grid, container.firstChild);
+                }
+                updateModeTypeCounts('irr');
+            }
             try { localStorage.setItem('lastSection','irrigacao'); localStorage.setItem('lastSubIRR', sub); } catch(_) {}
         }
 
@@ -6331,6 +6406,7 @@
             if (existingIdx >= 0) irrigInspections[existingIdx] = record; else irrigInspections.push(record);
             setCachedIrrInspections(irrigInspections);
             renderIrrHistory();
+            updateStats();
             showIrrSubsection('historico');
             try { localStorage.removeItem('irrDraft'); } catch(_) {}
             savingInspection = false;
@@ -7080,8 +7156,8 @@
                 plantadora: all.filter(i => i.tipo === 'plantadora').length,
                 distribuidora: all.filter(i => i.tipo === 'distribuidora').length,
                 reboque: all.filter(i => i.tipo === 'reboque').length,
-                cct_coque: all.filter(i => i.tipo === 'cct_coque').length,
                 transbordo: all.filter(i => i.tipo === 'transbordo').length,
+                tortao: all.filter(i => i.tipo === 'tortao').length,
                 motobombas: all.filter(i => i.tipo === 'motobombas').length,
                 hidroroll: all.filter(i => i.tipo === 'hidroroll').length
             };
@@ -7116,6 +7192,14 @@
             const elDist = document.getElementById('countDistribuidoras');
             if (elDist) elDist.textContent = counts.distribuidora;
             document.getElementById('countReboques').textContent = counts.reboque;
+            const elTrans = document.getElementById('countTransbordo');
+            if (elTrans) elTrans.textContent = counts.transbordo;
+            const elTort = document.getElementById('countTortao');
+            if (elTort) elTort.textContent = counts.tortao;
+            const elMoto = document.getElementById('countMotobombas');
+            if (elMoto) elMoto.textContent = counts.motobombas;
+            const elHidro = document.getElementById('countHidroroll');
+            if (elHidro) elHidro.textContent = counts.hidroroll;
             
             // Update recent inspections
             updateRecentInspections();
@@ -7123,6 +7207,36 @@
             // Update history table
             updateHistoryTable();
             populateAnalyticsFilters();
+            updateModeTypeCounts(viewMode === 'irr' ? 'irr' : 'cct');
+        }
+
+        function updateModeTypeCounts(mode) {
+            try {
+                const all = mode === 'cct' ? (Array.isArray(inspections) ? inspections.slice() : []) : (Array.isArray(irrigInspections) ? irrigInspections.slice() : []);
+                if (mode === 'cct') {
+                    const counts = {
+                        caminhao: all.filter(i => i.tipo === 'caminhao').length,
+                        trator: all.filter(i => i.tipo === 'trator').length,
+                        colhedora: all.filter(i => i.tipo === 'colhedora').length,
+                        plantadora: all.filter(i => i.tipo === 'plantadora').length,
+                        distribuidora: all.filter(i => i.tipo === 'distribuidora').length,
+                        reboque: all.filter(i => i.tipo === 'reboque').length,
+                        transbordo: all.filter(i => i.tipo === 'transbordo').length,
+                        tortao: all.filter(i => i.tipo === 'tortao').length
+                    };
+                    const ids = {
+                        caminhao:'cctCountCaminhoes', trator:'cctCountTratores', colhedora:'cctCountColhedoras', plantadora:'cctCountPlantadoras', distribuidora:'cctCountDistribuidoras', reboque:'cctCountReboques', transbordo:'cctCountTransbordo', tortao:'cctCountTortao'
+                    };
+                    Object.keys(ids).forEach(k => { const el = document.getElementById(ids[k]); if (el) el.textContent = counts[k]; });
+                } else if (mode === 'irr') {
+                    const counts = {
+                        motobombas: all.filter(i => i.tipo === 'motobombas').length,
+                        hidroroll: all.filter(i => i.tipo === 'hidroroll').length
+                    };
+                    const elMoto = document.getElementById('irrCountMotobombas'); if (elMoto) elMoto.textContent = counts.motobombas;
+                    const elHidro = document.getElementById('irrCountHidroroll'); if (elHidro) elHidro.textContent = counts.hidroroll;
+                }
+            } catch(_) {}
         }
 
         function getAllInspectionsCombined() {
