@@ -6055,6 +6055,10 @@
                                         <input type="radio" name="irr_item_${index}" value="notok" onchange="updateIrrItemStatus(${index}, 'notok')" class="form-radio h-6 w-6 sm:h-4 sm:w-4 text-primary">
                                         <span class="ml-2 text-sm text-red-600 dark:text-red-400">NÃO OK</span>
                                     </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="irr_item_${index}" value="na" onchange="updateIrrItemStatus(${index}, 'na')" class="form-radio h-6 w-6 sm:h-4 sm:w-4 text-primary">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">NÃO APLICA</span>
+                                    </label>
                                 </div>
                             </div>
                             <div class="mt-3 hidden" id="irr_note_${index}">
@@ -6717,6 +6721,10 @@
                                     <label class="inline-flex items-center">
                                         <input type="radio" name="item_${index}" value="notok" onchange="updateItemStatus(${index}, 'notok')" class="form-radio h-6 w-6 sm:h-4 sm:w-4 text-primary">
                                         <span class="ml-2 text-sm text-red-600 dark:text-red-400">NÃO OK</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="item_${index}" value="na" onchange="updateItemStatus(${index}, 'na')" class="form-radio h-6 w-6 sm:h-4 sm:w-4 text-primary">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">NÃO APLICA</span>
                                     </label>
                                 </div>
                             </div>
