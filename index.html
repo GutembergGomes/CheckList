@@ -6666,7 +6666,8 @@
         }
 
         function generateIrrReport() {
-            const type = document.getElementById('irrReportType')?.value || 'geral';
+            let type = document.getElementById('irrReportType')?.value || 'geral';
+            if ((!type || type === 'geral') && typeof window !== 'undefined' && window.quickIrrReportType) { type = window.quickIrrReportType; }
             const period = document.getElementById('irrReportPeriod')?.value || '30';
             let format = document.getElementById('irrReportFormat')?.value || 'csv';
             const supported = ['csv','excel','pdf','json'];
@@ -6676,13 +6677,38 @@
             const end = new Date();
             const start = new Date();
             start.setDate(end.getDate() - days + 1);
-            const filtered = irrigInspections.filter(i => {
+            let filtered = irrigInspections.filter(i => {
                 const d = new Date(i.data || new Date());
                 return d >= start && d <= end;
             });
+            const quickTypes = ['summary','performance','maintenance','trends','compliance','costs'];
+            if (quickTypes.includes(type)) {
+                if (type === 'performance') {
+                    filtered = filtered.slice().sort((a,b) => (b.results?.percentage||0) - (a.results?.percentage||0));
+                } else if (type === 'maintenance') {
+                    filtered = filtered.filter(i => {
+                        const items = Array.isArray(i.items) ? i.items : [];
+                        const hasNonOkItem = items.some(it => {
+                            const s = it.status;
+                            const sval = typeof s === 'string' ? s.toLowerCase() : (typeof s === 'boolean' ? (s ? 'ok' : 'notok') : '');
+                            const hasNote = !!(it.note && String(it.note).trim());
+                            return sval === 'notok' || (!s && hasNote);
+                        });
+                        return (i.results?.notOk||0) > 0 || hasNonOkItem;
+                    });
+                } else if (type === 'trends') {
+                    filtered = filtered.slice().sort((a,b) => new Date(a.data) - new Date(b.data));
+                } else if (type === 'compliance') {
+                    filtered = filtered.filter(i => (i.results?.percentage||0) >= 90);
+                } else if (type === 'costs') {
+                    filtered = filtered.filter(i => (i.results?.notOk||0) > 0);
+                }
+            } else if (type === 'criticos') {
+                filtered = filtered.filter(i => (i.results?.notOk||0) > 0);
+            }
             const total = filtered.length;
             const avg = total ? Math.round(filtered.reduce((s,i)=>s+(i.results?.percentage||0),0)/total) : 0;
-            const counts = { motobombas:0, hidroroll:0 };
+            const counts = { motobombas:0, hidroroll:0, tortao:0 };
             filtered.forEach(i => { if (counts[i.tipo] !== undefined) counts[i.tipo]++; });
             if (format === 'json') {
                 const payload = { type, period, summary: { total, average: avg, counts }, inspections: filtered };
@@ -6722,7 +6748,7 @@
                 const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
                 const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `relatorio_irrigacao_${type}_${period}.xls`; a.click(); URL.revokeObjectURL(a.href);
             } else if (format === 'pdf') {
-                const rows = filtered.map(i => `
+                const rows = (filtered.length ? filtered.map(i => `
                     <tr>
                         <td>${formatDateBR(i.data)}</td>
                         <td>${i.tipo}</td>
@@ -6732,9 +6758,31 @@
                         <td>${i.results?.notOk||0}</td>
                         <td>${i.results?.percentage||0}%</td>
                     </tr>
-                `).join('');
+                `).join('') : '<tr><td colspan="7">Sem registros no período selecionado</td></tr>');
                 const dist = counts;
                 const dateRange = `${start.toLocaleDateString('pt-BR')} — ${end.toLocaleDateString('pt-BR')}`;
+                const maintSection = (type === 'maintenance') ? (() => {
+                    const blocks = filtered.map(i => {
+                        const arr = Array.isArray(i.items) ? i.items : [];
+                        const nonOk = arr.filter(it => {
+                            const s = it.status;
+                            const sval = typeof s === 'string' ? s.toLowerCase() : (typeof s === 'boolean' ? (s ? 'ok' : 'notok') : '');
+                            const hasNote = !!(it.note && String(it.note).trim());
+                            return sval === 'notok' || (!s && hasNote);
+                        });
+                        if (!nonOk.length) return '';
+                        const lines = nonOk.map(it => {
+                            const s = it.status;
+                            const sval = typeof s === 'string' ? s.toLowerCase() : (typeof s === 'boolean' ? (s ? 'ok' : 'notok') : '');
+                            const statusLabel = sval === 'notok' ? 'NÃO OK' : (sval === 'ok' ? 'OK' : 'NÃO OK');
+                            const choice = (it.note && String(it.note).trim()) || (it.value && String(it.value).trim()) || (it.selected && String(it.selected).trim()) || '';
+                            const desc = `${(it.section?it.section+' • ':'')}${it.name}`;
+                            return `<li>${desc} — ${statusLabel}${choice ? ' • Motivo: '+choice : ''}</li>`;
+                        }).join('');
+                        return `<div class="mcard"><div class="mh">${formatDateBR(i.data)} • ${i.tipo} • Frota: ${i.frota} • Líder: ${i.mecanico}</div><ul class="mlist">${lines}</ul></div>`;
+                    }).filter(Boolean).join('');
+                    return blocks ? `<div class="section"><h4>Manutenções e Motivos</h4>${blocks}</div>` : `<div class="section"><h4>Manutenções e Motivos</h4><div class="muted">Nenhum motivo registrado</div></div>`;
+                })() : '';
                 const doc = `
                     <html><head>
                         <meta charset="utf-8" />
@@ -6760,6 +6808,10 @@
                             thead th { background: #f3f4f6; text-align: left; font-size: 11px; color:#374151; border-bottom:1px solid #e5e7eb; }
                             th, td { border: 1px solid #e5e7eb; padding: 8px 10px; font-size: 11px; word-break: break-word; }
                             tbody tr:nth-child(odd) { background: #fafafa; }
+                            .section { margin-top: 18px; }
+                            .mcard { border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff; margin-top:10px; }
+                            .mh { font-size:12px; color:#374151; margin-bottom:8px; }
+                            .mlist { margin:0; padding-left:16px; font-size:11px; color:#111827; }
                             .footer { margin-top: 18px; font-size: 11px; color:#6B7280; text-align:right; }
                             @media screen { body { background:#f3f4f6; } .container { background:#fff; padding:24px; box-shadow: 0 1px 6px rgba(0,0,0,0.08); } }
                         </style>
@@ -6788,12 +6840,14 @@
                                     <tbody>${rows}</tbody>
                                 </table>
                             </div>
+                            ${maintSection}
                             <div class="footer">Sistema de Checklist • ${new Date().getFullYear()}</div>
                         </div>
                     </body></html>
                 `;
                 const w = window.open('', '_blank'); if (w) { w.document.write(doc); w.document.close(); }
             } else { showFloatingNotification('warning', 'Formato não suportado. Use CSV, Excel ou PDF.'); }
+            if (typeof window !== 'undefined') { try { window.quickIrrReportType = ''; } catch(_) {} }
         }
 
         function generateIrrQuickReport(type) {
@@ -6801,8 +6855,9 @@
             const per = document.getElementById('irrReportPeriod');
             const fmt = document.getElementById('irrReportFormat');
             if (sel) sel.value = type;
-            if (per) per.value = '30';
-            if (fmt) fmt.value = 'csv';
+            if (per) per.value = '90';
+            if (fmt) fmt.value = 'pdf';
+            try { window.quickIrrReportType = type; } catch(_) {}
             generateIrrReport();
         }
 
@@ -8930,7 +8985,8 @@
 
         // Report generation functions
         function generateReport() {
-            const type = document.getElementById('reportType').value;
+            let type = document.getElementById('reportType').value;
+            if (!type && typeof window !== 'undefined' && window.quickReportType) { type = window.quickReportType; }
             const period = document.getElementById('reportPeriod').value;
             let format = document.getElementById('reportFormat').value;
             const supported = ['csv','excel','pdf','json'];
@@ -8941,10 +8997,35 @@
             const start = new Date();
             start.setDate(end.getDate() - days + 1);
             const all = getAllInspectionsCombined();
-            const filtered = all.filter(i => {
+            let filtered = all.filter(i => {
                 const d = dateOnlyToLocalDate(i.data);
                 return d >= start && d <= end;
             });
+            const quickTypes = ['summary','performance','maintenance','trends','compliance','costs'];
+            if (quickTypes.includes(type)) {
+                if (type === 'performance') {
+                    filtered = filtered.slice().sort((a,b) => (b.results?.percentage||0) - (a.results?.percentage||0));
+                } else if (type === 'maintenance') {
+                    filtered = filtered.filter(i => {
+                        const items = Array.isArray(i.items) ? i.items : [];
+                        const hasNonOkItem = items.some(it => {
+                            const s = it.status;
+                            const sval = typeof s === 'string' ? s.toLowerCase() : (typeof s === 'boolean' ? (s ? 'ok' : 'notok') : '');
+                            const hasNote = !!(it.note && String(it.note).trim());
+                            return sval === 'notok' || (!s && hasNote);
+                        });
+                        return (i.results?.notOk||0) > 0 || hasNonOkItem;
+                    });
+                } else if (type === 'trends') {
+                    filtered = filtered.slice().sort((a,b) => dateOnlyToLocalDate(a.data) - dateOnlyToLocalDate(b.data));
+                } else if (type === 'compliance') {
+                    filtered = filtered.filter(i => (i.results?.percentage||0) >= 90);
+                } else if (type === 'costs') {
+                    filtered = filtered.filter(i => (i.results?.notOk||0) > 0);
+                }
+            } else if (type === 'criticos') {
+                filtered = filtered.filter(i => (i.results?.notOk||0) > 0);
+            }
             const total = filtered.length;
             const avg = total ? Math.round(filtered.reduce((s,i)=>s+(i.results?.percentage||0),0)/total) : 0;
             const counts = { caminhao: 0, trator: 0, colhedora: 0, plantadora: 0, distribuidora: 0, reboque: 0, manutencao: 0, motobombas: 0, hidroroll: 0, tortao: 0 };
@@ -9022,7 +9103,7 @@
                 URL.revokeObjectURL(a.href);
                 showFloatingNotification('success', 'Relatório Excel (XLS) gerado');
             } else if (format === 'pdf') {
-                const rows = filtered.map(i => `
+                const rows = (filtered.length ? filtered.map(i => `
                     <tr>
                         <td>${formatDateBR(i.data)}</td>
                         <td>${i.tipo}</td>
@@ -9032,9 +9113,31 @@
                         <td>${i.results?.notOk||0}</td>
                         <td>${i.results?.percentage||0}%</td>
                     </tr>
-                `).join('');
+                `).join('') : '<tr><td colspan="7">Sem registros no período selecionado</td></tr>');
                 const dist = counts;
                 const dateRange = `${start.toLocaleDateString('pt-BR')} — ${end.toLocaleDateString('pt-BR')}`;
+                const maintSection = (type === 'maintenance') ? (() => {
+                    const blocks = filtered.map(i => {
+                        const arr = Array.isArray(i.items) ? i.items : [];
+                        const nonOk = arr.filter(it => {
+                            const s = it.status;
+                            const sval = typeof s === 'string' ? s.toLowerCase() : (typeof s === 'boolean' ? (s ? 'ok' : 'notok') : '');
+                            const hasNote = !!(it.note && String(it.note).trim());
+                            return sval === 'notok' || (!s && hasNote);
+                        });
+                        if (!nonOk.length) return '';
+                        const lines = nonOk.map(it => {
+                            const s = it.status;
+                            const sval = typeof s === 'string' ? s.toLowerCase() : (typeof s === 'boolean' ? (s ? 'ok' : 'notok') : '');
+                            const statusLabel = sval === 'notok' ? 'NÃO OK' : (sval === 'ok' ? 'OK' : 'NÃO OK');
+                            const choice = (it.note && String(it.note).trim()) || (it.value && String(it.value).trim()) || (it.selected && String(it.selected).trim()) || '';
+                            const desc = `${(it.section?it.section+' • ':'')}${it.name}`;
+                            return `<li>${desc} — ${statusLabel}${choice ? ' • Motivo: '+choice : ''}</li>`;
+                        }).join('');
+                        return `<div class="mcard"><div class="mh">${formatDateBR(i.data)} • ${i.tipo} • Frota: ${i.frota} • Líder: ${i.mecanico}</div><ul class="mlist">${lines}</ul></div>`;
+                    }).filter(Boolean).join('');
+                    return blocks ? `<div class="section"><h4>Manutenções e Motivos</h4>${blocks}</div>` : `<div class="section"><h4>Manutenções e Motivos</h4><div class="muted">Nenhum motivo registrado</div></div>`;
+                })() : '';
                 const doc = `
                     <html><head>
                         <meta charset="utf-8" />
@@ -9060,6 +9163,10 @@
                             thead th { background: #f3f4f6; text-align: left; font-size: 11px; color:#374151; border-bottom:1px solid #e5e7eb; }
                             th, td { border: 1px solid #e5e7eb; padding: 8px 10px; font-size: 11px; word-break: break-word; }
                             tbody tr:nth-child(odd) { background: #fafafa; }
+                            .section { margin-top: 18px; }
+                            .mcard { border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fff; margin-top:10px; }
+                            .mh { font-size:12px; color:#374151; margin-bottom:8px; }
+                            .mlist { margin:0; padding-left:16px; font-size:11px; color:#111827; }
                             .badge { display:inline-block; border-radius:6px; padding:2px 6px; font-size:11px; }
                             .ok { background:#ECFDF5; color:#065F46; border:1px solid #D1FAE5; }
                             .nok { background:#FEF2F2; color:#7F1D1D; border:1px solid #FECACA; }
@@ -9097,6 +9204,7 @@
                                     <tbody>${rows}</tbody>
                                 </table>
                             </div>
+                            ${maintSection}
                             <div class="footer">Sistema de Checklist • ${new Date().getFullYear()}</div>
                         </div>
                     </body></html>
@@ -9107,6 +9215,7 @@
             } else {
                 showFloatingNotification('warning', 'Formato não suportado. Use CSV, Excel ou PDF.');
             }
+            if (typeof window !== 'undefined') { try { window.quickReportType = ''; } catch(_) {} }
         }
 
         function generateQuickReport(type) {
@@ -9114,8 +9223,9 @@
             const per = document.getElementById('reportPeriod');
             const fmt = document.getElementById('reportFormat');
             if (sel) sel.value = type;
-            if (per) per.value = '30';
-            if (fmt) fmt.value = 'csv';
+            if (per) per.value = '90';
+            if (fmt) fmt.value = 'pdf';
+            try { window.quickReportType = type; } catch(_) {}
             generateReport();
         }
 
