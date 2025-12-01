@@ -11,8 +11,8 @@
     
     <!-- Outras dependências -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js" defer></script>
     <script>
         // Configuração do Tailwind (Play CDN)
         tailwind.config = {
@@ -98,6 +98,7 @@
         .glass-morphism {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .dark .glass-morphism {
@@ -427,7 +428,7 @@
                     
                     <div class="flex items-center space-x-4">
                         <div class="text-sm text-gray-500 dark:text-gray-400" id="currentDateTime"></div>
-                        <button onclick="toggleTheme()" class="p-2 rounded-md glass-morphism backdrop-blur-xs interactive-scale tooltip" data-tooltip="Alternar tema">
+                        <button onclick="toggleTheme()" aria-label="Alternar tema" title="Alternar tema" class="p-2 rounded-md glass-morphism backdrop-blur-xs interactive-scale tooltip" data-tooltip="Alternar tema">
                             <svg class="w-5 h-5 text-gray-700 dark:text-gray-300 inline dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364l-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0l-1.414-1.414M7.05 7.05L5.636 5.636M12 8a4 4 0 100 8 4 4 0 000-8z"/>
                             </svg>
@@ -435,7 +436,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 118.646 3.646a7 7 0 1011.708 11.708z"/>
                             </svg>
                         </button>
-                        <button onclick="openSettings()" class="p-2 rounded-md glass-morphism backdrop-blur-xs interactive-scale tooltip" data-tooltip="Configurações">
+                        <button onclick="openSettings()" aria-label="Configurações" title="Configurações" class="p-2 rounded-md glass-morphism backdrop-blur-xs interactive-scale tooltip" data-tooltip="Configurações">
                             <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-1.14 1.952-1.14 2.252 0a1.724 1.724 0 002.573 1.066c.986-.57 2.23.37 1.995 1.454a1.724 1.724 0 001.051 1.93c1.07.39 1.07 1.92 0 2.31a1.724 1.724 0 00-1.051 1.93c.235 1.083-.999 2.024-1.995 1.454a1.724 1.724 0 00-2.573 1.066c-.3 1.14-1.952 1.14-2.252 0a1.724 1.724 0 00-2.573-1.066c-.996.57-2.23-.37-1.995-1.454a1.724 1.724 0 00-1.051-1.93c-1.07-.39-1.07-1.92 0-2.31.63-.23 1.06-.77 1.051-1.93-.235-1.083.999-2.024 1.995-1.454.87.503 1.973.07 2.573-1.066z"/>
                             </svg>
@@ -559,13 +560,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
-                        <button onclick="showNotificationCenter()" class="relative p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                        <button onclick="showNotificationCenter()" aria-label="Notificações" title="Notificações" class="relative p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">3</span>
                         </button>
-                        <button onclick="exportData()" class="tooltip px-3 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors duration-200 interactive-scale" data-tooltip="Exportar dados">
+                        <button onclick="exportData()" aria-label="Exportar dados" title="Exportar dados" class="tooltip px-3 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors duration-200 interactive-scale" data-tooltip="Exportar dados">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
                             </svg>
@@ -4745,6 +4746,32 @@
             bindDraftPersistence();
         }
 
+        function bindDraftPersistence() {
+            const fields = [
+                { id: 'mecanico', key: 'draft_mecanico' },
+                { id: 'frotaSelect', key: 'draft_frota' },
+                { id: 'calObservacoes', key: 'draft_cal_observacoes' }
+            ];
+            fields.forEach(f => {
+                const el = document.getElementById(f.id);
+                if (!el) return;
+                try {
+                    const saved = localStorage.getItem(f.key);
+                    if (saved !== null && String(el.value || '') === '') { el.value = saved; }
+                } catch {}
+                try {
+                    el.addEventListener('input', (e) => {
+                        const v = e.target && 'value' in e.target ? e.target.value : '';
+                        try { localStorage.setItem(f.key, String(v ?? '')); } catch {}
+                    });
+                    el.addEventListener('change', (e) => {
+                        const v = e.target && 'value' in e.target ? e.target.value : '';
+                        try { localStorage.setItem(f.key, String(v ?? '')); } catch {}
+                    });
+                } catch {}
+            });
+        }
+
         // Alternar entre login e cadastro
         function toggleAuthMode() {
             const loginForm = document.getElementById('loginForm');
@@ -4899,50 +4926,71 @@
         // Carregar dados iniciais
         async function loadInitialData() {
             showLoading(true);
-            
             try {
-                let data = [];
-                if (isOnline()) {
-                    const resp = await supabase
-                        .from('inspections')
-                        .select('*')
-                        .order('created_at', { ascending: false });
-                    if (resp.error) { throw resp.error; }
-                    data = dedupeInspections(resp.data || []);
-                    setCachedInspections(data);
-                    try {
-                        const respIrr = await supabase
-                            .from('irrig_inspections')
-                            .select('*')
-                            .order('created_at', { ascending: false });
-                        if (!respIrr.error) { irrigInspections = dedupeInspections(respIrr.data || []); setCachedIrrInspections(irrigInspections); }
-                    } catch (_) {}
-                } else {
-                    data = dedupeInspections(getCachedInspections());
-                    showFloatingNotification('warning', 'Sem internet. Exibindo dados em cache.');
+                // Hidratar imediatamente com cache para acelerar a renderização
+                try {
+                    const cached = dedupeInspections(getCachedInspections());
+                    inspections = cached || [];
                     irrigInspections = dedupeInspections(getCachedIrrInspections());
+                    notifications = getCachedNotifications();
+                    updateNotificationBadge();
+                    updateStats();
+                    updateAnalytics();
+                    setTimeout(initializeCharts, 250);
+                } catch(_) {}
+
+                // Buscar online em paralelo e substituir cache quando disponível
+                if (isOnline()) {
+                    const fetchIns = supabase
+                        .from('inspections')
+                        .select('id,data,tipo,frota,mecanico,observacao,items,results,created_at,local_id')
+                        .order('created_at', { ascending: false })
+                        .limit(300);
+                    const fetchIrr = supabase
+                        .from('irrig_inspections')
+                        .select('id,data,tipo,frota,mecanico,observacao,items,results,created_at,local_id')
+                        .order('created_at', { ascending: false })
+                        .limit(300);
+                    const [resp, respIrr] = await Promise.allSettled([fetchIns, fetchIrr]);
+                    if (resp.status === 'fulfilled' && !resp.value.error) {
+                        const data = dedupeInspections(resp.value.data || []);
+                        inspections = data || [];
+                        setCachedInspections(inspections);
+                    }
+                    if (respIrr.status === 'fulfilled' && !respIrr.value.error) {
+                        irrigInspections = dedupeInspections(respIrr.value.data || []);
+                        setCachedIrrInspections(irrigInspections);
+                    }
+                } else {
+                    showFloatingNotification('warning', 'Sem internet. Exibindo dados em cache.');
                 }
-                inspections = data || [];
-                notifications = getCachedNotifications();
-                updateNotificationBadge();
+
+                // Equipamentos e sementes em paralelo
                 await loadEquipments();
-                await seedTrucks();
-                await seedHarvesters();
-                await seedTractors();
-                await seedPlanters();
-                await seedDistributors();
-                await seedTrailers();
-                await seedTransbordos();
-                await seedCobridores();
-                await seedTortao();
-                await syncPendingInspections();
-                await syncPendingIrrInspections();
-                await syncPendingEquipments();
-                await syncPendingCalibragem();
-                await syncPendingControle3p();
+                await Promise.all([
+                    seedTrucks(),
+                    seedHarvesters(),
+                    seedTractors(),
+                    seedPlanters(),
+                    seedDistributors(),
+                    seedTrailers(),
+                    seedTransbordos(),
+                    seedCobridores(),
+                    seedTortao()
+                ].map(p => p.catch ? p : Promise.resolve()));
+
+                // Sincronizações pendentes em paralelo
+                await Promise.all([
+                    syncPendingInspections(),
+                    syncPendingIrrInspections(),
+                    syncPendingEquipments(),
+                    syncPendingCalibragem(),
+                    syncPendingControle3p()
+                ].map(p => p.catch ? p : Promise.resolve()));
+
                 updateStats();
                 updateAnalytics();
-                setTimeout(initializeCharts, 500);
+                setTimeout(initializeCharts, 250);
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
                 showFloatingNotification('error', 'Erro ao carregar dados');
