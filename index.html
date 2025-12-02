@@ -351,7 +351,8 @@
             <form id="loginForm" data-mode="login">
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
-                    <input type="email" id="loginEmail" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <input type="email" id="loginEmail" required placeholder="Digite seu email" title="Email de acesso" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Senha</label>
@@ -901,28 +902,52 @@
                 <div id="irr-sub-inicio" class="">
                     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Nova Inspeção • Irrigação</h3>
-                        <div id="irrEquipCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div onclick="selectIrrEquipment('motobombas')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                        <div id="irrEquipCards" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                          <div onclick="selectIrrEquipment('motobombas')" class="equipment-card bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200 h-[116px] flex items-center">
                                 <div class="flex items-center space-x-4">
-                                    <div class="w-12 h-12 bg-rose-100 dark:bg-rose-900 rounded-lg flex items-center justify-center">
-                                        <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a7 7 0 100 14h6a3 3 0 000-6h-1a4 4 0 01-4-4V4z"/></svg>
+                                    <div class="w-10 h-10 bg-rose-100 dark:bg-rose-900 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a7 7 0 100 14h6a3 3 0 000-6h-1a4 4 0 01-4-4V4z"/></svg>
                                     </div>
                                     <div>
-                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">MotoBombas</h3>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Checklist detalhado conforme PDF</p>
+                                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">MotoBombas</h3>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Checklist detalhado conforme PDF</p>
                                     </div>
                                 </div>
-                            </div>
-                            <div onclick="selectIrrEquipment('hidroroll')" class="equipment-card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200">
+                          </div>
+                          <div onclick="selectIrrEquipment('hidroroll')" class="equipment-card bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200 h-[116px] flex items-center">
                                 <div class="flex items-center space-x-4">
-                                    <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center">
-                                        <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h10M4 17h8"/></svg>
+                                    <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h10M4 17h8"/></svg>
                                     </div>
                                     <div>
-                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Hidro Roll</h3>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Checklist detalhado conforme PDF</p>
+                                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">Hidro Roll</h3>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Checklist detalhado conforme PDF</p>
                                     </div>
                                 </div>
+                          </div>
+                          <div onclick="selectIrrEquipment('caminhoes')" class="equipment-card bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200 h-[116px] flex items-center">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 13h13l3 3v3H3v-6zM16 6h3l2 5H16V6z"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">Caminhões</h3>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Checklist dos caminhões de irrigação</p>
+                                    </div>
+                                </div>
+                          </div>
+                          <div onclick="selectIrrEquipment('tanques')" class="equipment-card bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200 h-[116px] flex items-center">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16v10H4zM6 9h12v6H6z"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">Tanques</h3>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Checklist de tanques de irrigação</p>
+                                    </div>
+                                </div>
+                          </div>
+                        </div>
                             </div>
                         </div>
                     </div>
@@ -937,6 +962,8 @@
                                     <option value="">Todos</option>
                                     <option value="motobombas">MotoBombas</option>
                                     <option value="hidroroll">Hidro Roll</option>
+                                    <option value="caminhoes">Caminhões</option>
+                                    <option value="tanques">Tanques</option>
                                 </select>
                             </div>
                             <div>
@@ -984,6 +1011,8 @@
                                     <option value="all" selected>Todos equipamentos</option>
                                     <option value="motobombas">MotoBombas</option>
                                     <option value="hidroroll">Hidro Roll</option>
+                                    <option value="caminhoes">Caminhões</option>
+                                    <option value="tanques">Tanques</option>
                                 </select>
                                 <select id="irrLeaderFilter" class="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1">
                                     <option value="all" selected>Todos líderes</option>
@@ -6039,6 +6068,8 @@
                     grid.innerHTML = `
                         <div class="flex items-center justify-between"><span class="text-sm">MotoBombas</span><span id="irrCountMotobombas" class="text-lg font-semibold">0</span></div>
                         <div class="flex items-center justify-between"><span class="text-sm">Hidro Roll</span><span id="irrCountHidroroll" class="text-lg font-semibold">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm">Caminhões</span><span id="irrCountCaminhoes" class="text-lg font-semibold">0</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sm">Tanques</span><span id="irrCountTanques" class="text-lg font-semibold">0</span></div>
                     `;
                     container.insertBefore(grid, container.firstChild);
                 }
@@ -6158,6 +6189,146 @@
                         ]
                     }
                 ]
+            },
+            caminhoes: {
+                title: 'Checklist de Liberação - Caminhão',
+                sections: [
+                    {
+                        name: 'CABINE',
+                        items: [
+                            'Bucha da suspensão',
+                            'Batente e dobradiça portas',
+                            'Borrachas das portas',
+                            'Palhetas do limpador para-brisa',
+                            'Maçanetas (internas/externas) e manivela dos vidros',
+                            'Bancos (motorista e passageiro)',
+                            'Conjunto de basculamento da cabine',
+                            'Reservatório e mangueira do limpador de para-brisa',
+                            'Estado da escada',
+                            'Estado dos retrovisores',
+                            'Paralama dianteiro'
+                        ]
+                    },
+                    {
+                        name: 'CHASSI',
+                        items: [
+                            'Trincas no chassi e travessas',
+                            'Rampa e quinta roda',
+                            'Suportes de fixação (tq combustível, bateria, tq arla)',
+                            'Danos paralamas traseiros',
+                            'Danos e fixação do para barro',
+                            'Trincas e fixação da boca de lobo',
+                            'Parafuso de fixação do implemento',
+                            'Plataformas e suportes dos cones'
+                        ]
+                    },
+                    {
+                        name: 'MOTOR',
+                        items: [
+                            'Radiadores, reservatório de água e intercooler',
+                            'Tensores de correia, roletes e polias',
+                            'Mangueiras e abraçadeiras do sist. de arrefecimento',
+                            'Mangueiras e abraçadeiras do sist. de admissão e intercooler',
+                            'Regulagem de válvulas do motor e vazamentos (água/diesel/lub)',
+                            'Coxins do motor',
+                            'Protetores e fixação do silencioso',
+                            'Folga no eixo da turbina ou vazamentos',
+                            'Carcaça do filtro e tubulação de ar'
+                        ]
+                    },
+                    {
+                        name: 'SISTEMA ELÉTRICO',
+                        items: [
+                            'Sinalização traseira e dianteira',
+                            'Faróis e piscas',
+                            'Chicotes elétricos',
+                            'Luzes do painel',
+                            'Alternador, correia e tensor',
+                            'Ventilador, correia e tensor',
+                            'Funcionamento dos vidros',
+                            'Ar condicionado',
+                            'Ventilador e distribuição do ar',
+                            'Funcionamento do limpador de para-brisa',
+                            'Motor de partida'
+                        ]
+                    },
+                    {
+                        name: 'TRANSMISSÃO',
+                        items: [
+                            'Embreagem (folga/funcionamento)',
+                            'Caixa de câmbio (vazamentos/ruídos)',
+                            'Cardans e cruzetas',
+                            'Acoplamentos e flanges',
+                            'Diferencial (fixação/vazamentos)',
+                            'Semieixos e juntas',
+                            'Suportes e coxins da transmissão'
+                        ]
+                    },
+                    {
+                        name: 'EIXO DIANTEIRO',
+                        items: [
+                            'Rolamentos e cubos',
+                            'Manga de eixo',
+                            'Amortecedores',
+                            'Molas/feixes e fixações',
+                            'Barra estabilizadora',
+                            'Barra de direção e terminais',
+                            'Geometria/folgas de direção'
+                        ]
+                    },
+                    {
+                        name: 'EIXO TRASEIRO',
+                        items: [
+                            'Molas/feixes e fixações',
+                            'Amortecedores',
+                            'Braços/estabilizadores',
+                            'Rolamentos e cubos',
+                            'Eixo/diferencial (ruídos/vazamentos)'
+                        ]
+                    },
+                    {
+                        name: 'SISTEMA PNEUMÁTICO',
+                        items: [
+                            'Reservatórios de ar',
+                            'Válvulas e conexões',
+                            'Mangueiras e flexíveis',
+                            'Câmaras de freio',
+                            'Tubulações do sistema',
+                            'Vazamentos/pressão'
+                        ]
+                    },
+                    {
+                        name: 'DIREÇÃO',
+                        items: [
+                            'Bomba da direção',
+                            'Caixa de direção',
+                            'Mangueiras e vazamentos',
+                            'Folgas no sistema',
+                            'Alinhamento/funcionamento'
+                        ]
+                    }
+                ]
+            },
+            tanques: {
+                title: 'Checklist de Liberação - Tanques',
+                sections: [
+                    {
+                        name: 'TIPO DE SERVIÇO',
+                        items: [
+                            'VERIFICAR MESA (ESTRUTURA, TRINCAS)',
+                            'VERIFICAR CHAPA DE FIXAÇÃO',
+                            'SOLDA NO CABEÇALHO - REPARAR SE NECESSÁRIO',
+                            'CORRIGIR TRINCAS',
+                            'PINTURA - REFAZER',
+                            'CATALOGAR PEÇAS',
+                            'DESMONTAR CUBOS DE RODA',
+                            'LAVAR E VERIFICAR ROLAMENTOS',
+                            'MONTAR CUBOS',
+                            'CORRIGIR TRINCAS E FUROS - REPARAR SE NECESSÁRIO',
+                            'CORRIGIR CORRIMÃO - REPARAR SE NECESSÁRIO'
+                        ]
+                    }
+                ]
             }
         };
 
@@ -6173,9 +6344,9 @@
                 if (f) sel.appendChild(f);
             }
             if (f) { f.classList.remove('hidden'); f.classList.add('fade-in'); }
-            const titles = { motobombas:'Checklist • MotoBombas', hidroroll:'Checklist • Hidro Roll' };
             const tt = document.getElementById('irrChecklistTitle');
-            if (tt) tt.textContent = titles[type] || 'Checklist • Irrigação';
+            const conf = irrigEquipmentConfigs[type];
+            if (tt) tt.textContent = (conf && conf.title) ? conf.title : ({ motobombas:'Checklist • MotoBombas', hidroroll:'Checklist • Hidro Roll', caminhoes:'Checklist • Caminhões', tanques:'Checklist • Tanques' }[type] || 'Checklist • Irrigação');
             irrPhotoSessionId = (crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()));
             generateIrrChecklistItems(type);
             irrPopulateFrotaOptions();
@@ -7397,10 +7568,14 @@
                 } else if (mode === 'irr') {
                     const counts = {
                         motobombas: all.filter(i => i.tipo === 'motobombas').length,
-                        hidroroll: all.filter(i => i.tipo === 'hidroroll').length
+                        hidroroll: all.filter(i => i.tipo === 'hidroroll').length,
+                        caminhoes: all.filter(i => i.tipo === 'caminhoes').length,
+                        tanques: all.filter(i => i.tipo === 'tanques').length
                     };
                     const elMoto = document.getElementById('irrCountMotobombas'); if (elMoto) elMoto.textContent = counts.motobombas;
                     const elHidro = document.getElementById('irrCountHidroroll'); if (elHidro) elHidro.textContent = counts.hidroroll;
+                    const elCaminhoes = document.getElementById('irrCountCaminhoes'); if (elCaminhoes) elCaminhoes.textContent = counts.caminhoes;
+                    const elTanques = document.getElementById('irrCountTanques'); if (elTanques) elTanques.textContent = counts.tanques;
                 }
             } catch(_) {}
         }
